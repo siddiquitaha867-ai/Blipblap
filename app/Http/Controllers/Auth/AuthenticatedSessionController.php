@@ -36,7 +36,11 @@ class AuthenticatedSessionController extends Controller
             'last_login_at' => now(),
         ])->save();
 
-        return redirect()->intended(route('home'));
+        $fallbackRoute = $request->user()?->is_admin
+            ? route('admin.dashboard')
+            : route('home');
+
+        return redirect()->intended($fallbackRoute);
     }
 
     public function destroy(Request $request): RedirectResponse

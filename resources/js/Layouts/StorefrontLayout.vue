@@ -1,16 +1,22 @@
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 const page = usePage();
 const plansOpen = ref(false);
+const isAdminPreview = computed(() => Boolean(page.props.auth.user?.is_admin));
+const homeHref = computed(() => (isAdminPreview.value ? '/admin/storefront' : '/'));
+const displayName = computed(() => (isAdminPreview.value ? 'Admin' : page.props.auth.user?.name));
 </script>
 
 <template>
   <div class="site-shell">
     <header class="air-header">
+      <div v-if="isAdminPreview" class="preview-bar">
+        Admin storefront preview. Purchases are disabled.
+      </div>
       <div class="air-header-top">
-        <Link href="/" class="brand" aria-label="BlipBlap home">
+        <Link :href="homeHref" class="brand" aria-label="BlipBlap home">
           <img src="/images/blipblap/logo-blue.png" alt="BlipBlap" />
         </Link>
 
@@ -19,7 +25,7 @@ const plansOpen = ref(false);
           <span class="header-divider"></span>
           <button type="button" class="icon-button" aria-label="Wallet">▣</button>
           <template v-if="page.props.auth.user">
-            <span class="nav-user">{{ page.props.auth.user.name }}</span>
+            <span class="nav-user">{{ displayName }}</span>
             <Link href="/logout" method="post" as="button" class="pill">Logout</Link>
           </template>
           <template v-else>
@@ -30,7 +36,7 @@ const plansOpen = ref(false);
       </div>
 
       <nav class="air-nav" aria-label="Primary navigation">
-        <Link href="/">Home</Link>
+        <Link :href="homeHref">Home</Link>
         <div
           class="nav-dropdown"
           @mouseenter="plansOpen = true"
@@ -46,9 +52,9 @@ const plansOpen = ref(false);
             <Link href="/destinations/asia">Regional eSIM</Link>
           </div>
         </div>
-        <a href="/#loyalty">Loyalty Program</a>
-        <a href="/#faqs">FAQs</a>
-        <a href="/#contact">Contact Us</a>
+        <a :href="`${homeHref}#loyalty`">Loyalty Program</a>
+        <a :href="`${homeHref}#faqs`">FAQs</a>
+        <a :href="`${homeHref}#contact`">Contact Us</a>
       </nav>
 
       <div class="air-search-row">

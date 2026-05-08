@@ -44,8 +44,8 @@ defineProps({
         <strong>{{ stats.orders }}</strong>
       </article>
       <article>
-        <span>Customer eSIMs</span>
-        <strong>{{ stats.customer_esims }}</strong>
+        <span>Promotions</span>
+        <strong>{{ stats.promotions }}</strong>
       </article>
     </div>
 

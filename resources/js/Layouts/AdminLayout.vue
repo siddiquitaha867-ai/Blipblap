@@ -12,8 +12,12 @@ const page = usePage();
       </Link>
       <nav>
         <Link href="/admin">Dashboard</Link>
+        <Link href="/admin/plans">Plans</Link>
+        <Link href="/admin/orders">Orders</Link>
+        <Link href="/admin/logs">Logs</Link>
+        <Link href="/admin/promotions">Promotions</Link>
         <Link href="/admin/users">Users</Link>
-        <Link href="/pakistan-esim">Storefront</Link>
+        <Link href="/admin/storefront">Storefront</Link>
       </nav>
     </aside>
 
