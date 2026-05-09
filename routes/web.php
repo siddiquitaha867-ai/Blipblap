@@ -22,7 +22,10 @@ Route::get('/destinations/{slug}', [DestinationController::class, 'show'])->name
 Route::get('/united-arab-emirates-esim', [DestinationController::class, 'show'])->defaults('slug', 'united-arab-emirates')->name('country.uae');
 Route::get('/plans/{plan:slug}', [PlanController::class, 'show'])->name('plans.show');
 Route::get('/checkout/{plan:slug}', [CheckoutController::class, 'show'])->name('checkout.show');
+Route::get('/checkout/{plan:slug}/payment', [CheckoutController::class, 'payment'])->name('checkout.payment');
+Route::post('/checkout/{plan:slug}/stripe', [CheckoutController::class, 'stripe'])->name('checkout.stripe');
 Route::get('/checkout/{plan:slug}/success', [CheckoutController::class, 'success'])->name('checkout.success');
+Route::post('/stripe/webhook', [CheckoutController::class, 'webhook'])->name('stripe.webhook');
 
 Route::middleware('guest')->group(function (): void {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');

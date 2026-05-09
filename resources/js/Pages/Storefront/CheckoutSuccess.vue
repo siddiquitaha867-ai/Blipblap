@@ -8,6 +8,10 @@ defineProps({
     type: Object,
     required: true,
   },
+  order: {
+    type: Object,
+    default: null,
+  },
 });
 </script>
 
@@ -32,7 +36,11 @@ defineProps({
         </div>
         <div>
           <dt>Status</dt>
-          <dd>Payment/provisioning integration next</dd>
+          <dd>{{ order?.status || 'Waiting for Stripe webhook' }}</dd>
+        </div>
+        <div v-if="order">
+          <dt>Order reference</dt>
+          <dd>{{ order.order_reference }}</dd>
         </div>
       </dl>
     </div>

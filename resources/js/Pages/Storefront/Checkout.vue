@@ -1,14 +1,27 @@
 <script setup>
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
+import { router, usePage } from '@inertiajs/vue3';
+import { ref } from 'vue';
 
 defineOptions({ layout: StorefrontLayout });
 
-defineProps({
+const props = defineProps({
   plan: {
     type: Object,
     required: true,
   },
 });
+
+const page = usePage();
+const customerName = ref(page.props.auth.user?.name || '');
+const customerEmail = ref(page.props.auth.user?.email || '');
+
+const goToPayment = () => {
+  router.get(`/checkout/${props.plan.slug}/payment`, {
+    name: customerName.value,
+    email: customerEmail.value,
+  });
+};
 </script>
 
 <template>
@@ -21,14 +34,14 @@ defineProps({
         Your install details will be prepared after payment.
       </p>
 
-      <form class="checkout-form">
+      <form class="checkout-form" @submit.prevent="goToPayment">
         <label>
           <span>Full name</span>
-          <input type="text" placeholder="Your name" autocomplete="name">
+          <input v-model="customerName" type="text" placeholder="Your name" autocomplete="name">
         </label>
         <label>
           <span>Email for eSIM delivery</span>
-          <input type="email" placeholder="you@example.com" autocomplete="email">
+          <input v-model="customerEmail" type="email" placeholder="you@example.com" autocomplete="email" required>
         </label>
         <label class="checkout-wide">
           <span>Payment method</span>
@@ -37,6 +50,7 @@ defineProps({
             <option>Wallet payment</option>
           </select>
         </label>
+        <button type="submit" class="checkout-inline-submit">Continue to payment</button>
       </form>
     </div>
 
@@ -57,7 +71,7 @@ defineProps({
           <dd>{{ plan.currency }} {{ Number(plan.retail_price).toFixed(2) }}</dd>
         </div>
       </dl>
-      <a :href="`/checkout/${plan.slug}/success`">Proceed to checkout</a>
+      <button type="button" class="checkout-summary-button" @click="goToPayment">Proceed to checkout</button>
       <p class="checkout-note">Payment gateway will connect here before live launch.</p>
     </aside>
   </section>
