@@ -110,14 +110,14 @@ const syncCatalogue = async () => {
     <section class="admin-panel diagnostic-actions">
       <div>
         <h2>eSIM API tools</h2>
-        <p>Test the configured API key from this server, then sync the first catalogue page when the connection is healthy.</p>
+        <p>Test the configured API key from this server, then sync every available catalogue page when the connection is healthy.</p>
       </div>
       <div class="diagnostic-action-buttons">
         <button type="button" :disabled="testingApi" @click="testApiConnection">
           {{ testingApi ? 'Testing...' : 'Test eSIM API' }}
         </button>
         <button type="button" :disabled="syncingCatalogue" @click="syncCatalogue">
-          {{ syncingCatalogue ? 'Syncing...' : 'Sync catalogue' }}
+          {{ syncingCatalogue ? 'Syncing all plans...' : 'Sync all plans' }}
         </button>
       </div>
       <div v-if="apiTest" :class="['diagnostic-result', apiTest.ok ? 'ok' : 'warn']">
@@ -129,7 +129,8 @@ const syncCatalogue = async () => {
         <strong>Catalogue sync: {{ syncResult.message }}</strong>
         <span v-if="syncResult.status">Status {{ syncResult.status }}</span>
         <span v-if="syncResult.ok">
-          Synced {{ syncResult.synced }} of {{ syncResult.source_count }} items. Local plans: {{ syncResult.local_plan_count }}.
+          Synced {{ syncResult.synced }} of {{ syncResult.source_count }} items across {{ syncResult.pages_fetched }} pages.
+          Skipped {{ syncResult.skipped }}. Local plans: {{ syncResult.local_plan_count }}.
         </span>
         <pre v-if="syncResult.provider_response">{{ JSON.stringify(syncResult.provider_response, null, 2) }}</pre>
       </div>

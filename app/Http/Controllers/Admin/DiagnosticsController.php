@@ -9,10 +9,11 @@ use App\Services\EsimGo\CatalogueMapper;
 use App\Services\EsimGo\EsimGoClient;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
 use Inertia\Inertia;
 use Inertia\Response;
+use Throwable;
 
 class DiagnosticsController extends Controller
 {
@@ -102,51 +103,88 @@ class DiagnosticsController extends Controller
 
     public function syncCatalogue(EsimGoClient $client, CatalogueMapper $mapper): JsonResponse
     {
-        try {
-            $response = $client->catalogue([
-                'page' => 1,
-                'perPage' => 100,
-            ]);
-        } catch (RequestException $exception) {
-            return response()->json([
-                'ok' => false,
-                'message' => 'Catalogue sync failed.',
-                'status' => $exception->response?->status(),
-                'provider_response' => $exception->response?->json() ?? $exception->response?->body(),
-            ], 502);
-        }
+        set_time_limit(300);
 
-        $items = $response['bundles'] ?? $response['items'] ?? $response['data'] ?? [];
+        $perPage = 100;
+        $page = 1;
+        $pageCount = null;
+        $pagesFetched = 0;
         $synced = 0;
         $skipped = 0;
+        $sourceCount = 0;
 
-        foreach ($items as $item) {
-            if (! is_array($item)) {
-                $skipped++;
-                continue;
+        while (true) {
+            try {
+                $response = $client->catalogue([
+                    'page' => $page,
+                    'perPage' => $perPage,
+                ]);
+            } catch (RequestException $exception) {
+                return response()->json([
+                    'ok' => false,
+                    'message' => "Catalogue sync failed on page {$page}.",
+                    'status' => $exception->response?->status(),
+                    'pages_fetched' => $pagesFetched,
+                    'synced' => $synced,
+                    'skipped' => $skipped,
+                    'provider_response' => $exception->response?->json() ?? $exception->response?->body(),
+                ], 502);
             }
 
-            $supplierCode = (string) ($item['name'] ?? $item['bundle'] ?? $item['id'] ?? '');
+            $items = $response['bundles'] ?? $response['items'] ?? $response['data'] ?? [];
+            $pageCount = isset($response['pageCount']) ? (int) $response['pageCount'] : $pageCount;
+            $pageSourceCount = is_countable($items) ? count($items) : 0;
+            $sourceCount += $pageSourceCount;
 
-            if ($supplierCode === '') {
-                $skipped++;
-                continue;
+            if ($pageSourceCount === 0) {
+                break;
             }
 
-            EsimPlan::query()->updateOrCreate(
-                ['supplier_code' => $supplierCode],
-                $mapper->map($item)
-            );
+            foreach ($items as $item) {
+                if (! is_array($item)) {
+                    $skipped++;
+                    continue;
+                }
 
-            $synced++;
+                $supplierCode = (string) ($item['name'] ?? $item['bundle'] ?? $item['id'] ?? '');
+
+                if ($supplierCode === '') {
+                    $skipped++;
+                    continue;
+                }
+
+                try {
+                    EsimPlan::query()->updateOrCreate(
+                        ['supplier_code' => $supplierCode],
+                        $mapper->map($item)
+                    );
+
+                    $synced++;
+                } catch (Throwable) {
+                    $skipped++;
+                }
+            }
+
+            $pagesFetched++;
+
+            if ($pageCount !== null && $page >= $pageCount) {
+                break;
+            }
+
+            if ($pageSourceCount < $perPage) {
+                break;
+            }
+
+            $page++;
         }
 
         return response()->json([
             'ok' => true,
-            'message' => 'Catalogue sync completed.',
+            'message' => 'Full catalogue sync completed.',
+            'pages_fetched' => $pagesFetched,
             'synced' => $synced,
             'skipped' => $skipped,
-            'source_count' => is_countable($items) ? count($items) : 0,
+            'source_count' => $sourceCount,
             'local_plan_count' => EsimPlan::query()->count(),
         ]);
     }
