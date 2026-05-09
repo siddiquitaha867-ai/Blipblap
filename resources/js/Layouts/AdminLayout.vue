@@ -15,6 +15,7 @@ const page = usePage();
         <Link href="/admin/plans">Plans</Link>
         <Link href="/admin/orders">Orders</Link>
         <Link href="/admin/logs">Logs</Link>
+        <Link href="/admin/diagnostics">Diagnostics</Link>
         <Link href="/admin/promotions">Promotions</Link>
         <Link href="/admin/users">Users</Link>
         <Link href="/admin/storefront">Storefront</Link>

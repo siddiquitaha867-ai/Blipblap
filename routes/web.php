@@ -9,6 +9,7 @@ use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
+use App\Http\Controllers\Admin\DiagnosticsController as AdminDiagnosticsController;
 use App\Http\Controllers\Admin\LogController as AdminLogController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\PlanController as AdminPlanController;
@@ -53,6 +54,7 @@ Route::middleware('auth')->group(function (): void {
 
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function (): void {
     Route::get('/', AdminDashboardController::class)->name('dashboard');
+    Route::get('/diagnostics', AdminDiagnosticsController::class)->name('diagnostics');
     Route::get('/storefront', AdminStorefrontPreviewController::class)->name('storefront');
     Route::get('/plans', [AdminPlanController::class, 'index'])->name('plans.index');
     Route::get('/plans/country/{country}', [AdminPlanController::class, 'country'])->name('plans.country');

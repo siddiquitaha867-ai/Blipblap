@@ -1335,6 +1335,57 @@ input {
   margin: 4px 0 0;
 }
 
+.diagnostic-status-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-bottom: 18px;
+}
+
+.diagnostic-status-grid article {
+  background: #ffffff;
+  border: 1px solid #e0e8ef;
+  border-left: 5px solid #d5dde5;
+  border-radius: 10px;
+  box-shadow: 0 12px 28px rgba(23, 57, 84, 0.05);
+  padding: 18px;
+}
+
+.diagnostic-status-grid article.ok {
+  border-left-color: #28a978;
+}
+
+.diagnostic-status-grid article.warn {
+  border-left-color: #e4a11b;
+}
+
+.diagnostic-status-grid span {
+  color: var(--bb-muted);
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.diagnostic-status-grid strong {
+  display: block;
+  font-size: 18px;
+  margin-top: 8px;
+  overflow-wrap: anywhere;
+}
+
+.diagnostic-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.diagnostic-panel dd {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
 .empty-admin {
   color: var(--bb-muted);
 }
@@ -1758,6 +1809,8 @@ input {
   .admin-country-tabs,
   .admin-plan-line,
   .admin-plan-edit-line,
+  .diagnostic-status-grid,
+  .diagnostic-grid,
   .country-search-row,
   .why-grid,
   .video-section,
