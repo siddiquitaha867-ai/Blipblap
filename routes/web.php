@@ -55,6 +55,8 @@ Route::middleware('auth')->group(function (): void {
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function (): void {
     Route::get('/', AdminDashboardController::class)->name('dashboard');
     Route::get('/diagnostics', AdminDiagnosticsController::class)->name('diagnostics');
+    Route::post('/diagnostics/test-esim-api', [AdminDiagnosticsController::class, 'testEsimApi'])->name('diagnostics.test-esim-api');
+    Route::post('/diagnostics/sync-catalogue', [AdminDiagnosticsController::class, 'syncCatalogue'])->name('diagnostics.sync-catalogue');
     Route::get('/storefront', AdminStorefrontPreviewController::class)->name('storefront');
     Route::get('/plans', [AdminPlanController::class, 'index'])->name('plans.index');
     Route::get('/plans/country/{country}', [AdminPlanController::class, 'country'])->name('plans.country');

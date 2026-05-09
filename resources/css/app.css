@@ -1338,7 +1338,7 @@ input {
 .diagnostic-status-grid {
   display: grid;
   gap: 14px;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   margin-bottom: 18px;
 }
 
@@ -1380,10 +1380,93 @@ input {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.diagnostic-actions {
+  align-items: flex-start;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr auto;
+  margin-bottom: 18px;
+}
+
+.diagnostic-actions p {
+  color: var(--bb-muted);
+  margin: 6px 0 0;
+}
+
+.diagnostic-action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.diagnostic-action-buttons button {
+  background: var(--bb-sky);
+  border: 0;
+  border-radius: 999px;
+  color: #ffffff;
+  cursor: pointer;
+  font-weight: 800;
+  min-height: 42px;
+  padding: 0 16px;
+}
+
+.diagnostic-action-buttons button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.diagnostic-result {
+  border: 1px solid #d5dde5;
+  border-left: 5px solid #d5dde5;
+  border-radius: 10px;
+  grid-column: 1 / -1;
+  padding: 12px 14px;
+}
+
+.diagnostic-result.ok {
+  border-left-color: #28a978;
+}
+
+.diagnostic-result.warn {
+  border-left-color: #e4a11b;
+}
+
+.diagnostic-result strong,
+.diagnostic-result span {
+  display: block;
+}
+
+.diagnostic-result span {
+  color: var(--bb-muted);
+  margin-top: 4px;
+}
+
+.diagnostic-result pre {
+  background: #f3f7fa;
+  border-radius: 8px;
+  font-size: 12px;
+  margin: 10px 0 0;
+  max-height: 220px;
+  overflow: auto;
+  padding: 10px;
+  white-space: pre-wrap;
+}
+
 .diagnostic-panel dd {
   font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
   font-size: 13px;
   overflow-wrap: anywhere;
+}
+
+.diagnostic-copy-value {
+  background: #eef6ff;
+  border: 1px solid #c9dff4;
+  border-radius: 8px;
+  color: #164f7a;
+  display: inline-block;
+  font-weight: 800;
+  padding: 6px 8px;
 }
 
 .empty-admin {
@@ -1811,6 +1894,7 @@ input {
   .admin-plan-edit-line,
   .diagnostic-status-grid,
   .diagnostic-grid,
+  .diagnostic-actions,
   .country-search-row,
   .why-grid,
   .video-section,
