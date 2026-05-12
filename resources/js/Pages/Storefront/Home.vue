@@ -10,6 +10,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  featuredPlans: {
+    type: Array,
+    default: () => [],
+  },
 });
 
 const trustItems = [
@@ -51,6 +55,16 @@ const groups = {
 };
 
 const visibleDestinations = computed(() => groups[activeTab.value] || []);
+
+const planDataLabel = (plan) => {
+  if (plan.unlimited) {
+    return 'Unlimited';
+  }
+
+  return `${Number(plan.data_amount || 0)} ${plan.data_unit || 'GB'}`;
+};
+
+const planLocation = (plan) => plan.country_name || plan.region_name || 'Global';
 
 const destinationUrl = (name) => {
   const slug = name.toLowerCase().replaceAll(' ', '-');
@@ -123,6 +137,32 @@ const faqs = [
         <h3>{{ item[0] }}</h3>
         <p>{{ item[1] }}</p>
       </article>
+    </div>
+  </section>
+
+  <section v-if="featuredPlans.length" class="featured-plans-section">
+    <div class="featured-plans-copy">
+      <p class="eyebrow">Featured eSIM plans</p>
+      <h2>Fast picks for your next trip</h2>
+      <p>
+        Admin-selected packages appear here with the key details customers need
+        before checkout.
+      </p>
+    </div>
+
+    <div class="featured-plans-rail">
+      <a
+        v-for="plan in featuredPlans"
+        :key="plan.id"
+        class="featured-plan-tile"
+        :href="`/checkout/${plan.slug}`"
+      >
+        <span class="featured-plan-tile__location">{{ planLocation(plan) }}</span>
+        <strong>{{ planDataLabel(plan) }}</strong>
+        <small>{{ plan.duration_days }} {{ Number(plan.duration_days) === 1 ? 'day' : 'days' }}</small>
+        <em>{{ plan.currency }} {{ Number(plan.retail_price).toFixed(2) }}</em>
+        <span class="featured-plan-tile__name">{{ plan.title }}</span>
+      </a>
     </div>
   </section>
 
