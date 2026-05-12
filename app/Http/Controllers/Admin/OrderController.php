@@ -42,6 +42,8 @@ class OrderController extends Controller
         return response()->streamDownload(function () use ($search, $range): void {
             $handle = fopen('php://output', 'w');
 
+            fwrite($handle, "\xEF\xBB\xBF");
+
             fputcsv($handle, [
                 'Invoice No',
                 'Order ID',
@@ -76,7 +78,7 @@ class OrderController extends Controller
                         fputcsv($handle, [
                             $order->order_reference ?: 'BB-' . $order->id,
                             $order->id,
-                            optional($order->created_at)->format('Y-m-d H:i:s'),
+                            $this->csvText(optional($order->created_at)->format('Y-m-d H:i:s')),
                             data_get($order->request_payload, 'customer_name', ''),
                             $order->customer_email,
                             $planNames->get(data_get($order->request_payload, 'plan_id'))
@@ -151,5 +153,10 @@ class OrderController extends Controller
         }
 
         return data_get($order->response_payload, 'payment_method_collection', 'stripe');
+    }
+
+    private function csvText(?string $value): string
+    {
+        return $value === null || $value === '' ? '' : '="' . str_replace('"', '""', $value) . '"';
     }
 }

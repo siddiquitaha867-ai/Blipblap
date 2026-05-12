@@ -59,13 +59,15 @@ const submit = () => {
 
     <form class="admin-search" @submit.prevent="submit">
       <input v-model="search" type="search" placeholder="Search email, order, payment, bundle, ICCID" />
-      <select v-model="range" class="admin-range-select" @change="submit">
-        <option v-for="(label, value) in rangeOptions" :key="value" :value="value">
-          {{ label }}
-        </option>
-      </select>
       <button type="submit">Search</button>
-      <a class="admin-export-button" :href="csvUrl">CSV</a>
+      <div class="admin-order-actions">
+        <select v-model="range" class="admin-range-select" @change="submit">
+          <option v-for="(label, value) in rangeOptions" :key="value" :value="value">
+            {{ label }}
+          </option>
+        </select>
+        <a class="admin-export-button" :href="csvUrl">CSV</a>
+      </div>
     </form>
 
     <section class="admin-panel">
