@@ -1,7 +1,7 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { Link, router } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 defineOptions({ layout: AdminLayout });
 
@@ -17,9 +17,34 @@ const props = defineProps({
 });
 
 const search = ref(props.filters.search || '');
+const range = ref(props.filters.range || 'last_7_days');
+
+const rangeOptions = computed(() => props.filters.range_options || {
+  last_7_days: 'Last 7 days',
+  last_15_days: 'Last 15 days',
+  last_1_month: 'Last 1 month',
+  last_3_months: 'Last 3 months',
+});
+
+const query = computed(() => ({
+  search: search.value,
+  range: range.value,
+}));
+
+const csvUrl = computed(() => {
+  const params = new URLSearchParams();
+
+  if (search.value) {
+    params.set('search', search.value);
+  }
+
+  params.set('range', range.value);
+
+  return `/admin/orders/export?${params.toString()}`;
+});
 
 const submit = () => {
-  router.get('/admin/orders', { search: search.value }, { preserveState: true, replace: true });
+  router.get('/admin/orders', query.value, { preserveState: true, replace: true });
 };
 </script>
 
@@ -34,7 +59,13 @@ const submit = () => {
 
     <form class="admin-search" @submit.prevent="submit">
       <input v-model="search" type="search" placeholder="Search email, order, payment, bundle, ICCID" />
+      <select v-model="range" class="admin-range-select" @change="submit">
+        <option v-for="(label, value) in rangeOptions" :key="value" :value="value">
+          {{ label }}
+        </option>
+      </select>
       <button type="submit">Search</button>
+      <a class="admin-export-button" :href="csvUrl">CSV</a>
     </form>
 
     <section class="admin-panel">

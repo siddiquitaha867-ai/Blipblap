@@ -62,6 +62,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/plans/country/{country}', [AdminPlanController::class, 'country'])->name('plans.country');
     Route::patch('/plans/{plan}', [AdminPlanController::class, 'update'])->name('plans.update');
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/export', [AdminOrderController::class, 'export'])->name('orders.export');
     Route::get('/logs', [AdminLogController::class, 'index'])->name('logs.index');
     Route::get('/promotions', [AdminPromotionController::class, 'index'])->name('promotions.index');
     Route::post('/promotions', [AdminPromotionController::class, 'store'])->name('promotions.store');
