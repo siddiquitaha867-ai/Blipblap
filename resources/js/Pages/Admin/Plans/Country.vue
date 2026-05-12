@@ -28,6 +28,7 @@ const dataLabel = (plan) => {
 };
 
 const draftFor = (plan) => ({
+  title: plan.title || '',
   retail_price: Number(plan.retail_price || 0),
   duration_days: Number(plan.duration_days || 1),
   unlimited: Boolean(plan.unlimited),
@@ -92,6 +93,7 @@ const updatePlan = (plan) => {
   const draft = drafts.value[plan.id];
 
   router.patch(`/admin/plans/${plan.id}`, {
+    title: draft.title,
     retail_price: draft.retail_price,
     duration_days: draft.duration_days,
     unlimited: Boolean(draft.unlimited),
@@ -141,6 +143,10 @@ const updatePlan = (plan) => {
               </div>
 
               <div class="admin-plan-edit-line">
+                <label class="admin-plan-title-field">
+                  <span>Plan name</span>
+                  <input v-model="drafts[plan.id].title" type="text" />
+                </label>
                 <label>
                   <span>Retail</span>
                   <input v-model="drafts[plan.id].retail_price" type="number" min="0" step="0.01" />
@@ -164,14 +170,16 @@ const updatePlan = (plan) => {
                     <option value="MB">MB</option>
                   </select>
                 </label>
-                <label class="admin-check-row">
-                  <input v-model="drafts[plan.id].is_active" type="checkbox" />
-                  Active
-                </label>
-                <label class="admin-check-row">
-                  <input v-model="drafts[plan.id].is_featured" type="checkbox" />
-                  Featured
-                </label>
+                <div class="admin-plan-status-stack">
+                  <label class="admin-check-row">
+                    <input v-model="drafts[plan.id].is_active" type="checkbox" />
+                    Active
+                  </label>
+                  <label class="admin-check-row">
+                    <input v-model="drafts[plan.id].is_featured" type="checkbox" />
+                    Featured
+                  </label>
+                </div>
                 <button type="button" class="admin-mini-button" @click="updatePlan(plan)">Save</button>
               </div>
             </article>

@@ -63,6 +63,7 @@ class PlanController extends Controller
     public function update(Request $request, EsimPlan $plan): RedirectResponse
     {
         $data = $request->validate([
+            'title' => ['required', 'string', 'max:255'],
             'retail_price' => ['required', 'numeric', 'min:0'],
             'duration_days' => ['required', 'integer', 'min:1'],
             'unlimited' => ['required', 'boolean'],
