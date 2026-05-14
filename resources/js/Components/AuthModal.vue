@@ -20,7 +20,7 @@ const authHref = (path) => {
 <template>
   <section class="auth-modal" aria-label="Authentication">
     <div class="auth-modal-top">
-      <Link href="/" class="auth-close" aria-label="Close">×</Link>
+      <Link href="/" class="auth-close" aria-label="Close">x</Link>
     </div>
 
     <div class="auth-tabs">
@@ -29,9 +29,15 @@ const authHref = (path) => {
     </div>
 
     <div class="social-row" aria-label="Social sign in options">
-      <button type="button" title="Apple sign in will be connected with OAuth credentials">●</button>
-      <button type="button" title="Google sign in will be connected with OAuth credentials">G</button>
-      <button type="button" title="Facebook sign in will be connected with OAuth credentials">f</button>
+      <button type="button" class="social-button social-button--apple" title="Apple sign in will be connected with OAuth credentials">
+        <span>Apple</span>
+      </button>
+      <button type="button" class="social-button social-button--google" title="Google sign in will be connected with OAuth credentials">
+        <span>Google</span>
+      </button>
+      <button type="button" class="social-button social-button--facebook" title="Facebook sign in will be connected with OAuth credentials">
+        <span>Facebook</span>
+      </button>
     </div>
 
     <slot />
