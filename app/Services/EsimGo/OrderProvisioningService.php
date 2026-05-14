@@ -7,6 +7,10 @@ use App\Models\CustomerEsim;
 use App\Models\EsimEvent;
 use App\Models\EsimOrder;
 use App\Models\EsimPlan;
+use BaconQrCode\Renderer\Image\SvgImageBackEnd;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Writer;
 use Illuminate\Support\Facades\Mail;
 
 class OrderProvisioningService
@@ -71,6 +75,10 @@ class OrderProvisioningService
 
         if (! $installDetails['activation_code'] && $installDetails['smdp_address'] && $installDetails['matching_id']) {
             $installDetails['activation_code'] = 'LPA:1$' . $installDetails['smdp_address'] . '$' . $installDetails['matching_id'];
+        }
+
+        if (! $installDetails['qr_code_url'] && $installDetails['activation_code']) {
+            $installDetails['qr_code_url'] = $this->qrCodeFromActivationCode($installDetails['activation_code']);
         }
 
         if (($installDetails['qr_code_url'] || $installDetails['activation_code']) && $installDetails['status'] === 'pending_install_details') {
@@ -316,6 +324,8 @@ class OrderProvisioningService
             $updates['activation_code'] = 'LPA:1$' . $esim->smdp_address . '$' . $esim->matching_id;
         }
 
+        $activationCode = $updates['activation_code'] ?? $esim->activation_code;
+
         if (! $esim->qr_code_url) {
             $references = array_filter(array_unique([
                 data_get($order->response_payload, 'esim_go_order.orderReference'),
@@ -334,6 +344,10 @@ class OrderProvisioningService
                     break;
                 }
             }
+
+            if (! isset($updates['qr_code_url']) && $activationCode) {
+                $updates['qr_code_url'] = $this->qrCodeFromActivationCode($activationCode);
+            }
         }
 
         if (($updates['qr_code_url'] ?? $esim->qr_code_url) || ($updates['activation_code'] ?? $esim->activation_code)) {
@@ -348,6 +362,26 @@ class OrderProvisioningService
         $this->sendReadyEmail($esim, $order, $plan);
 
         return $esim;
+    }
+
+    private function qrCodeFromActivationCode(string $activationCode): ?string
+    {
+        if (trim($activationCode) === '') {
+            return null;
+        }
+
+        try {
+            $renderer = new ImageRenderer(
+                new RendererStyle(360, 2),
+                new SvgImageBackEnd(),
+            );
+            $writer = new Writer($renderer);
+            $svg = $writer->writeString($activationCode);
+
+            return 'data:image/svg+xml;base64,' . base64_encode($svg);
+        } catch (\Throwable) {
+            return null;
+        }
     }
 
     private function value(array $source, array $paths): ?string
