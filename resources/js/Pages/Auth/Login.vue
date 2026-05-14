@@ -11,6 +11,12 @@ const form = useForm({
   remember: true,
 });
 
+const redirect = typeof window === 'undefined'
+  ? ''
+  : new URLSearchParams(window.location.search).get('redirect') || '';
+
+const signupHref = redirect ? `/auth/signup?redirect=${encodeURIComponent(redirect)}` : '/auth/signup';
+
 const submit = () => {
   form.post('/login', {
     preserveScroll: true,
@@ -47,7 +53,7 @@ const submit = () => {
 
       <p class="auth-bottom">
         New to BlipBlap?
-        <a href="/auth/signup">Create an account</a>
+        <a :href="signupHref">Create an account</a>
       </p>
     </form>
   </AuthModal>

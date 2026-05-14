@@ -1,6 +1,8 @@
 <script setup>
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
 import DestinationTabs from '@/Components/DestinationTabs.vue';
+import AuthRequiredModal from '@/Components/AuthRequiredModal.vue';
+import { usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 
 defineOptions({ layout: StorefrontLayout });
@@ -25,6 +27,9 @@ const trustItems = [
 
 const activeTab = ref('Top Destinations');
 const activeStep = ref(0);
+const page = usePage();
+const authPromptCheckoutUrl = ref('');
+const isLoggedIn = computed(() => Boolean(page.props.auth.user));
 
 const groups = {
   'Top Destinations': props.featuredDestinations,
@@ -74,6 +79,15 @@ const destinationUrl = (name) => {
   }
 
   return `/destinations/${slug}`;
+};
+
+const requestCheckout = (event, plan) => {
+  if (isLoggedIn.value) {
+    return;
+  }
+
+  event.preventDefault();
+  authPromptCheckoutUrl.value = `/checkout/${plan.slug}`;
 };
 
 const steps = [
@@ -156,6 +170,7 @@ const faqs = [
         :key="plan.id"
         class="featured-plan-tile"
         :href="`/checkout/${plan.slug}`"
+        @click="requestCheckout($event, plan)"
       >
         <span class="featured-plan-tile__location">{{ planLocation(plan) }}</span>
         <strong>{{ planDataLabel(plan) }}</strong>
@@ -272,4 +287,10 @@ const faqs = [
       <a href="#contact">Contact Us</a>
     </div>
   </footer>
+
+  <AuthRequiredModal
+    v-if="authPromptCheckoutUrl"
+    :checkout-url="authPromptCheckoutUrl"
+    @close="authPromptCheckoutUrl = ''"
+  />
 </template>

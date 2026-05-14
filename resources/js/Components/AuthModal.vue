@@ -7,6 +7,14 @@ defineProps({
     required: true,
   },
 });
+
+const redirect = typeof window === 'undefined'
+  ? ''
+  : new URLSearchParams(window.location.search).get('redirect') || '';
+
+const authHref = (path) => {
+  return redirect ? `${path}?redirect=${encodeURIComponent(redirect)}` : path;
+};
 </script>
 
 <template>
@@ -16,8 +24,8 @@ defineProps({
     </div>
 
     <div class="auth-tabs">
-      <Link href="/auth/login" :class="{ active: mode === 'login' }">Log in</Link>
-      <Link href="/auth/signup" :class="{ active: mode === 'signup' }">Sign up</Link>
+      <Link :href="authHref('/auth/login')" :class="{ active: mode === 'login' }">Log in</Link>
+      <Link :href="authHref('/auth/signup')" :class="{ active: mode === 'signup' }">Sign up</Link>
     </div>
 
     <div class="social-row" aria-label="Social sign in options">

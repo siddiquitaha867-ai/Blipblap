@@ -19,6 +19,10 @@ class CheckoutController extends Controller
 {
     public function show(Request $request, EsimPlan $plan): Response|RedirectResponse
     {
+        if (! $request->user()) {
+            return $this->redirectGuestToAuth($request, route('checkout.show', $plan));
+        }
+
         if ($request->user()?->is_admin) {
             return redirect()
                 ->route('plans.show', $plan)
@@ -32,6 +36,10 @@ class CheckoutController extends Controller
 
     public function payment(Request $request, EsimPlan $plan): Response|RedirectResponse
     {
+        if (! $request->user()) {
+            return $this->redirectGuestToAuth($request, route('checkout.payment', $plan));
+        }
+
         if ($request->user()?->is_admin) {
             return redirect()
                 ->route('plans.show', $plan)
@@ -48,6 +56,10 @@ class CheckoutController extends Controller
 
     public function stripe(Request $request, EsimPlan $plan): RedirectResponse|HttpResponse
     {
+        if (! $request->user()) {
+            return $this->redirectGuestToAuth($request, route('checkout.show', $plan));
+        }
+
         if ($request->user()?->is_admin) {
             return redirect()
                 ->route('plans.show', $plan)
@@ -264,6 +276,15 @@ class CheckoutController extends Controller
             'paid_at' => $order->paid_at ?: now(),
             'response_payload' => $session,
         ]);
+    }
+
+    private function redirectGuestToAuth(Request $request, string $intendedUrl): RedirectResponse
+    {
+        $request->session()->put('url.intended', $intendedUrl);
+
+        return redirect()
+            ->route('auth.login', ['redirect' => $intendedUrl])
+            ->with('status', 'Please log in or create an account before checkout.');
     }
 
     private function isValidStripeSignature(string $payload, string $signature, string $secret): bool

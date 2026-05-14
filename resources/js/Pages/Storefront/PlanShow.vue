@@ -2,6 +2,7 @@
 import { computed, ref, watchEffect } from 'vue';
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
 import { usePage } from '@inertiajs/vue3';
+import AuthRequiredModal from '@/Components/AuthRequiredModal.vue';
 
 defineOptions({ layout: StorefrontLayout });
 
@@ -18,8 +19,10 @@ const props = defineProps({
 
 const page = usePage();
 const isAdminPreview = computed(() => Boolean(page.props.auth.user?.is_admin));
+const isLoggedIn = computed(() => Boolean(page.props.auth.user));
 const activeDuration = ref(Number(props.plan.duration_days || 0));
 const compatibilityOpen = ref(false);
+const authPromptCheckoutUrl = ref('');
 const activeDeviceCategory = ref('ios');
 const deviceSearch = ref('');
 
@@ -166,6 +169,15 @@ const closeCompatibility = () => {
   compatibilityOpen.value = false;
 };
 
+const requestCheckout = (event, item) => {
+  if (isLoggedIn.value) {
+    return;
+  }
+
+  event.preventDefault();
+  authPromptCheckoutUrl.value = `/checkout/${item.slug}`;
+};
+
 watchEffect(() => {
   if (!groupedPlans.value.length) {
     return;
@@ -250,6 +262,7 @@ watchEffect(() => {
             :key="item.id"
             :href="`/checkout/${item.slug}`"
             class="package-card"
+            @click="requestCheckout($event, item)"
           >
             <span>{{ item.duration_days }} days</span>
             <strong>{{ planDataLabel(item) }}</strong>
@@ -417,5 +430,11 @@ watchEffect(() => {
         </div>
       </div>
     </Teleport>
+
+    <AuthRequiredModal
+      v-if="authPromptCheckoutUrl"
+      :checkout-url="authPromptCheckoutUrl"
+      @close="authPromptCheckoutUrl = ''"
+    />
   </section>
 </template>

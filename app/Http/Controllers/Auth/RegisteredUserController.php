@@ -14,8 +14,10 @@ use Inertia\Response;
 
 class RegisteredUserController extends Controller
 {
-    public function create(): Response
+    public function create(Request $request): Response
     {
+        $this->rememberSafeIntendedUrl($request);
+
         return Inertia::render('Auth/Register');
     }
 
@@ -46,6 +48,25 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('verification.notice');
+        return redirect()->intended(route('home'));
+    }
+
+    private function rememberSafeIntendedUrl(Request $request): void
+    {
+        $redirect = (string) $request->query('redirect', '');
+
+        if ($redirect === '' || str_starts_with($redirect, '//')) {
+            return;
+        }
+
+        if (str_starts_with($redirect, '/')) {
+            $request->session()->put('url.intended', url($redirect));
+
+            return;
+        }
+
+        if (str_starts_with($redirect, url('/'))) {
+            $request->session()->put('url.intended', $redirect);
+        }
     }
 }
