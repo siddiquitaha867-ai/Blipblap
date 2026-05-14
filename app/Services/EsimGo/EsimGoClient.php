@@ -63,6 +63,17 @@ class EsimGoClient
         return $this->get('/esims/assignments', array_merge(['reference' => $reference], $query));
     }
 
+    public function installDetailsZip(string $reference): string
+    {
+        $response = $this->request()
+            ->accept('application/zip')
+            ->get('/esims/assignments', ['reference' => $reference]);
+
+        $response->throw();
+
+        return $response->body();
+    }
+
     public function esim(string $iccid): array
     {
         return $this->get('/esims/' . rawurlencode($iccid));

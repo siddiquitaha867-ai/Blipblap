@@ -3581,6 +3581,18 @@ input {
   margin: 0;
 }
 
+.install-alert {
+  background: #fff4e5;
+  border: 1px solid #ffd79a;
+  border-radius: 12px;
+  color: #8a4b00;
+  font-weight: 600;
+  line-height: 1.5;
+  margin-top: 24px;
+  max-width: 760px;
+  padding: 14px 16px;
+}
+
 .install-preview {
   align-items: center;
   display: grid;
@@ -3589,15 +3601,37 @@ input {
   margin-top: 36px;
 }
 
-.fake-qr {
+.install-preview--ready {
+  align-items: start;
+}
+
+.install-qr {
   align-items: center;
-  background: white;
-  border: 10px solid #111827;
+  background: #f8fafb;
+  border: 1px solid #dce7ef;
+  border-radius: 14px;
+  color: var(--bb-muted);
   display: flex;
-  font-size: 96px;
-  height: 160px;
+  font-size: 28px;
+  font-weight: 700;
+  height: 180px;
   justify-content: center;
-  width: 160px;
+  overflow: hidden;
+  padding: 12px;
+  width: 180px;
+}
+
+.install-qr img {
+  background: white;
+  display: block;
+  height: 100%;
+  object-fit: contain;
+  width: 100%;
+}
+
+.install-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  line-break: anywhere;
 }
 
 @media (max-width: 900px) {

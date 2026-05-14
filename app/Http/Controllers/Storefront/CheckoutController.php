@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Storefront;
 
 use App\Http\Controllers\Controller;
+use App\Models\CustomerEsim;
 use App\Models\EsimOrder;
 use App\Models\EsimPlan;
+use App\Services\EsimGo\OrderProvisioningService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -131,7 +133,7 @@ class CheckoutController extends Controller
         return Inertia::location($session['url']);
     }
 
-    public function success(Request $request, EsimPlan $plan): Response|RedirectResponse
+    public function success(Request $request, EsimPlan $plan, OrderProvisioningService $provisioning): Response|RedirectResponse
     {
         if ($request->user()?->is_admin) {
             return redirect()
@@ -144,13 +146,39 @@ class CheckoutController extends Controller
             ? EsimOrder::query()->where('payment_reference', $sessionId)->first()
             : null;
 
+        $provisioningError = null;
+
+        if ($order) {
+            $this->markStripeSessionPaid($order, $sessionId);
+
+            try {
+                $provisioning->provision($order->refresh(), $plan);
+            } catch (\Throwable $exception) {
+                $provisioningError = 'Provisioning failed. Please check the eSIM Go API key, balance, and bundle code.';
+
+                $order->update([
+                    'status' => 'provisioning_failed',
+                    'fulfillment_status' => 'provisioning_failed',
+                    'response_payload' => array_merge($order->response_payload ?? [], [
+                        'provisioning_error' => $exception->getMessage(),
+                    ]),
+                ]);
+            }
+        }
+
+        $customerEsim = $order
+            ? CustomerEsim::query()->where('source_order_id', $order->id)->first()
+            : null;
+
         return Inertia::render('Storefront/CheckoutSuccess', [
             'plan' => $plan,
-            'order' => $order,
+            'order' => $order?->refresh(),
+            'esim' => $customerEsim,
+            'provisioningError' => $provisioningError,
         ]);
     }
 
-    public function webhook(Request $request): HttpResponse
+    public function webhook(Request $request, OrderProvisioningService $provisioning): HttpResponse
     {
         $payload = $request->getContent();
         $signature = (string) $request->header('Stripe-Signature', '');
@@ -171,9 +199,10 @@ class CheckoutController extends Controller
             $orderId = $session['metadata']['order_id'] ?? $session['client_reference_id'] ?? null;
 
             if ($orderId) {
-                EsimOrder::query()
-                    ->whereKey($orderId)
-                    ->update([
+                $order = EsimOrder::query()->whereKey($orderId)->first();
+
+                if ($order) {
+                    $order->update([
                         'payment_reference' => $session['id'] ?? null,
                         'apply_reference' => $session['payment_intent'] ?? null,
                         'status' => 'paid',
@@ -182,10 +211,59 @@ class CheckoutController extends Controller
                         'paid_at' => now(),
                         'response_payload' => $session,
                     ]);
+
+                    try {
+                        $plan = EsimPlan::query()->where('supplier_code', $order->bundle_code)->first();
+                        $provisioning->provision($order->refresh(), $plan);
+                    } catch (\Throwable $exception) {
+                        $order->update([
+                            'status' => 'provisioning_failed',
+                            'fulfillment_status' => 'provisioning_failed',
+                            'response_payload' => array_merge($order->response_payload ?? [], [
+                                'provisioning_error' => $exception->getMessage(),
+                            ]),
+                        ]);
+                    }
+                }
             }
         }
 
         return response('Webhook received');
+    }
+
+    private function markStripeSessionPaid(EsimOrder $order, string $sessionId): void
+    {
+        if ($order->status !== 'pending_payment' || $sessionId === '') {
+            return;
+        }
+
+        $secret = (string) config('services.stripe.secret');
+
+        if ($secret === '') {
+            return;
+        }
+
+        $response = Http::withToken($secret)
+            ->get('https://api.stripe.com/v1/checkout/sessions/' . rawurlencode($sessionId));
+
+        if (! $response->successful()) {
+            return;
+        }
+
+        $session = $response->json() ?? [];
+
+        if (($session['payment_status'] ?? '') !== 'paid' && ($session['status'] ?? '') !== 'complete') {
+            return;
+        }
+
+        $order->update([
+            'apply_reference' => $session['payment_intent'] ?? $order->apply_reference,
+            'status' => 'paid',
+            'validation_status' => 'paid',
+            'fulfillment_status' => 'ready_for_provisioning',
+            'paid_at' => $order->paid_at ?: now(),
+            'response_payload' => $session,
+        ]);
     }
 
     private function isValidStripeSignature(string $payload, string $signature, string $secret): bool
