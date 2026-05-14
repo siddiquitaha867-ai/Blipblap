@@ -2,10 +2,12 @@
 
 namespace App\Services\EsimGo;
 
+use App\Mail\EsimReadyMail;
 use App\Models\CustomerEsim;
 use App\Models\EsimEvent;
 use App\Models\EsimOrder;
 use App\Models\EsimPlan;
+use Illuminate\Support\Facades\Mail;
 
 class OrderProvisioningService
 {
@@ -20,7 +22,7 @@ class OrderProvisioningService
             ->first();
 
         if ($existing) {
-            return $existing;
+            return $this->completeExistingInstallDetails($existing, $order, $plan);
         }
 
         if (! in_array($order->status, ['paid', 'provisioning', 'provisioned'], true)) {
@@ -71,7 +73,7 @@ class OrderProvisioningService
             $installDetails['activation_code'] = 'LPA:1$' . $installDetails['smdp_address'] . '$' . $installDetails['matching_id'];
         }
 
-        if ($installDetails['qr_code_url'] && $installDetails['status'] === 'pending_install_details') {
+        if (($installDetails['qr_code_url'] || $installDetails['activation_code']) && $installDetails['status'] === 'pending_install_details') {
             $installDetails['status'] = 'ready_to_install';
         }
 
@@ -112,6 +114,8 @@ class OrderProvisioningService
                 'bundle_code' => $order->bundle_code,
             ],
         ]);
+
+        $this->sendReadyEmail($esim, $order, $plan);
 
         return $esim;
     }
@@ -228,6 +232,18 @@ class OrderProvisioningService
             return null;
         }
 
+        $rawImage = $this->imageDataUriFromBinary($zipBody);
+
+        if ($rawImage) {
+            return $rawImage;
+        }
+
+        $json = json_decode($zipBody, true);
+
+        if (is_array($json)) {
+            return $this->qrCodeUrl($json);
+        }
+
         $path = tempnam(sys_get_temp_dir(), 'bb-esim-qr-');
 
         if ($path === false) {
@@ -248,9 +264,8 @@ class OrderProvisioningService
 
             for ($index = 0; $index < $zip->numFiles; $index++) {
                 $name = (string) $zip->getNameIndex($index);
-                $extension = strtolower(pathinfo($name, PATHINFO_EXTENSION));
 
-                if (! in_array($extension, ['png', 'jpg', 'jpeg'], true)) {
+                if (str_ends_with($name, '/')) {
                     continue;
                 }
 
@@ -260,9 +275,11 @@ class OrderProvisioningService
                     continue;
                 }
 
-                $mime = $extension === 'png' ? 'image/png' : 'image/jpeg';
+                $dataUri = $this->imageDataUriFromBinary($image);
 
-                return 'data:' . $mime . ';base64,' . base64_encode($image);
+                if ($dataUri) {
+                    return $dataUri;
+                }
             }
         } finally {
             if ($opened) {
@@ -273,6 +290,64 @@ class OrderProvisioningService
         }
 
         return null;
+    }
+
+    private function imageDataUriFromBinary(string $binary): ?string
+    {
+        $mime = match (true) {
+            str_starts_with($binary, "\x89PNG\r\n\x1A\n") => 'image/png',
+            str_starts_with($binary, "\xFF\xD8\xFF") => 'image/jpeg',
+            str_starts_with(ltrim($binary), '<svg') => 'image/svg+xml',
+            default => null,
+        };
+
+        if (! $mime) {
+            return null;
+        }
+
+        return 'data:' . $mime . ';base64,' . base64_encode($binary);
+    }
+
+    private function completeExistingInstallDetails(CustomerEsim $esim, EsimOrder $order, ?EsimPlan $plan): CustomerEsim
+    {
+        $updates = [];
+
+        if (! $esim->activation_code && $esim->smdp_address && $esim->matching_id) {
+            $updates['activation_code'] = 'LPA:1$' . $esim->smdp_address . '$' . $esim->matching_id;
+        }
+
+        if (! $esim->qr_code_url) {
+            $references = array_filter(array_unique([
+                data_get($order->response_payload, 'esim_go_order.orderReference'),
+                data_get($order->response_payload, 'esim_go_order.order_reference'),
+                data_get($order->response_payload, 'esim_go_order.reference'),
+                data_get($esim->last_status, 'orderReference'),
+                data_get($esim->last_status, 'order_reference'),
+                $order->order_reference,
+            ]));
+
+            foreach ($references as $reference) {
+                $qrCodeUrl = $this->qrCodeFromInstallDetailsZip((string) $reference);
+
+                if ($qrCodeUrl) {
+                    $updates['qr_code_url'] = $qrCodeUrl;
+                    break;
+                }
+            }
+        }
+
+        if (($updates['qr_code_url'] ?? $esim->qr_code_url) || ($updates['activation_code'] ?? $esim->activation_code)) {
+            $updates['status'] = 'ready_to_install';
+        }
+
+        if ($updates !== []) {
+            $esim->update($updates);
+            $esim->refresh();
+        }
+
+        $this->sendReadyEmail($esim, $order, $plan);
+
+        return $esim;
     }
 
     private function value(array $source, array $paths): ?string
@@ -293,5 +368,41 @@ class OrderProvisioningService
         $current = is_array($order->response_payload) ? $order->response_payload : [];
 
         return array_merge($current, $data);
+    }
+
+    private function sendReadyEmail(CustomerEsim $esim, EsimOrder $order, ?EsimPlan $plan): void
+    {
+        $alreadySent = EsimEvent::query()
+            ->where('customer_esim_id', $esim->id)
+            ->where('esim_order_id', $order->id)
+            ->where('event_type', 'ready_email_sent')
+            ->exists();
+
+        if ($alreadySent) {
+            return;
+        }
+
+        try {
+            Mail::to($order->customer_email)->send(new EsimReadyMail($esim, $order, $plan));
+
+            EsimEvent::query()->create([
+                'customer_esim_id' => $esim->id,
+                'esim_order_id' => $order->id,
+                'event_type' => 'ready_email_sent',
+                'event_payload' => [
+                    'to' => $order->customer_email,
+                ],
+            ]);
+        } catch (\Throwable $exception) {
+            EsimEvent::query()->create([
+                'customer_esim_id' => $esim->id,
+                'esim_order_id' => $order->id,
+                'event_type' => 'ready_email_failed',
+                'event_payload' => [
+                    'to' => $order->customer_email,
+                    'error' => $exception->getMessage(),
+                ],
+            ]);
+        }
     }
 }
