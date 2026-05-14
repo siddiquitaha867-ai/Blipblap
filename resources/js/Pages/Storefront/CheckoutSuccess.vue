@@ -1,6 +1,6 @@
 <script setup>
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
-import QRCode from 'qrcode';
+import * as QRCode from 'qrcode';
 import { computed, ref, watchEffect } from 'vue';
 
 defineOptions({ layout: StorefrontLayout });
@@ -37,15 +37,17 @@ watchEffect(async () => {
   }
 
   try {
-    generatedQrCodeUrl.value = await QRCode.toDataURL(props.esim.activation_code, {
+    const svg = await QRCode.toString(props.esim.activation_code, {
+      type: 'svg',
       errorCorrectionLevel: 'M',
       margin: 2,
-      scale: 8,
       color: {
         dark: '#111827',
         light: '#ffffff',
       },
     });
+
+    generatedQrCodeUrl.value = `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
   } catch {
     generatedQrCodeUrl.value = '';
   }
