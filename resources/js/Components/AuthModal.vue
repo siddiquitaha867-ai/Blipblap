@@ -18,7 +18,7 @@ const authHref = (path) => {
 </script>
 
 <template>
-  <section class="auth-modal" aria-label="Authentication">
+  <section :class="['auth-modal', `auth-modal--${mode}`]" aria-label="Authentication">
     <div class="auth-modal-top">
       <Link href="/" class="auth-close" aria-label="Close">x</Link>
     </div>

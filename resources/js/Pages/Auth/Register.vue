@@ -26,15 +26,17 @@ const submit = () => {
 <template>
   <AuthModal mode="signup">
     <form class="auth-form" @submit.prevent="submit">
-      <label>
-        <input v-model="form.first_name" type="text" placeholder="First name" autofocus />
-        <small v-if="form.errors.first_name">{{ form.errors.first_name }}</small>
-      </label>
+      <div class="auth-field-grid">
+        <label>
+          <input v-model="form.first_name" type="text" placeholder="First name" autofocus />
+          <small v-if="form.errors.first_name">{{ form.errors.first_name }}</small>
+        </label>
 
-      <label>
-        <input v-model="form.last_name" type="text" placeholder="Last name (Optional)" />
-        <small v-if="form.errors.last_name">{{ form.errors.last_name }}</small>
-      </label>
+        <label>
+          <input v-model="form.last_name" type="text" placeholder="Last name (Optional)" />
+          <small v-if="form.errors.last_name">{{ form.errors.last_name }}</small>
+        </label>
+      </div>
 
       <label>
         <input v-model="form.email" type="email" placeholder="Email" />
