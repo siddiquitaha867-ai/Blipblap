@@ -1,6 +1,7 @@
 <script setup>
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
-import { computed } from 'vue';
+import QRCode from 'qrcode';
+import { computed, ref, watchEffect } from 'vue';
 
 defineOptions({ layout: StorefrontLayout });
 
@@ -24,7 +25,31 @@ const props = defineProps({
 });
 
 const installStatus = computed(() => props.esim?.status || props.order?.fulfillment_status || props.order?.status || 'Waiting for payment');
-const hasInstallDetails = computed(() => Boolean(props.esim?.qr_code_url || props.esim?.activation_code || props.esim?.smdp_address));
+const generatedQrCodeUrl = ref('');
+const qrCodeUrl = computed(() => props.esim?.qr_code_url || generatedQrCodeUrl.value);
+const hasInstallDetails = computed(() => Boolean(qrCodeUrl.value || props.esim?.activation_code || props.esim?.smdp_address));
+
+watchEffect(async () => {
+  if (props.esim?.qr_code_url || !props.esim?.activation_code) {
+    generatedQrCodeUrl.value = '';
+
+    return;
+  }
+
+  try {
+    generatedQrCodeUrl.value = await QRCode.toDataURL(props.esim.activation_code, {
+      errorCorrectionLevel: 'M',
+      margin: 2,
+      scale: 8,
+      color: {
+        dark: '#111827',
+        light: '#ffffff',
+      },
+    });
+  } catch {
+    generatedQrCodeUrl.value = '';
+  }
+});
 </script>
 
 <template>
@@ -44,7 +69,7 @@ const hasInstallDetails = computed(() => Boolean(props.esim?.qr_code_url || prop
 
     <div class="install-preview" :class="{ 'install-preview--ready': hasInstallDetails }">
       <div class="install-qr">
-        <img v-if="esim?.qr_code_url" :src="esim.qr_code_url" alt="eSIM installation QR code">
+        <img v-if="qrCodeUrl" :src="qrCodeUrl" alt="eSIM installation QR code">
         <span v-else>QR</span>
       </div>
       <dl>
