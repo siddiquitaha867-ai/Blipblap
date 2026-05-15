@@ -19,40 +19,104 @@ class HomeController extends Controller
 
         return Inertia::render('Storefront/Home', [
             'featuredDestinations' => $this->featuredDestinations(),
+            'destinationGroups' => $this->destinationGroups(),
             'featuredPlans' => $this->featuredPlans(),
         ]);
     }
 
     private function featuredDestinations()
     {
-        $fallback = collect(config('blipblap.featured_destinations', []));
+        return $this->destinationGroups()['Top Destinations'];
+    }
 
-        $destinations = EsimPlan::query()
+    private function destinationGroups(): array
+    {
+        $plans = EsimPlan::query()
             ->where('is_active', true)
-            ->get(['country_name', 'region_name', 'coverage_type', 'country_iso'])
+            ->get([
+                'country_name',
+                'region_name',
+                'coverage_type',
+                'country_iso',
+                'retail_price',
+                'currency',
+            ]);
+
+        $fallback = collect(config('blipblap.featured_destinations', []))
+            ->take(9)
+            ->values();
+
+        if ($plans->isEmpty()) {
+            return [
+                'Top Destinations' => $fallback,
+                'Local eSIMs' => $fallback,
+                'Regional Packs' => collect()->values(),
+                'Worldwide eSIMs' => collect()->values(),
+            ];
+        }
+
+        $local = $this->rankedDestinations($plans->where('coverage_type', 'local'));
+        $regional = $this->rankedDestinations(
+            $plans->reject(fn (EsimPlan $plan): bool => $plan->coverage_type === 'local' || $this->isGlobalPlan($plan))
+        );
+        $worldwide = $this->rankedDestinations($plans->filter(fn (EsimPlan $plan): bool => $this->isGlobalPlan($plan)));
+
+        return [
+            'Top Destinations' => $this->rankedDestinations($plans),
+            'Local eSIMs' => $local,
+            'Regional Packs' => $regional,
+            'Worldwide eSIMs' => $worldwide,
+        ];
+    }
+
+    private function rankedDestinations($plans)
+    {
+        return $plans
             ->map(function (EsimPlan $plan): array {
+                $name = $plan->country_name ?: $plan->region_name ?: $plan->coverage_type;
+
                 return [
-                    'name' => $plan->country_name ?: $plan->region_name ?: $plan->coverage_type,
+                    'name' => $name,
                     'iso' => $plan->country_iso,
+                    'price' => (float) $plan->retail_price,
+                    'currency' => $plan->currency ?: config('blipblap.currency', 'USD'),
                 ];
             })
             ->filter(fn (array $destination): bool => trim((string) $destination['name']) !== '')
             ->groupBy(fn (array $destination): string => (string) $destination['name'])
-            ->map(function ($plans, string $name): array {
-                $iso = collect($plans)->pluck('iso')->filter()->first();
+            ->map(function ($items, string $name): array {
+                $iso = collect($items)->pluck('iso')->filter()->first();
+                $prices = collect($items)->pluck('price')->filter(fn (float $price): bool => $price > 0);
+                $minPrice = $prices->min();
+                $currency = collect($items)->pluck('currency')->filter()->first() ?: config('blipblap.currency', 'USD');
 
                 return [
                     'name' => $name,
                     'iso' => $iso ?: strtoupper(substr($name, 0, 2)),
-                    'plan_count' => count($plans),
+                    'plan_count' => count($items),
+                    'min_price' => $minPrice,
+                    'currency' => $currency,
                     'flag_url' => $this->flagUrl($iso),
                 ];
             })
-            ->sortByDesc('plan_count')
-            ->take(12)
-            ->values();
+            ->sort(function (array $a, array $b): int {
+                $countCompare = $b['plan_count'] <=> $a['plan_count'];
 
-        return $destinations->isNotEmpty() ? $destinations : $fallback;
+                if ($countCompare !== 0) {
+                    return $countCompare;
+                }
+
+                return ((float) ($a['min_price'] ?? PHP_FLOAT_MAX)) <=> ((float) ($b['min_price'] ?? PHP_FLOAT_MAX));
+            })
+            ->take(9)
+            ->values();
+    }
+
+    private function isGlobalPlan(EsimPlan $plan): bool
+    {
+        $name = strtolower((string) ($plan->country_name ?: $plan->region_name ?: $plan->coverage_type));
+
+        return str_contains($name, 'global') || str_contains($name, 'world');
     }
 
     private function featuredPlans()

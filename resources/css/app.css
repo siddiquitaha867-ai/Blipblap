@@ -2537,9 +2537,10 @@ input {
   background: white;
   border-radius: 14px;
   display: flex;
-  gap: 18px;
-  min-height: 88px;
-  padding: 18px 24px;
+  gap: 16px;
+  min-height: 92px;
+  overflow: hidden;
+  padding: 18px 22px;
   transition: transform 180ms ease, box-shadow 180ms ease;
 }
 
@@ -2550,32 +2551,53 @@ input {
 
 .flag {
   align-items: center;
-  background: white;
+  background: linear-gradient(135deg, #e8f2ff, #d7ecff);
   border-radius: 50%;
-  box-shadow: 0 3px 10px rgba(17, 24, 39, 0.08);
+  box-shadow: 0 6px 18px rgba(17, 24, 39, 0.1);
+  color: var(--bb-blue);
   display: inline-flex;
   flex: 0 0 auto;
-  font-size: 32px;
+  font-size: 13px;
+  font-weight: 800;
   height: 46px;
   justify-content: center;
   overflow: hidden;
+  text-transform: uppercase;
   width: 46px;
 }
 
 .flag img {
   display: block;
-  height: 34px;
-  object-fit: contain;
-  width: 34px;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
 }
 
 .destination-tile strong,
-.destination-tile small {
+.destination-tile small,
+.destination-tile em {
   display: block;
 }
 
+.destination-tile strong {
+  color: #06152b;
+  font-size: 14px;
+  line-height: 1.15;
+}
+
 .destination-tile small {
+  color: #06152b;
   font-size: 12px;
+  line-height: 1.25;
+  margin-top: 2px;
+}
+
+.destination-tile em {
+  color: var(--bb-muted);
+  font-size: 11px;
+  font-style: normal;
+  line-height: 1.2;
+  margin-top: 6px;
 }
 
 .steps-section {

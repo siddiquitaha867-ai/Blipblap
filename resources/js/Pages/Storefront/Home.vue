@@ -16,6 +16,10 @@ const props = defineProps({
     type: Array,
     default: () => [],
   },
+  destinationGroups: {
+    type: Object,
+    default: () => ({}),
+  },
 });
 
 const trustItems = [
@@ -31,35 +35,19 @@ const page = usePage();
 const authPromptCheckoutUrl = ref('');
 const isLoggedIn = computed(() => Boolean(page.props.auth.user));
 
-const groups = {
+const fallbackGroups = {
   'Top Destinations': props.featuredDestinations,
-  'Local eSIMs': [
-    { name: 'Canada', iso: 'CA' },
-    { name: 'USA', iso: 'US', flag_url: '/images/blipblap/USA.svg' },
-    { name: 'Pakistan', iso: 'PK' },
-    { name: 'Turkey', iso: 'TR', flag_url: '/images/blipblap/TUR.svg' },
-    { name: 'United Kingdom', iso: 'GB', flag_url: '/images/blipblap/GBR.svg' },
-    { name: 'Saudi Arabia', iso: 'SA', flag_url: '/images/blipblap/SAU.svg' },
-  ],
-  'Regional Packs': [
-    { name: 'Europe', iso: 'EU', flag_url: '/images/blipblap/EUR.svg' },
-    { name: 'Middle East', iso: 'ME' },
-    { name: 'Asia', iso: 'AS' },
-    { name: 'North America', iso: 'NA' },
-    { name: 'Caribbean', iso: 'CB' },
-    { name: 'Latin America', iso: 'LA' },
-  ],
-  'Worldwide eSIMs': [
-    { name: 'Global 1GB', iso: 'GL' },
-    { name: 'Global 3GB', iso: 'GL' },
-    { name: 'Global 5GB', iso: 'GL' },
-    { name: 'Global 10GB', iso: 'GL' },
-    { name: 'Global 20GB', iso: 'GL' },
-    { name: 'Global Unlimited', iso: 'GL' },
-  ],
+  'Local eSIMs': props.featuredDestinations,
+  'Regional Packs': [],
+  'Worldwide eSIMs': [],
 };
 
-const visibleDestinations = computed(() => groups[activeTab.value] || []);
+const groups = computed(() => ({
+  ...fallbackGroups,
+  ...props.destinationGroups,
+}));
+
+const visibleDestinations = computed(() => (groups.value[activeTab.value] || []).slice(0, 9));
 
 const planDataLabel = (plan) => {
   if (plan.unlimited) {
@@ -72,13 +60,30 @@ const planDataLabel = (plan) => {
 const planLocation = (plan) => plan.country_name || plan.region_name || 'Global';
 
 const destinationUrl = (name) => {
-  const slug = name.toLowerCase().replaceAll(' ', '-');
+  const slug = name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
 
   if (name.toLowerCase().startsWith('global')) {
     return '/global-esim';
   }
 
   return `/destinations/${slug}`;
+};
+
+const destinationMeta = (destination) => {
+  const parts = [];
+
+  if (destination.min_price) {
+    parts.push(`from ${destination.currency || 'USD'} ${Number(destination.min_price).toFixed(2)}`);
+  }
+
+  if (destination.plan_count) {
+    parts.push(`${destination.plan_count} plans`);
+  }
+
+  return parts.join(' · ');
 };
 
 const requestCheckout = (event, plan) => {
@@ -200,6 +205,7 @@ const faqs = [
           <span>
             <strong>eSIM</strong>
             <small>{{ destination.name }}</small>
+            <em v-if="destinationMeta(destination)">{{ destinationMeta(destination) }}</em>
           </span>
         </a>
       </div>
