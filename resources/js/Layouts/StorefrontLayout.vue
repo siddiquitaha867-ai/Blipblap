@@ -52,6 +52,14 @@ const destinationMeta = (destination) => {
 
   return parts.join(' - ');
 };
+
+const closeSearchWhenLeaving = (event) => {
+  if (event.currentTarget.contains(event.relatedTarget)) {
+    return;
+  }
+
+  searchOpen.value = false;
+};
 </script>
 
 <template>
@@ -104,7 +112,7 @@ const destinationMeta = (destination) => {
 
       <div class="air-search-row">
         <span class="air-line"></span>
-        <div class="air-search-wrap" @focusout="searchOpen = false">
+        <div class="air-search-wrap" @focusout="closeSearchWhenLeaving">
           <form class="air-search" @submit.prevent="loadDestinations">
             <span>⌕</span>
             <input
