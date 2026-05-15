@@ -225,6 +225,16 @@ input {
   overflow: hidden;
 }
 
+.air-search-wrap {
+  max-width: 1010px;
+  min-width: min(78vw, 1010px);
+  position: relative;
+}
+
+.air-search-wrap .air-search {
+  min-width: 100%;
+}
+
 .air-search > span {
   color: #001f5c;
   font-size: 28px;
@@ -252,6 +262,118 @@ input {
   font-weight: 700;
   margin-right: 5px;
   padding: 0 28px;
+}
+
+.destination-search-menu {
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid #dbe7ef;
+  border-radius: 24px;
+  box-shadow: 0 26px 70px rgba(16, 44, 76, 0.18);
+  left: 0;
+  margin-top: 12px;
+  overflow: hidden;
+  padding: 18px;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  z-index: 80;
+}
+
+.destination-search-menu label {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.destination-search-menu label span {
+  color: var(--bb-muted);
+  font-size: 11px;
+  font-weight: 800;
+  padding-left: 6px;
+  text-transform: uppercase;
+}
+
+.destination-search-menu label input {
+  background: #f3f7fa;
+  border: 1px solid #dce7ef;
+  border-radius: 999px;
+  color: #07182f;
+  height: 44px;
+  outline: 0;
+  padding: 0 18px;
+}
+
+.destination-search-menu label input:focus {
+  border-color: var(--bb-blue);
+  box-shadow: 0 0 0 4px rgba(11, 112, 255, 0.1);
+}
+
+.destination-search-list {
+  display: grid;
+  gap: 8px;
+  max-height: min(430px, 56vh);
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.destination-search-item {
+  align-items: center;
+  border-radius: 16px;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 42px 1fr;
+  min-height: 62px;
+  padding: 10px 12px;
+  transition: background 160ms ease, transform 160ms ease;
+}
+
+.destination-search-item:hover {
+  background: #e8f2ff;
+  transform: translateY(-1px);
+}
+
+.destination-search-flag {
+  align-items: center;
+  background: #e8f2ff;
+  border-radius: 50%;
+  color: var(--bb-blue);
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 900;
+  height: 42px;
+  justify-content: center;
+  overflow: hidden;
+  width: 42px;
+}
+
+.destination-search-flag img {
+  display: block;
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.destination-search-item strong,
+.destination-search-item small {
+  display: block;
+}
+
+.destination-search-item strong {
+  color: #06152b;
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.destination-search-item small,
+.destination-search-state {
+  color: var(--bb-muted);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.destination-search-state {
+  margin: 0;
+  padding: 16px 12px;
 }
 
 .nav-user {
@@ -4278,6 +4400,10 @@ input {
   }
 
   .air-search {
+    min-width: 100%;
+  }
+
+  .air-search-wrap {
     min-width: 100%;
   }
 

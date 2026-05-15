@@ -16,11 +16,48 @@ use App\Http\Controllers\Admin\PlanController as AdminPlanController;
 use App\Http\Controllers\Admin\PromotionController as AdminPromotionController;
 use App\Http\Controllers\Admin\StorefrontPreviewController as AdminStorefrontPreviewController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use App\Models\EsimPlan;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 
 Route::get('/', HomeController::class)->name('home');
 Route::get('/how-blipblap-works', fn () => Inertia::render('Storefront/HowItWorks'))->name('how-it-works');
+Route::get('/destinations-list', function () {
+    $flagMap = [
+        'AE' => '/images/blipblap/ARE.svg',
+        'EG' => '/images/blipblap/EGY.svg',
+        'GB' => '/images/blipblap/GBR.svg',
+        'OM' => '/images/blipblap/OMN.svg',
+        'RU' => '/images/blipblap/RUS.svg',
+        'SA' => '/images/blipblap/SAU.svg',
+        'TR' => '/images/blipblap/TUR.svg',
+        'US' => '/images/blipblap/USA.svg',
+        'EU' => '/images/blipblap/EUR.svg',
+    ];
+
+    return EsimPlan::query()
+        ->where('is_active', true)
+        ->whereNotNull('country_name')
+        ->get(['country_name', 'country_iso', 'retail_price', 'currency'])
+        ->groupBy('country_name')
+        ->map(function ($plans, string $country) use ($flagMap): array {
+            $iso = strtoupper((string) $plans->pluck('country_iso')->filter()->first());
+            $price = $plans->pluck('retail_price')->filter(fn ($value) => (float) $value > 0)->min();
+
+            return [
+                'name' => $country,
+                'iso' => $iso ?: strtoupper(substr($country, 0, 2)),
+                'flag_url' => $flagMap[$iso] ?? (strlen($iso) === 2 ? 'https://flagcdn.com/w80/' . strtolower($iso) . '.png' : ''),
+                'plan_count' => $plans->count(),
+                'min_price' => $price ? (float) $price : null,
+                'currency' => $plans->pluck('currency')->filter()->first() ?: config('blipblap.currency', 'USD'),
+                'url' => '/destinations/' . Str::slug($country),
+            ];
+        })
+        ->sortBy('name')
+        ->values();
+})->name('destinations.list');
 Route::get('/destinations/{slug}', [DestinationController::class, 'show'])->name('destinations.show');
 Route::get('/united-arab-emirates-esim', [DestinationController::class, 'show'])->defaults('slug', 'united-arab-emirates')->name('country.uae');
 Route::get('/plans/{plan:slug}', [PlanController::class, 'show'])->name('plans.show');
