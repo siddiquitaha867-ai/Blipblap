@@ -23,10 +23,26 @@ const props = defineProps({
 });
 
 const trustItems = [
-  ['GLOBAL COVERAGE', 'Stay connected across Canada, USA & 190 worldwide destinations.'],
-  ['INSTANT ACTIVATION', 'No physical SIM, just scan the QR and start.'],
-  ['AFFORDABLE & TRANSPARENT', 'No hidden fees, no roaming surprises.'],
-  ['24/7 SUPPORT', 'We are here wherever you need help.'],
+  {
+    title: 'GLOBAL COVERAGE',
+    text: 'Stay connected across Canada, USA & 190 worldwide destinations.',
+    image: '/images/blipblap/Trip-1.gif',
+  },
+  {
+    title: 'INSTANT ACTIVATION',
+    text: 'No physical SIM, just scan the QR and start.',
+    image: '/images/blipblap/Instant-information-1-e1767885932699-300x300.gif',
+  },
+  {
+    title: 'AFFORDABLE & TRANSPARENT',
+    text: 'No hidden fees, no roaming surprises.',
+    image: '/images/blipblap/ChatGPT-Image-Jan-8-2026-07_40_45-PM-03-300x300.png',
+  },
+  {
+    title: '24/7 SUPPORT',
+    text: 'We are here wherever you need help.',
+    image: '/images/blipblap/trust-icon.webp',
+  },
 ];
 
 const activeTab = ref('Top Destinations');
@@ -151,10 +167,10 @@ const faqs = [
     <span class="shape shape-lines"></span>
     <h2>Why Travelers Worldwide<br />Trust Blip Blap ESIM</h2>
     <div class="trust-grid">
-      <article v-for="item in trustItems" :key="item[0]">
-        <img class="trust-icon-img" src="/images/blipblap/trust-icon.webp" alt="" />
-        <h3>{{ item[0] }}</h3>
-        <p>{{ item[1] }}</p>
+      <article v-for="item in trustItems" :key="item.title">
+        <img class="trust-icon-img" :src="item.image" :alt="item.title" />
+        <h3>{{ item.title }}</h3>
+        <p>{{ item.text }}</p>
       </article>
     </div>
   </section>
