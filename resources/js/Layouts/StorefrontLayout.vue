@@ -119,7 +119,7 @@ const destinationMeta = (destination) => {
             <button type="button" @click="loadDestinations">Locations⌄</button>
           </form>
 
-          <div v-show="searchOpen" class="destination-search-menu" @mousedown.prevent>
+          <div v-show="searchOpen" class="destination-search-menu">
             <label>
               <span>Search country</span>
               <input
@@ -137,10 +137,11 @@ const destinationMeta = (destination) => {
               <template v-else>
                 <Link
                   v-for="destination in filteredDestinations"
-                  :key="destination.name"
-                  :href="destination.url"
-                  class="destination-search-item"
-                >
+                :key="destination.name"
+                :href="destination.url"
+                class="destination-search-item"
+                @mousedown.prevent
+              >
                   <span class="destination-search-flag">
                     <img v-if="destination.flag_url" :src="destination.flag_url" :alt="`${destination.name} flag`">
                     <span v-else>{{ destination.iso }}</span>
