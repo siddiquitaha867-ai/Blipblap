@@ -66,8 +66,6 @@ class PlansIndexController extends Controller
                 ];
             })
             ->sortBy([
-                ['plan_count', 'desc'],
-                ['min_price', 'asc'],
                 ['name', 'asc'],
             ])
             ->values();
@@ -77,8 +75,7 @@ class PlansIndexController extends Controller
     {
         return ! $this->isGlobalPlan($plan)
             && $plan->coverage_type === 'local'
-            && filled($plan->country_name)
-            && blank($plan->region_name);
+            && filled($plan->country_name);
     }
 
     private function isRegionalPlan(EsimPlan $plan): bool

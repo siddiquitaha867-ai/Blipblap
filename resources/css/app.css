@@ -3487,10 +3487,7 @@ input {
 }
 
 .plans-index-heading {
-  align-items: end;
-  display: grid;
-  gap: 24px;
-  grid-template-columns: 0.65fr 1fr;
+  display: block;
   margin-bottom: 28px;
 }
 
@@ -3499,7 +3496,8 @@ input {
 }
 
 .plans-index-heading p {
-  margin: 0;
+  margin: 16px 0 0;
+  max-width: 560px;
 }
 
 .plans-index-grid {

@@ -51,7 +51,7 @@ const priceLabel = (plan) => {
 
     <section class="plans-index-section">
       <div class="plans-index-heading">
-        <span>Local eSIMs</span>
+        <span>Country plans</span>
         <h2>Country plans</h2>
         <p>Best for one destination. Each card opens all available data packages for that country.</p>
       </div>
