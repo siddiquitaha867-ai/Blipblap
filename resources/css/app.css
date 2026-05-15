@@ -222,7 +222,7 @@ input {
   height: 58px;
   max-width: 1010px;
   min-width: min(78vw, 1010px);
-  overflow: hidden;
+  overflow: visible;
 }
 
 .air-search-wrap {
@@ -252,19 +252,25 @@ input {
 }
 
 .air-search button {
-  align-self: stretch;
+  align-self: center;
   background: var(--bb-sky);
   border: 0;
-  border-left: 0;
   border-radius: 999px;
   color: white;
   cursor: pointer;
   font-weight: 700;
-  height: 46px;
-  margin: 5px 6px 5px 0;
-  min-width: 134px;
-  padding: 0 22px;
+  height: 44px;
+  justify-self: end;
+  margin-right: 7px;
+  min-width: 126px;
+  padding: 0 20px;
   white-space: nowrap;
+}
+
+.air-search button:hover,
+.air-search button:focus-visible {
+  background: var(--bb-blue);
+  outline: 0;
 }
 
 .destination-search-menu {
@@ -280,7 +286,7 @@ input {
   right: 0;
   top: 100%;
   transform: translateX(-50%);
-  width: min(720px, 94vw);
+  width: min(680px, 94vw);
   z-index: 80;
 }
 
@@ -316,7 +322,7 @@ input {
 .destination-search-list {
   display: grid;
   gap: 4px;
-  max-height: min(300px, 42vh);
+  max-height: min(360px, 48vh);
   overflow-y: auto;
   padding-right: 4px;
 }

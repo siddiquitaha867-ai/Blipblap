@@ -36,8 +36,7 @@ const filteredDestinations = computed(() => {
   const query = searchQuery.value.trim().toLowerCase();
 
   return destinations.value
-    .filter((destination) => !query || destination.name.toLowerCase().includes(query))
-    .slice(0, 80);
+    .filter((destination) => !query || destination.name.toLowerCase().includes(query));
 });
 
 const destinationMeta = (destination) => {
