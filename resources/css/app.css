@@ -1,8 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;500;600;700&family=Lexend:wght@300;400;500;600;700&display=swap');
 
 :root {
-  --bb-blue: #0b70ff;
-  --bb-ink: #0b70ff;
+  --bb-blue: #0E50ED;
+  --bb-ink: #0E50ED;
   --bb-sky: #72bef0;
   --bb-soft: #f3f4f4;
   --bb-panel: #ffffff;
@@ -74,7 +74,7 @@ input {
 
 .brand {
   align-items: center;
-  color: #0b70ff;
+  color: var(--bb-blue);
   display: flex;
   font-size: 20px;
   font-weight: 700;
@@ -89,7 +89,7 @@ input {
 
 .brand-mark {
   align-items: center;
-  background: #0b70ff;
+  background: var(--bb-blue);
   border-radius: 50%;
   color: white;
   display: inline-flex;
@@ -161,7 +161,7 @@ input {
 }
 
 .plans-menu {
-  background: var(--bb-sky);
+  background: var(--bb-blue);
   border-radius: 8px;
   box-shadow: 0 20px 42px rgba(25, 91, 142, 0.2);
   display: grid;
@@ -253,7 +253,7 @@ input {
 
 .air-search button {
   align-self: center;
-  background: var(--bb-sky);
+  background: var(--bb-blue);
   border: 0;
   border-radius: 999px;
   color: white;
@@ -316,7 +316,7 @@ input {
 
 .destination-search-menu label input:focus {
   border-color: var(--bb-blue);
-  box-shadow: 0 0 0 4px rgba(11, 112, 255, 0.1);
+  box-shadow: 0 0 0 4px rgba(14, 80, 237, 0.1);
 }
 
 .destination-search-list {
@@ -400,7 +400,7 @@ input {
 .pill {
   border: 0;
   align-items: center;
-  background: var(--bb-sky);
+  background: var(--bb-blue);
   border-radius: 18px;
   color: white;
   display: inline-flex;
@@ -414,7 +414,7 @@ input {
 }
 
 .pill-soft {
-  background: var(--bb-sky);
+  background: var(--bb-blue);
   border: 0;
   color: white;
 }
@@ -446,7 +446,7 @@ input {
   background:
     linear-gradient(135deg, rgba(255, 255, 255, 0.38), transparent 38%),
     radial-gradient(circle at 20% 18%, rgba(114, 190, 240, 0.26), transparent 26%),
-    radial-gradient(circle at 82% 74%, rgba(11, 112, 255, 0.18), transparent 24%);
+    radial-gradient(circle at 82% 74%, rgba(14, 80, 237, 0.18), transparent 24%);
   inset: 0;
   position: absolute;
 }
@@ -524,7 +524,7 @@ input {
 
 .auth-tabs a.active {
   background: var(--bb-blue);
-  box-shadow: 0 10px 24px rgba(11, 112, 255, 0.2);
+  box-shadow: 0 10px 24px rgba(14, 80, 237, 0.2);
   color: white;
 }
 
@@ -571,12 +571,12 @@ input {
 
 .social-button--google::before {
   background: #eef6fb;
-  color: #0b70ff;
+  color: var(--bb-blue);
   content: 'G';
 }
 
 .social-button--facebook::before {
-  background: #0b70ff;
+  background: var(--bb-blue);
   color: white;
   content: 'f';
 }
@@ -684,10 +684,10 @@ input {
 }
 
 .auth-submit {
-  background: var(--bb-sky);
+  background: var(--bb-blue);
   border: 0;
   border-radius: 999px;
-  box-shadow: 0 14px 30px rgba(114, 190, 240, 0.28);
+  box-shadow: 0 14px 30px rgba(14, 80, 237, 0.24);
   color: white;
   cursor: pointer;
   font-size: 15px;
@@ -700,7 +700,7 @@ input {
 
 .auth-submit:hover {
   background: var(--bb-blue);
-  box-shadow: 0 16px 34px rgba(11, 112, 255, 0.25);
+  box-shadow: 0 16px 34px rgba(14, 80, 237, 0.25);
   transform: translateY(-1px);
 }
 
@@ -1396,7 +1396,7 @@ input {
 .admin-country-tab:hover,
 .admin-country-tab.active {
   border-color: var(--bb-blue);
-  box-shadow: 0 14px 34px rgba(11, 112, 255, 0.12);
+  box-shadow: 0 14px 34px rgba(14, 80, 237, 0.12);
   transform: translateY(-1px);
 }
 
@@ -2402,7 +2402,7 @@ input {
 .search-strip button,
 .search-strip a,
 .primary-cta {
-  background: var(--bb-sky);
+  background: var(--bb-blue);
   border: 0;
   border-radius: 999px;
   color: white;
@@ -2596,7 +2596,7 @@ input {
 
 .featured-plan-tile:hover {
   border-color: var(--bb-blue);
-  box-shadow: 0 22px 42px rgba(11, 112, 255, 0.16);
+  box-shadow: 0 22px 42px rgba(14, 80, 237, 0.16);
   transform: translateY(-3px);
 }
 
@@ -3789,7 +3789,7 @@ input {
 
 .duration-tab.active {
   background: var(--bb-blue);
-  box-shadow: 0 12px 30px rgba(11, 112, 255, 0.18);
+  box-shadow: 0 12px 30px rgba(14, 80, 237, 0.18);
   color: white;
 }
 
@@ -3831,14 +3831,14 @@ input {
 .package-card:hover {
   background: #e8f2ff;
   border-color: var(--bb-blue);
-  box-shadow: 0 14px 34px rgba(11, 112, 255, 0.16);
+  box-shadow: 0 14px 34px rgba(14, 80, 237, 0.16);
   transform: translateY(-3px);
 }
 
 .package-card.selected {
   background: #dff0ff;
   border-color: var(--bb-blue);
-  box-shadow: 0 16px 36px rgba(11, 112, 255, 0.2);
+  box-shadow: 0 16px 36px rgba(14, 80, 237, 0.2);
 }
 
 .package-card span {
@@ -3879,7 +3879,7 @@ input {
 .package-card--disabled:hover {
   background: #e8f2ff;
   border-color: var(--bb-blue);
-  box-shadow: 0 14px 34px rgba(11, 112, 255, 0.16);
+  box-shadow: 0 14px 34px rgba(14, 80, 237, 0.16);
   transform: translateY(-3px);
 }
 
@@ -3921,7 +3921,7 @@ input {
 .checkout-summary a:hover,
 .checkout-summary-button:hover {
   background: #005ee0;
-  box-shadow: 0 12px 28px rgba(11, 112, 255, 0.26);
+  box-shadow: 0 12px 28px rgba(14, 80, 237, 0.26);
   transform: translateY(-2px);
 }
 
@@ -4045,8 +4045,8 @@ input {
 }
 
 .compatibility-tabs button.active {
-  background: var(--bb-sky);
-  border-color: var(--bb-sky);
+  background: var(--bb-blue);
+  border-color: var(--bb-blue);
   color: #ffffff;
 }
 
@@ -4236,7 +4236,7 @@ input {
 .comment-form input:focus,
 .comment-form textarea:focus {
   border-color: var(--bb-blue);
-  box-shadow: 0 0 0 4px rgba(11, 112, 255, 0.14);
+  box-shadow: 0 0 0 4px rgba(14, 80, 237, 0.14);
 }
 
 .comment-form textarea {
@@ -4355,7 +4355,7 @@ input {
 .checkout-form input:focus,
 .checkout-form select:focus {
   border-color: var(--bb-blue);
-  box-shadow: 0 0 0 4px rgba(11, 112, 255, 0.12);
+  box-shadow: 0 0 0 4px rgba(14, 80, 237, 0.12);
 }
 
 .checkout-wide {
@@ -4509,7 +4509,7 @@ input {
 
 .payment-submit:hover {
   background: #005ee0;
-  box-shadow: 0 12px 28px rgba(11, 112, 255, 0.26);
+  box-shadow: 0 12px 28px rgba(14, 80, 237, 0.26);
   transform: translateY(-2px);
 }
 
