@@ -26,22 +26,22 @@ const trustItems = [
   {
     title: 'GLOBAL COVERAGE',
     text: 'Stay connected across Canada, USA & 190 worldwide destinations.',
-    image: '/images/blipblap/Trip-1.gif',
+    image: '/images/blipblap/Group-22-300x259.png',
   },
   {
     title: 'INSTANT ACTIVATION',
     text: 'No physical SIM, just scan the QR and start.',
-    image: '/images/blipblap/Instant-information-1-e1767885932699-300x300.gif',
+    image: '/images/blipblap/ChatGPT-Image-Jan-8-2026-07_40_45-PM-02-300x300.png',
   },
   {
     title: 'AFFORDABLE & TRANSPARENT',
     text: 'No hidden fees, no roaming surprises.',
-    image: '/images/blipblap/cropped-blip-blap-icon-300x300.png',
+    image: '/images/blipblap/trust-transparent.svg',
   },
   {
     title: '24/7 SUPPORT',
     text: 'We are here wherever you need help.',
-    image: '/images/blipblap/Instant-information.gif',
+    image: '/images/blipblap/trust-support-24-7.svg',
   },
 ];
 
@@ -115,7 +115,7 @@ const steps = [
   {
     title: 'Choose Your eSIM Plan',
     text: 'Select your destination and data package.',
-    image: '/images/blipblap/Instant-information.gif',
+    image: '/images/blipblap/ChatGPT-Image-Jan-8-2026-07_40_45-PM-01-300x300.png',
     alt: 'Choose an eSIM plan',
   },
   {
@@ -137,7 +137,7 @@ let stepTimer;
 onMounted(() => {
   stepTimer = window.setInterval(() => {
     activeStep.value = (activeStep.value + 1) % steps.length;
-  }, 2000);
+  }, 5000);
 });
 
 onBeforeUnmount(() => {
@@ -168,7 +168,7 @@ const faqs = [
       <div class="hero-art" aria-hidden="true">
         <img
           class="hero-photo-img"
-          src="/images/blipblap/Group-22-300x259.png"
+          src="/images/blipblap/trust-icon.webp"
           alt="Travelers using BlipBlap eSIM"
         />
       </div>

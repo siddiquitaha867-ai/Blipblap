@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120" role="img" aria-label="24/7 support">
+  <circle cx="60" cy="60" r="54" fill="#eef6ff"/>
+  <circle cx="60" cy="56" r="30" fill="#ffffff" stroke="#0E50ED" stroke-width="5"/>
+  <path d="M60 39v19l13 8" fill="none" stroke="#0E50ED" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M28 67v-7c0-18 14-33 32-33s32 15 32 33v7" fill="none" stroke="#0E50ED" stroke-width="5" stroke-linecap="round"/>
+  <rect x="22" y="62" width="15" height="24" rx="7" fill="#0E50ED"/>
+  <rect x="83" y="62" width="15" height="24" rx="7" fill="#0E50ED"/>
+  <path d="M84 86c-4 9-12 14-24 14" fill="none" stroke="#0E50ED" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="60" cy="100" r="5" fill="#0E50ED"/>
+  <text x="60" y="92" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#0E50ED">24/7</text>
+</svg>
