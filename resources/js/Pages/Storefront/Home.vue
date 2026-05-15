@@ -150,7 +150,7 @@ const faqs = [
           Instant Canada & Global eSIM plans, activate in seconds with zero hassle.
           Connect across 190+ countries with affordable data and 24/7 support.
         </p>
-        <a href="#destinations" class="primary-cta">Explore eSIM Plans</a>
+        <a href="/esim-plans" class="primary-cta">Explore eSIM Plans</a>
       </div>
 
       <div class="hero-art" aria-hidden="true">

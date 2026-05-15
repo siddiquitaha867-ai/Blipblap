@@ -114,7 +114,7 @@ const priceLabel = (plan) => {
     <section class="plans-index-final">
       <h2>Ready to connect?</h2>
       <p>Open a destination, choose your data package, and BlipBlap will guide you through checkout and installation.</p>
-      <a href="/#destinations">Browse popular destinations</a>
+      <a href="/esim-plans">Browse all eSIM plans</a>
     </section>
 
     <footer id="contact" class="footer">

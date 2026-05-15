@@ -32,7 +32,7 @@ const phoneFrames = [
         <p>
           Buy a travel data plan, receive digital eSIM installation details, and connect on your mobile without waiting for a physical SIM card.
         </p>
-        <a href="/#destinations">Show all country plans</a>
+        <a href="/esim-plans">Show all country plans</a>
       </div>
       <div class="how-hero__visual" aria-hidden="true">
         <img src="/images/blipblap/Trip.gif" alt="">
@@ -106,7 +106,7 @@ const phoneFrames = [
       <div>
         <p class="how-kicker">Ready when you are</p>
         <h2>Browse country, regional, and worldwide eSIM plans in one place.</h2>
-        <a href="/#destinations">Explore all plans</a>
+        <a href="/esim-plans">Explore all plans</a>
       </div>
     </section>
   </section>
