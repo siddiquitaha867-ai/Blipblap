@@ -11,6 +11,20 @@ use Inertia\Response;
 
 class PlansIndexController extends Controller
 {
+    private const REGIONAL_DESTINATION_NAMES = [
+        'africa',
+        'asia',
+        'balkans',
+        'caribbean',
+        'central america',
+        'europe',
+        'latin america',
+        'middle east',
+        'north america',
+        'oceania',
+        'south america',
+    ];
+
     public function __invoke(): Response
     {
         $plans = EsimPlan::query()
@@ -38,7 +52,7 @@ class PlansIndexController extends Controller
             ->map(function (EsimPlan $plan) use ($type): array {
                 $name = match ($type) {
                     'global' => $this->globalName($plan),
-                    'regional' => (string) ($plan->region_name ?: $plan->coverage_type),
+                    'regional' => $this->regionalName($plan),
                     default => (string) $plan->country_name,
                 };
 
@@ -60,7 +74,7 @@ class PlansIndexController extends Controller
                     'plan_count' => $items->count(),
                     'min_price' => $prices->min(),
                     'currency' => $items->pluck('currency')->filter()->first() ?: config('blipblap.currency', 'USD'),
-                    'flag_url' => $type === 'global' ? '' : $this->flagUrl($iso),
+                    'flag_url' => $type === 'local' ? $this->flagUrl($iso) : '',
                     'icon' => $type === 'global' ? 'globe' : null,
                     'url' => '/destinations/' . Str::slug($name),
                 ];
@@ -74,6 +88,7 @@ class PlansIndexController extends Controller
     private function isLocalPlan(EsimPlan $plan): bool
     {
         return ! $this->isGlobalPlan($plan)
+            && ! $this->hasRegionalDestinationName($plan)
             && $plan->coverage_type === 'local'
             && filled($plan->country_name);
     }
@@ -81,7 +96,7 @@ class PlansIndexController extends Controller
     private function isRegionalPlan(EsimPlan $plan): bool
     {
         return ! $this->isGlobalPlan($plan)
-            && (filled($plan->region_name) || $plan->coverage_type !== 'local');
+            && $this->hasRegionalDestinationName($plan);
     }
 
     private function isGlobalPlan(EsimPlan $plan): bool
@@ -100,6 +115,40 @@ class PlansIndexController extends Controller
         }
 
         return $name ?: (string) $plan->title;
+    }
+
+    private function regionalName(EsimPlan $plan): string
+    {
+        foreach ([$plan->country_name, $plan->region_name, $plan->coverage_type, $plan->title] as $name) {
+            $normalizedName = $this->normalizedName($name);
+
+            if ($this->isRegionalDestinationName($normalizedName)) {
+                return Str::title($normalizedName);
+            }
+        }
+
+        return (string) ($plan->region_name ?: $plan->country_name ?: $plan->coverage_type);
+    }
+
+    private function hasRegionalDestinationName(EsimPlan $plan): bool
+    {
+        foreach ([$plan->country_name, $plan->region_name, $plan->coverage_type, $plan->title] as $name) {
+            if ($this->isRegionalDestinationName($this->normalizedName($name))) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function isRegionalDestinationName(string $name): bool
+    {
+        return in_array($name, self::REGIONAL_DESTINATION_NAMES, true);
+    }
+
+    private function normalizedName(?string $name): string
+    {
+        return trim(strtolower((string) $name));
     }
 
     private function flagUrl(string $iso): string
