@@ -16,9 +16,11 @@ use App\Http\Controllers\Admin\PlanController as AdminPlanController;
 use App\Http\Controllers\Admin\PromotionController as AdminPromotionController;
 use App\Http\Controllers\Admin\StorefrontPreviewController as AdminStorefrontPreviewController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
+use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
+Route::get('/how-blipblap-works', fn () => Inertia::render('Storefront/HowItWorks'))->name('how-it-works');
 Route::get('/destinations/{slug}', [DestinationController::class, 'show'])->name('destinations.show');
 Route::get('/united-arab-emirates-esim', [DestinationController::class, 'show'])->defaults('slug', 'united-arab-emirates')->name('country.uae');
 Route::get('/plans/{plan:slug}', [PlanController::class, 'show'])->name('plans.show');

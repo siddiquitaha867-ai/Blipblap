@@ -52,7 +52,7 @@ const displayName = computed(() => (isAdminPreview.value ? 'Admin' : page.props.
             <Link href="/destinations/asia">Regional eSIM</Link>
           </div>
         </div>
-        <a :href="`${homeHref}#loyalty`">Loyalty Program</a>
+        <Link href="/how-blipblap-works">How BlipBlap Works</Link>
         <a :href="`${homeHref}#faqs`">FAQs</a>
         <a :href="`${homeHref}#contact`">Contact Us</a>
       </nav>
