@@ -34,6 +34,7 @@ class HomeController extends Controller
         $plans = EsimPlan::query()
             ->where('is_active', true)
             ->get([
+                'title',
                 'country_name',
                 'region_name',
                 'coverage_type',
@@ -55,31 +56,56 @@ class HomeController extends Controller
             ];
         }
 
-        $local = $this->rankedDestinations($plans->where('coverage_type', 'local'));
-        $regional = $this->rankedDestinations(
-            $plans->reject(fn (EsimPlan $plan): bool => $plan->coverage_type === 'local' || $this->isGlobalPlan($plan))
+        $topNames = [
+            'United Arab Emirates',
+            'Saudi Arabia',
+            'United Kingdom',
+            'Pakistan',
+            'United States',
+            'Canada',
+            'Turkey',
+            'Europe Extra',
+            'Asia',
+        ];
+
+        $localPlans = $plans->filter(fn (EsimPlan $plan): bool => $this->isLocalPlan($plan));
+        $regionalPlans = $plans->filter(fn (EsimPlan $plan): bool => $this->isRegionalPlan($plan));
+        $worldwidePlans = $plans->filter(fn (EsimPlan $plan): bool => $this->isGlobalPlan($plan));
+
+        $top = $this->rankedDestinations($plans, topNames: $topNames);
+        $local = $this->rankedDestinations(
+            $localPlans->reject(fn (EsimPlan $plan): bool => in_array($this->destinationName($plan), $topNames, true))
         );
-        $worldwide = $this->rankedDestinations($plans->filter(fn (EsimPlan $plan): bool => $this->isGlobalPlan($plan)));
+        $regional = $this->rankedDestinations(
+            $regionalPlans,
+            preferredNames: ['Europe Extra', 'Asia', 'Middle East', 'North America', 'LATAM', 'Caribbean', 'Oceania', 'Africa', 'CIS']
+        );
+        $worldwide = $this->rankedDestinations(
+            $worldwidePlans,
+            groupByPlan: true,
+            preferredNames: ['Global - Light', 'Global - Standard', 'Global - Max', 'Global', 'Global 1GB', 'Global 3GB', 'Global 5GB', 'Global 10GB', 'Global 20GB']
+        );
 
         return [
-            'Top Destinations' => $this->rankedDestinations($plans),
-            'Local eSIMs' => $local,
+            'Top Destinations' => $top,
+            'Local eSIMs' => $local->isNotEmpty() ? $local : $this->rankedDestinations($localPlans),
             'Regional Packs' => $regional,
             'Worldwide eSIMs' => $worldwide,
         ];
     }
 
-    private function rankedDestinations($plans)
+    private function rankedDestinations($plans, array $preferredNames = [], array $topNames = [], bool $groupByPlan = false)
     {
         return $plans
-            ->map(function (EsimPlan $plan): array {
-                $name = $plan->country_name ?: $plan->region_name ?: $plan->coverage_type;
+            ->map(function (EsimPlan $plan) use ($groupByPlan): array {
+                $name = $groupByPlan ? $this->globalPlanName($plan) : $this->destinationName($plan);
 
                 return [
                     'name' => $name,
                     'iso' => $plan->country_iso,
                     'price' => (float) $plan->retail_price,
                     'currency' => $plan->currency ?: config('blipblap.currency', 'USD'),
+                    'icon' => $this->isGlobalPlan($plan) ? 'globe' : null,
                 ];
             })
             ->filter(fn (array $destination): bool => trim((string) $destination['name']) !== '')
@@ -97,9 +123,26 @@ class HomeController extends Controller
                     'min_price' => $minPrice,
                     'currency' => $currency,
                     'flag_url' => $this->flagUrl($iso),
+                    'icon' => collect($items)->pluck('icon')->filter()->first(),
                 ];
             })
-            ->sort(function (array $a, array $b): int {
+            ->sort(function (array $a, array $b) use ($preferredNames, $topNames): int {
+                $aPreferred = $this->rankIndex((string) $a['name'], $preferredNames);
+                $bPreferred = $this->rankIndex((string) $b['name'], $preferredNames);
+
+                if ($aPreferred !== $bPreferred) {
+                    return $aPreferred <=> $bPreferred;
+                }
+
+                if ($topNames !== []) {
+                    $aTop = $this->rankIndex((string) $a['name'], $topNames);
+                    $bTop = $this->rankIndex((string) $b['name'], $topNames);
+
+                    if ($aTop !== $bTop) {
+                        return $aTop <=> $bTop;
+                    }
+                }
+
                 $countCompare = $b['plan_count'] <=> $a['plan_count'];
 
                 if ($countCompare !== 0) {
@@ -112,11 +155,49 @@ class HomeController extends Controller
             ->values();
     }
 
+    private function destinationName(EsimPlan $plan): string
+    {
+        return (string) ($plan->country_name ?: $plan->region_name ?: $plan->coverage_type);
+    }
+
+    private function globalPlanName(EsimPlan $plan): string
+    {
+        $name = $this->destinationName($plan);
+
+        if (! in_array(strtolower($name), ['global', 'worldwide'], true)) {
+            return $name;
+        }
+
+        return (string) ($plan->title ?: $name);
+    }
+
+    private function isLocalPlan(EsimPlan $plan): bool
+    {
+        return $plan->country_name !== null
+            && $plan->country_name !== ''
+            && ! $this->isGlobalPlan($plan)
+            && ($plan->region_name === null || $plan->region_name === '')
+            && $plan->coverage_type === 'local';
+    }
+
+    private function isRegionalPlan(EsimPlan $plan): bool
+    {
+        return ! $this->isGlobalPlan($plan)
+            && ($plan->region_name !== null && $plan->region_name !== '' || $plan->coverage_type !== 'local');
+    }
+
     private function isGlobalPlan(EsimPlan $plan): bool
     {
         $name = strtolower((string) ($plan->country_name ?: $plan->region_name ?: $plan->coverage_type));
 
         return str_contains($name, 'global') || str_contains($name, 'world');
+    }
+
+    private function rankIndex(string $name, array $names): int
+    {
+        $index = array_search($name, $names, true);
+
+        return $index === false ? 1000 : (int) $index;
     }
 
     private function featuredPlans()

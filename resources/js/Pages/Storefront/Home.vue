@@ -199,7 +199,15 @@ const faqs = [
           :href="destinationUrl(destination.name)"
         >
           <span class="flag">
-            <img v-if="destination.flag_url" :src="destination.flag_url" :alt="`${destination.name} flag`" />
+            <svg
+              v-if="destination.icon === 'globe'"
+              viewBox="0 0 24 24"
+              aria-hidden="true"
+            >
+              <circle cx="12" cy="12" r="9" />
+              <path d="M3 12h18M12 3c2.3 2.5 3.4 5.5 3.4 9S14.3 18.5 12 21M12 3c-2.3 2.5-3.4 5.5-3.4 9S9.7 18.5 12 21" />
+            </svg>
+            <img v-else-if="destination.flag_url" :src="destination.flag_url" :alt="`${destination.name} flag`" />
             <span v-else>{{ destination.iso }}</span>
           </span>
           <span>

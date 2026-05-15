@@ -2219,7 +2219,6 @@ input {
 }
 
 .hero-section::before,
-.destinations-section::before,
 .steps-section::before,
 .faq-section::before {
   border-bottom: 34px solid transparent;
@@ -2230,6 +2229,10 @@ input {
   position: absolute;
   top: 360px;
   transform: rotate(12deg);
+}
+
+.destinations-section::before {
+  content: none;
 }
 
 .search-strip {
@@ -2571,6 +2574,16 @@ input {
   height: 100%;
   object-fit: cover;
   width: 100%;
+}
+
+.flag svg {
+  fill: none;
+  height: 28px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+  width: 28px;
 }
 
 .destination-tile strong,
