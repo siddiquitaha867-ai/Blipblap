@@ -3,7 +3,7 @@ import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
 import DestinationTabs from '@/Components/DestinationTabs.vue';
 import AuthRequiredModal from '@/Components/AuthRequiredModal.vue';
 import { usePage } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 
 defineOptions({ layout: StorefrontLayout });
 
@@ -36,12 +36,12 @@ const trustItems = [
   {
     title: 'AFFORDABLE & TRANSPARENT',
     text: 'No hidden fees, no roaming surprises.',
-    image: '/images/blipblap/ChatGPT-Image-Jan-8-2026-07_40_45-PM-03-300x300.png',
+    image: '/images/blipblap/cropped-blip-blap-icon-300x300.png',
   },
   {
     title: '24/7 SUPPORT',
     text: 'We are here wherever you need help.',
-    image: '/images/blipblap/trust-icon.webp',
+    image: '/images/blipblap/Instant-information.gif',
   },
 ];
 
@@ -115,7 +115,7 @@ const steps = [
   {
     title: 'Choose Your eSIM Plan',
     text: 'Select your destination and data package.',
-    image: '/images/blipblap/ChatGPT-Image-Jan-8-2026-07_40_45-PM-01-300x300.png',
+    image: '/images/blipblap/Instant-information.gif',
     alt: 'Choose an eSIM plan',
   },
   {
@@ -131,6 +131,18 @@ const steps = [
     alt: 'Connect with high speed data',
   },
 ];
+
+let stepTimer;
+
+onMounted(() => {
+  stepTimer = window.setInterval(() => {
+    activeStep.value = (activeStep.value + 1) % steps.length;
+  }, 2000);
+});
+
+onBeforeUnmount(() => {
+  window.clearInterval(stepTimer);
+});
 
 const faqs = [
   'How do I activate my eSIM?',
@@ -156,7 +168,7 @@ const faqs = [
       <div class="hero-art" aria-hidden="true">
         <img
           class="hero-photo-img"
-          src="/images/blipblap/186b5d5e-23fd-41a6-a460-8eba5e2f9410-300x300.webp"
+          src="/images/blipblap/Group-22-300x259.png"
           alt="Travelers using BlipBlap eSIM"
         />
       </div>
@@ -238,8 +250,7 @@ const faqs = [
 
   <section class="steps-section">
     <div class="steps-illustration">
-      <img class="steps-person" src="/images/blipblap/Mask-Group-15-300x300.png" alt="" />
-      <div class="step-phone-frame">
+      <div class="step-visual-card">
         <Transition name="step-fade" mode="out-in">
           <img
             :key="steps[activeStep].image"
@@ -258,8 +269,6 @@ const faqs = [
           :key="step.title"
           :class="{ active: activeStep === index }"
           tabindex="0"
-          @focus="activeStep = index"
-          @mouseenter="activeStep = index"
         >
           <span>{{ index + 1 }}</span>
           <div>
@@ -283,18 +292,6 @@ const faqs = [
         <p v-else>Earn points on eligible purchases and referrals, then redeem them for rewards.</p>
       </details>
     </div>
-  </section>
-
-  <section class="app-cta">
-    <div>
-      <h2>Download the App<br />and manage your<br />eSIMs easily.</h2>
-      <p>The quick & easy way to manage your eSIMs</p>
-      <div class="store-buttons">
-        <a href="#"><img src="/images/blipblap/pngwing.com_-e1764851044946-300x99.png" alt="Get it on Google Play" /></a>
-        <a href="#"><img src="/images/blipblap/pngwing.com-1-300x116.png" alt="Download on the App Store" /></a>
-      </div>
-    </div>
-    <img class="group-photo" src="/images/blipblap/Buddies.gif" alt="" />
   </section>
 
   <footer id="contact" class="footer">
