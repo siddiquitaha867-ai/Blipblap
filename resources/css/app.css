@@ -3379,6 +3379,231 @@ input {
   margin-top: 22px;
 }
 
+.plans-index-page {
+  background: #f3f4f4;
+  color: #07182f;
+}
+
+.plans-index-hero {
+  align-items: center;
+  display: grid;
+  gap: 54px;
+  grid-template-columns: minmax(320px, 0.95fr) minmax(320px, 0.75fr);
+  margin: 0 auto;
+  max-width: 1180px;
+  min-height: 520px;
+  padding: 72px 28px 54px;
+}
+
+.plans-index-hero span,
+.plans-index-heading span {
+  color: var(--bb-sky);
+  display: block;
+  font-size: 12px;
+  font-weight: 900;
+  margin-bottom: 14px;
+  text-transform: uppercase;
+}
+
+.plans-index-hero h1,
+.plans-index-heading h2,
+.plans-index-final h2 {
+  color: var(--bb-blue);
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 1.02;
+  margin: 0;
+}
+
+.plans-index-hero h1 {
+  font-size: clamp(42px, 5vw, 72px);
+}
+
+.plans-index-hero p,
+.plans-index-heading p,
+.plans-index-final p {
+  color: #4d5968;
+  font-size: 16px;
+  line-height: 1.7;
+  margin: 22px 0 0;
+  max-width: 620px;
+}
+
+.plans-index-hero img {
+  animation: howFloat 5.5s ease-in-out infinite;
+  border-radius: 28px;
+  box-shadow: 0 26px 70px rgba(16, 44, 76, 0.16);
+  display: block;
+  width: 100%;
+}
+
+.plans-index-strip {
+  align-items: center;
+  background: white;
+  border-radius: 24px;
+  display: grid;
+  gap: 28px;
+  grid-template-columns: 130px 1fr 130px;
+  margin: 0 auto 48px;
+  max-width: 1040px;
+  overflow: hidden;
+  padding: 18px 28px;
+}
+
+.plans-index-strip img {
+  border-radius: 18px;
+  display: block;
+  height: 104px;
+  object-fit: cover;
+  width: 104px;
+}
+
+.plans-index-strip img:last-child {
+  justify-self: end;
+}
+
+.plans-index-strip strong {
+  color: #06152b;
+  display: block;
+  font-size: 20px;
+}
+
+.plans-index-strip p {
+  color: var(--bb-muted);
+  line-height: 1.6;
+  margin: 8px 0 0;
+}
+
+.plans-index-section {
+  margin: 0 auto;
+  max-width: 1180px;
+  padding: 54px 28px;
+}
+
+.plans-index-section--soft {
+  background: white;
+  border-radius: 28px;
+  box-shadow: 0 20px 60px rgba(16, 44, 76, 0.06);
+}
+
+.plans-index-heading {
+  align-items: end;
+  display: grid;
+  gap: 24px;
+  grid-template-columns: 0.65fr 1fr;
+  margin-bottom: 28px;
+}
+
+.plans-index-heading h2 {
+  font-size: clamp(34px, 4vw, 56px);
+}
+
+.plans-index-heading p {
+  margin: 0;
+}
+
+.plans-index-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.plans-index-card {
+  align-items: center;
+  background: white;
+  border-radius: 16px;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: 48px 1fr;
+  min-height: 84px;
+  padding: 16px 18px;
+  transition: background 170ms ease, box-shadow 170ms ease, transform 170ms ease;
+}
+
+.plans-index-section--soft .plans-index-card {
+  background: #f8fafb;
+}
+
+.plans-index-card:hover {
+  background: #e8f2ff;
+  box-shadow: 0 18px 38px rgba(25, 91, 142, 0.12);
+  transform: translateY(-2px);
+}
+
+.plans-index-icon {
+  align-items: center;
+  background: #e8f2ff;
+  border-radius: 50%;
+  color: var(--bb-blue);
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 900;
+  height: 48px;
+  justify-content: center;
+  overflow: hidden;
+  width: 48px;
+}
+
+.plans-index-icon img {
+  height: 100%;
+  object-fit: cover;
+  width: 100%;
+}
+
+.plans-index-icon svg {
+  fill: none;
+  height: 28px;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
+  width: 28px;
+}
+
+.plans-index-card strong,
+.plans-index-card small {
+  display: block;
+}
+
+.plans-index-card strong {
+  color: #06152b;
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.plans-index-card small {
+  color: var(--bb-muted);
+  font-size: 12px;
+  line-height: 1.45;
+  margin-top: 5px;
+}
+
+.plans-index-final {
+  margin: 24px auto 64px;
+  max-width: 840px;
+  padding: 28px;
+  text-align: center;
+}
+
+.plans-index-final h2 {
+  font-size: clamp(34px, 4vw, 56px);
+}
+
+.plans-index-final p {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.plans-index-final a {
+  background: var(--bb-blue);
+  border-radius: 999px;
+  color: white;
+  display: inline-flex;
+  font-weight: 800;
+  margin-top: 24px;
+  padding: 15px 24px;
+}
+
 @keyframes howRise {
   from {
     opacity: 0;
@@ -4429,6 +4654,8 @@ input {
   .how-story,
   .how-connect,
   .how-final,
+  .plans-index-hero,
+  .plans-index-heading,
   .steps-section,
   .app-cta,
   .footer {
@@ -4450,6 +4677,7 @@ input {
 
   .trust-grid,
   .how-highlights,
+  .plans-index-grid,
   .featured-plans-rail,
   .destination-grid {
     grid-template-columns: 1fr;
@@ -4484,6 +4712,23 @@ input {
 
   .how-demo {
     min-height: 360px;
+  }
+
+  .plans-index-hero,
+  .plans-index-section {
+    padding: 48px 22px;
+  }
+
+  .plans-index-strip {
+    grid-template-columns: 1fr;
+    margin-left: 22px;
+    margin-right: 22px;
+    text-align: center;
+  }
+
+  .plans-index-strip img,
+  .plans-index-strip img:last-child {
+    justify-self: center;
   }
 
   .featured-plans-section {

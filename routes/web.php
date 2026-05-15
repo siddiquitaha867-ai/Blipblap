@@ -4,6 +4,7 @@ use App\Http\Controllers\Storefront\DestinationController;
 use App\Http\Controllers\Storefront\HomeController;
 use App\Http\Controllers\Storefront\CheckoutController;
 use App\Http\Controllers\Storefront\PlanController;
+use App\Http\Controllers\Storefront\PlansIndexController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
@@ -23,6 +24,7 @@ use Illuminate\Support\Str;
 
 Route::get('/', HomeController::class)->name('home');
 Route::get('/how-blipblap-works', fn () => Inertia::render('Storefront/HowItWorks'))->name('how-it-works');
+Route::get('/esim-plans', PlansIndexController::class)->name('plans.index');
 Route::get('/destinations-list', function () {
     $flagMap = [
         'AE' => '/images/blipblap/ARE.svg',

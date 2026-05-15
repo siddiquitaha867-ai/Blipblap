@@ -1,16 +1,16 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-C1383aGP.css",
+    "file": "assets/app-BMbHE1Ed.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-BgNpAZjg.js",
+    "file": "assets/app-PSM1HXP0.js",
     "name": "app",
     "src": "resources/js/app.js",
     "isEntry": true,
     "css": [
-      "assets/app-C1383aGP.css"
+      "assets/app-BMbHE1Ed.css"
     ]
   }
 }

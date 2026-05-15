@@ -3,7 +3,6 @@ import { Link, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 
 const page = usePage();
-const plansOpen = ref(false);
 const searchOpen = ref(false);
 const searchLoading = ref(false);
 const searchQuery = ref('');
@@ -74,7 +73,7 @@ const closeSearchWhenLeaving = (event) => {
         </Link>
 
         <div class="air-header-actions">
-          <button type="button" class="icon-button" aria-label="Language">○</button>
+          <button type="button" class="icon-button" aria-label="Language">o</button>
           <span class="header-divider"></span>
           <button type="button" class="icon-button" aria-label="Wallet">□</button>
           <template v-if="page.props.auth.user">
@@ -90,21 +89,7 @@ const closeSearchWhenLeaving = (event) => {
 
       <nav class="air-nav" aria-label="Primary navigation">
         <Link :href="homeHref">Home</Link>
-        <div
-          class="nav-dropdown"
-          @mouseenter="plansOpen = true"
-          @mouseleave="plansOpen = false"
-        >
-          <button type="button" @click="plansOpen = !plansOpen">
-            ESIM Plans <span>⌄</span>
-          </button>
-          <div v-show="plansOpen" class="plans-menu">
-            <Link href="/destinations/canada">Canada eSIM</Link>
-            <Link href="/destinations/usa">USA + Canada eSIM</Link>
-            <Link href="/destinations/global">Global eSIM</Link>
-            <Link href="/destinations/asia">Regional eSIM</Link>
-          </div>
-        </div>
+        <Link href="/esim-plans">ESIM Plans</Link>
         <Link href="/how-blipblap-works">How BlipBlap Works</Link>
         <a :href="`${homeHref}#faqs`">FAQs</a>
         <a :href="`${homeHref}#contact`">Contact Us</a>
@@ -144,11 +129,11 @@ const closeSearchWhenLeaving = (event) => {
               <template v-else>
                 <Link
                   v-for="destination in filteredDestinations"
-                :key="destination.name"
-                :href="destination.url"
-                class="destination-search-item"
-                @mousedown.prevent
-              >
+                  :key="destination.name"
+                  :href="destination.url"
+                  class="destination-search-item"
+                  @mousedown.prevent
+                >
                   <span class="destination-search-flag">
                     <img v-if="destination.flag_url" :src="destination.flag_url" :alt="`${destination.name} flag`">
                     <span v-else>{{ destination.iso }}</span>
