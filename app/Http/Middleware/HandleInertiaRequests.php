@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\CustomerEsim;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -25,6 +26,9 @@ class HandleInertiaRequests extends Middleware
                     'email' => $request->user()->email,
                     'email_verified_at' => $request->user()->email_verified_at,
                     'is_admin' => (bool) $request->user()->is_admin,
+                    'customer_esims_count' => CustomerEsim::query()
+                        ->where('user_id', $request->user()->id)
+                        ->count(),
                 ] : null,
             ],
             'flash' => [

@@ -7,10 +7,13 @@ const searchOpen = ref(false);
 const searchLoading = ref(false);
 const searchQuery = ref('');
 const destinations = ref([]);
+const accountOpen = ref(false);
 
-const isAdminPreview = computed(() => Boolean(page.props.auth.user?.is_admin));
+const user = computed(() => page.props.auth.user);
+const isAdminPreview = computed(() => Boolean(user.value?.is_admin));
 const homeHref = computed(() => (isAdminPreview.value ? '/admin/storefront' : '/'));
-const displayName = computed(() => (isAdminPreview.value ? 'Admin' : page.props.auth.user?.name));
+const displayName = computed(() => (isAdminPreview.value ? 'Admin' : user.value?.name));
+const hasCustomerEsims = computed(() => Number(user.value?.customer_esims_count || 0) > 0);
 
 const loadDestinations = async () => {
   searchOpen.value = true;
@@ -59,6 +62,14 @@ const closeSearchWhenLeaving = (event) => {
 
   searchOpen.value = false;
 };
+
+const closeAccountWhenLeaving = (event) => {
+  if (event.currentTarget.contains(event.relatedTarget)) {
+    return;
+  }
+
+  accountOpen.value = false;
+};
 </script>
 
 <template>
@@ -73,12 +84,29 @@ const closeSearchWhenLeaving = (event) => {
         </Link>
 
         <div class="air-header-actions">
-          <button type="button" class="icon-button" aria-label="Language">o</button>
-          <span class="header-divider"></span>
-          <button type="button" class="icon-button" aria-label="Wallet">□</button>
-          <template v-if="page.props.auth.user">
-            <span class="nav-user">{{ displayName }}</span>
-            <Link href="/logout" method="post" as="button" class="pill">Logout</Link>
+          <template v-if="user">
+            <Link v-if="hasCustomerEsims" href="/my-esims" class="account-link">My eSIMs</Link>
+            <button v-else type="button" class="account-link account-link--disabled" aria-disabled="true">
+              My eSIMs
+            </button>
+
+            <div class="account-menu-wrap" @focusout="closeAccountWhenLeaving">
+              <button
+                type="button"
+                class="pill account-trigger"
+                :aria-expanded="accountOpen"
+                @click="accountOpen = !accountOpen"
+              >
+                My Account
+              </button>
+
+              <div v-show="accountOpen" class="account-menu">
+                <span>Signed in as</span>
+                <strong>{{ displayName }}</strong>
+                <small>{{ user.email }}</small>
+                <Link href="/logout" method="post" as="button" class="account-logout">Logout</Link>
+              </div>
+            </div>
           </template>
           <template v-else>
             <Link href="/auth/login" class="pill pill-soft">Log in</Link>
@@ -99,7 +127,7 @@ const closeSearchWhenLeaving = (event) => {
         <span class="air-line"></span>
         <div class="air-search-wrap" @focusout="closeSearchWhenLeaving">
           <form class="air-search" @submit.prevent="loadDestinations">
-            <span>⌕</span>
+            <span>Search</span>
             <input
               v-model="searchQuery"
               type="search"
@@ -108,7 +136,7 @@ const closeSearchWhenLeaving = (event) => {
               @focus="loadDestinations"
               @input="loadDestinations"
             />
-            <button type="button" @click="loadDestinations">Locations⌄</button>
+            <button type="button" @click="loadDestinations">Locations</button>
           </form>
 
           <div v-show="searchOpen" class="destination-search-menu">

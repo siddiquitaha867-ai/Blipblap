@@ -103,7 +103,7 @@ input {
 .air-header-actions {
   align-items: center;
   display: flex;
-  gap: 16px;
+  gap: 12px;
   position: absolute;
   right: 0;
 }
@@ -237,8 +237,11 @@ input {
 
 .air-search > span {
   color: #001f5c;
-  font-size: 28px;
-  padding-left: 26px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  padding-left: 24px;
+  text-transform: uppercase;
 }
 
 .air-search input {
@@ -417,6 +420,81 @@ input {
   background: var(--bb-blue);
   border: 0;
   color: white;
+}
+
+.account-link {
+  align-items: center;
+  background: #eef6ff;
+  border: 1px solid #d8e7ff;
+  border-radius: 999px;
+  color: var(--bb-blue);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 800;
+  height: 40px;
+  justify-content: center;
+  padding: 0 18px;
+  white-space: nowrap;
+}
+
+.account-link--disabled {
+  cursor: default;
+  opacity: 0.55;
+}
+
+.account-menu-wrap {
+  position: relative;
+}
+
+.account-trigger {
+  border-radius: 999px;
+  height: 42px;
+  min-width: 118px;
+}
+
+.account-menu {
+  background: #ffffff;
+  border: 1px solid #dbe7ef;
+  border-radius: 18px;
+  box-shadow: 0 24px 58px rgba(16, 44, 76, 0.16);
+  display: grid;
+  gap: 8px;
+  min-width: 230px;
+  padding: 16px;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 12px);
+  z-index: 90;
+}
+
+.account-menu span {
+  color: var(--bb-muted);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.account-menu strong {
+  color: #07182f;
+  font-size: 15px;
+}
+
+.account-menu small {
+  color: var(--bb-muted);
+  line-height: 1.35;
+}
+
+.account-logout {
+  background: var(--bb-blue);
+  border: 0;
+  border-radius: 999px;
+  color: white;
+  cursor: pointer;
+  font-weight: 800;
+  margin-top: 8px;
+  padding: 11px 16px;
+  text-align: center;
 }
 
 .auth-screen {
@@ -4534,6 +4612,158 @@ input {
   margin: 0;
 }
 
+.my-esims-page {
+  margin: 0 auto;
+  max-width: 1120px;
+  padding: 54px 24px 96px;
+}
+
+.my-esims-hero {
+  margin-bottom: 34px;
+}
+
+.my-esims-hero span {
+  color: var(--bb-blue);
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+}
+
+.my-esims-hero h1 {
+  color: var(--bb-ink);
+  font-size: clamp(42px, 5vw, 68px);
+  font-weight: 400;
+  line-height: 1;
+  margin: 0 0 16px;
+}
+
+.my-esims-hero p,
+.my-esims-empty p {
+  color: var(--bb-muted);
+  line-height: 1.7;
+  margin: 0;
+  max-width: 620px;
+}
+
+.my-esims-empty {
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 18px 42px rgba(16, 44, 76, 0.06);
+  padding: 34px;
+}
+
+.my-esims-empty h2 {
+  color: var(--bb-ink);
+  font-size: 30px;
+  font-weight: 500;
+  margin: 0 0 12px;
+}
+
+.my-esims-empty a {
+  background: var(--bb-blue);
+  border-radius: 999px;
+  color: white;
+  display: inline-flex;
+  font-weight: 800;
+  margin-top: 24px;
+  padding: 14px 22px;
+}
+
+.my-esims-grid {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.my-esim-card {
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 18px 42px rgba(16, 44, 76, 0.06);
+  padding: 24px;
+}
+
+.my-esim-card__top {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.my-esim-card__top span {
+  color: var(--bb-blue);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.my-esim-card__top strong {
+  background: #eef6ff;
+  border-radius: 999px;
+  color: var(--bb-blue);
+  font-size: 11px;
+  padding: 7px 10px;
+}
+
+.my-esim-card h2 {
+  color: #07182f;
+  font-size: 24px;
+  font-weight: 500;
+  margin: 0 0 8px;
+}
+
+.my-esim-card p {
+  color: var(--bb-muted);
+  margin: 0 0 20px;
+}
+
+.my-esim-install {
+  align-items: start;
+  display: grid;
+  gap: 18px;
+  grid-template-columns: 118px 1fr;
+}
+
+.my-esim-install > img,
+.my-esim-install > span {
+  align-items: center;
+  background: #f8fafb;
+  border: 1px solid #dce7ef;
+  border-radius: 14px;
+  color: var(--bb-muted);
+  display: flex;
+  font-weight: 800;
+  height: 118px;
+  justify-content: center;
+  object-fit: contain;
+  padding: 8px;
+  width: 118px;
+}
+
+.my-esim-install dl {
+  display: grid;
+  gap: 11px;
+  margin: 0;
+}
+
+.my-esim-install dt {
+  color: var(--bb-muted);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.my-esim-install dd {
+  color: #07182f;
+  line-height: 1.35;
+  margin: 3px 0 0;
+}
+
+.my-esim-code {
+  line-break: anywhere;
+}
+
 .payment-secure-note {
   background: #e8f2ff;
   border-radius: 12px;
@@ -4780,6 +5010,7 @@ input {
 
   .detail-hero,
   .package-grid,
+  .my-esims-grid,
   .support-band > div,
   .comment-section,
   .comment-form,
@@ -4828,5 +5059,14 @@ input {
   .duration-tab {
     flex-basis: 72px;
     padding: 9px 8px;
+  }
+
+  .my-esim-install {
+    grid-template-columns: 1fr;
+  }
+
+  .account-menu {
+    right: 50%;
+    transform: translateX(50%);
   }
 }

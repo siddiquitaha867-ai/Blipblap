@@ -3,6 +3,7 @@
 use App\Http\Controllers\Storefront\DestinationController;
 use App\Http\Controllers\Storefront\HomeController;
 use App\Http\Controllers\Storefront\CheckoutController;
+use App\Http\Controllers\Storefront\MyEsimController;
 use App\Http\Controllers\Storefront\PlanController;
 use App\Http\Controllers\Storefront\PlansIndexController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -84,6 +85,7 @@ Route::middleware('guest')->group(function (): void {
 
 Route::middleware('auth')->group(function (): void {
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+    Route::get('/my-esims', MyEsimController::class)->name('my-esims');
     Route::get('/email/verify', [EmailVerificationController::class, 'notice'])->name('verification.notice');
     Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
         ->middleware(['signed', 'throttle:6,1'])
