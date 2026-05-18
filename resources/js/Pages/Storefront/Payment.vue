@@ -1,5 +1,6 @@
 <script setup>
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
+import { usePage } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
 defineOptions({ layout: StorefrontLayout });
@@ -23,6 +24,7 @@ const props = defineProps({
   },
 });
 
+const page = usePage();
 const customerEmail = ref(props.customerEmail);
 const stripeAction = `/checkout/${props.plan.slug}/stripe`;
 </script>
@@ -45,6 +47,10 @@ const stripeAction = `/checkout/${props.plan.slug}/stripe`;
     </div>
 
     <form class="payment-card" method="post" :action="stripeAction">
+      <p v-if="page.props.flash.status" class="payment-error-note">
+        {{ page.props.flash.status }}
+      </p>
+
       <input type="hidden" name="_token" :value="props.csrfToken">
       <input type="hidden" name="customer_name" :value="props.customerName">
 

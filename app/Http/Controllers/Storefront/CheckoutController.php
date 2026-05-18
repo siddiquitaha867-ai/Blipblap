@@ -128,12 +128,14 @@ class CheckoutController extends Controller
             ]);
 
         if (! $response->successful()) {
+            $stripeError = (string) data_get($response->json(), 'error.message', 'Please check your Stripe keys and live payment settings.');
+
             $order->update([
                 'status' => 'payment_session_failed',
                 'response_payload' => $response->json(),
             ]);
 
-            return back()->with('status', 'Stripe checkout session failed. Please check your Stripe keys.');
+            return back()->with('status', 'Stripe checkout session failed: ' . $stripeError);
         }
 
         $session = $response->json();
@@ -143,7 +145,18 @@ class CheckoutController extends Controller
             'response_payload' => $session,
         ]);
 
-        return Inertia::location($session['url']);
+        $checkoutUrl = (string) ($session['url'] ?? '');
+
+        if ($checkoutUrl === '') {
+            $order->update([
+                'status' => 'payment_session_failed',
+                'response_payload' => $session,
+            ]);
+
+            return back()->with('status', 'Stripe checkout session did not return a payment URL.');
+        }
+
+        return redirect()->away($checkoutUrl);
     }
 
     public function success(Request $request, EsimPlan $plan, OrderProvisioningService $provisioning): Response|RedirectResponse

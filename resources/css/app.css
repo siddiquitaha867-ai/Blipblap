@@ -4783,6 +4783,16 @@ input {
   margin: 0;
 }
 
+.payment-error-note {
+  background: #fff1f1;
+  border: 1px solid #ffd1d1;
+  border-radius: 14px;
+  color: #b42318 !important;
+  font-weight: 700;
+  margin-bottom: 16px !important;
+  padding: 13px 15px;
+}
+
 .my-esims-page {
   margin: 0 auto;
   max-width: 1120px;
