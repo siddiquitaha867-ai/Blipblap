@@ -39,6 +39,12 @@ const pay = () => {
         Your eSIM install details will be sent after payment.
       </p>
 
+      <div class="payment-progress-tabs" aria-label="Checkout progress">
+        <span>Details</span>
+        <span class="active">Payment</span>
+        <span>Install email</span>
+      </div>
+
       <div class="stripe-test-box">
         <span>Secure checkout</span>
         <strong>Card details are entered on Stripe</strong>

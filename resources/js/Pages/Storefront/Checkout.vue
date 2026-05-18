@@ -15,6 +15,7 @@ const props = defineProps({
 const page = usePage();
 const customerName = ref(page.props.auth.user?.name || '');
 const customerEmail = ref(page.props.auth.user?.email || '');
+const paymentMethod = ref('card');
 
 const goToPayment = () => {
   router.get(`/checkout/${props.plan.slug}/payment`, {
@@ -43,13 +44,25 @@ const goToPayment = () => {
           <span>Email for eSIM delivery</span>
           <input v-model="customerEmail" type="email" placeholder="you@example.com" autocomplete="email" required>
         </label>
-        <label class="checkout-wide">
-          <span>Payment method</span>
-          <select>
-            <option>Card payment</option>
-            <option>Wallet payment</option>
-          </select>
-        </label>
+        <fieldset class="checkout-method-group checkout-wide">
+          <legend>Payment method</legend>
+          <div class="checkout-method-tabs">
+            <button
+              type="button"
+              :class="{ active: paymentMethod === 'card' }"
+              @click="paymentMethod = 'card'"
+            >
+              Card
+            </button>
+            <button
+              type="button"
+              :class="{ active: paymentMethod === 'wallet' }"
+              @click="paymentMethod = 'wallet'"
+            >
+              Wallet
+            </button>
+          </div>
+        </fieldset>
         <div class="checkout-form-footer">
           <button type="submit" class="checkout-inline-submit">Continue to payment</button>
           <p>Secure payment opens on the next step.</p>
