@@ -17,10 +17,6 @@ const props = defineProps({
     type: String,
     default: '',
   },
-  stripePublishableKey: {
-    type: String,
-    default: '',
-  },
 });
 
 const form = useForm({
@@ -37,21 +33,24 @@ const pay = () => {
   <section class="payment-page">
     <div class="payment-copy">
       <p class="eyebrow">Payment</p>
-      <h1>Pay securely for your eSIM</h1>
+      <h1>Review and complete payment</h1>
       <p>
-        Use this screen to test the payment step. Live Stripe checkout will use
-        your Stripe test keys, then redirect back with provisioning status.
+        Confirm the delivery email and continue to the secure payment step.
+        Your eSIM install details will be sent after payment.
       </p>
 
       <div class="stripe-test-box">
-        <span>Stripe test mode</span>
-        <strong>{{ stripePublishableKey ? 'Publishable key detected' : 'Add Stripe keys to enable live test checkout' }}</strong>
-        <p>Test card: 4242 4242 4242 4242, any future expiry, any CVC.</p>
+        <span>Secure checkout</span>
+        <strong>Card details are entered on Stripe</strong>
+        <p>Your payment is processed on an encrypted checkout page before you return here for order status.</p>
       </div>
     </div>
 
     <aside class="payment-card">
-      <span>{{ plan.country_name || plan.coverage_type }}</span>
+      <div class="payment-card-top">
+        <span>Order summary</span>
+        <small>{{ plan.country_name || plan.coverage_type }}</small>
+      </div>
       <h2>{{ plan.title }}</h2>
       <dl>
         <div>
@@ -70,30 +69,16 @@ const pay = () => {
 
       <div class="payment-method-preview">
         <label>
-          <span>Email</span>
+          <span>Delivery email</span>
           <input v-model="form.customer_email" type="email" placeholder="you@example.com" required>
         </label>
-        <label>
-          <span>Card number</span>
-          <input value="4242 4242 4242 4242" readonly>
-        </label>
-        <div>
-          <label>
-            <span>Expiry</span>
-            <input value="12 / 34" readonly>
-          </label>
-          <label>
-            <span>CVC</span>
-            <input value="123" readonly>
-          </label>
-        </div>
       </div>
 
       <button type="button" class="payment-submit" :disabled="form.processing" @click="pay">
-        {{ form.processing ? 'Opening Stripe...' : 'Pay test order' }}
+        {{ form.processing ? 'Opening payment...' : 'Continue to secure payment' }}
       </button>
       <small v-if="form.errors.customer_email">{{ form.errors.customer_email }}</small>
-      <p class="payment-secure-note">You will be redirected to Stripe Checkout to complete this test payment securely.</p>
+      <p class="payment-secure-note">You will be redirected to Stripe Checkout to complete payment securely.</p>
     </aside>
   </section>
 </template>

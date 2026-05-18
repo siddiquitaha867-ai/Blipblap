@@ -50,12 +50,18 @@ const goToPayment = () => {
             <option>Wallet payment</option>
           </select>
         </label>
-        <button type="submit" class="checkout-inline-submit">Continue to payment</button>
+        <div class="checkout-form-footer">
+          <button type="submit" class="checkout-inline-submit">Continue to payment</button>
+          <p>Secure payment opens on the next step.</p>
+        </div>
       </form>
     </div>
 
     <aside class="checkout-summary">
-      <span>{{ plan.country_name || plan.coverage_type }}</span>
+      <div class="checkout-summary-top">
+        <span>Order summary</span>
+        <small>{{ plan.country_name || plan.coverage_type }}</small>
+      </div>
       <h2>{{ plan.title }}</h2>
       <dl>
         <div>
@@ -71,7 +77,6 @@ const goToPayment = () => {
           <dd>{{ plan.currency }} {{ Number(plan.retail_price).toFixed(2) }}</dd>
         </div>
       </dl>
-      <button type="button" class="checkout-summary-button" @click="goToPayment">Proceed to checkout</button>
       <p class="checkout-note">Payment gateway will connect here before live launch.</p>
     </aside>
   </section>
