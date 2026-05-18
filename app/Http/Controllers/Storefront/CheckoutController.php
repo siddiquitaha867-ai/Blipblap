@@ -50,6 +50,7 @@ class CheckoutController extends Controller
             'plan' => $plan,
             'customerName' => (string) $request->query('name', ''),
             'customerEmail' => (string) $request->query('email', $request->user()?->email ?? ''),
+            'csrfToken' => csrf_token(),
             'stripePublishableKey' => config('services.stripe.key'),
         ]);
     }

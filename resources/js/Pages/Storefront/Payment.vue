@@ -1,6 +1,6 @@
 <script setup>
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
-import { useForm } from '@inertiajs/vue3';
+import { ref } from 'vue';
 
 defineOptions({ layout: StorefrontLayout });
 
@@ -17,16 +17,14 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  csrfToken: {
+    type: String,
+    required: true,
+  },
 });
 
-const form = useForm({
-  customer_name: props.customerName,
-  customer_email: props.customerEmail,
-});
-
-const pay = () => {
-  form.post(`/checkout/${props.plan.slug}/stripe`);
-};
+const customerEmail = ref(props.customerEmail);
+const stripeAction = `/checkout/${props.plan.slug}/stripe`;
 </script>
 
 <template>
@@ -46,7 +44,10 @@ const pay = () => {
       </div>
     </div>
 
-    <aside class="payment-card">
+    <form class="payment-card" method="post" :action="stripeAction">
+      <input type="hidden" name="_token" :value="props.csrfToken">
+      <input type="hidden" name="customer_name" :value="props.customerName">
+
       <div class="payment-card-top">
         <span>Order summary</span>
         <small>{{ plan.country_name || plan.coverage_type }}</small>
@@ -70,15 +71,14 @@ const pay = () => {
       <div class="payment-method-preview">
         <label>
           <span>Delivery email</span>
-          <input v-model="form.customer_email" type="email" placeholder="you@example.com" required>
+          <input v-model="customerEmail" name="customer_email" type="email" placeholder="you@example.com" required>
         </label>
       </div>
 
-      <button type="button" class="payment-submit" :disabled="form.processing" @click="pay">
-        {{ form.processing ? 'Opening payment...' : 'Continue to secure payment' }}
+      <button type="submit" class="payment-submit">
+        Continue to secure payment
       </button>
-      <small v-if="form.errors.customer_email">{{ form.errors.customer_email }}</small>
       <p class="payment-secure-note">You will be redirected to Stripe Checkout to complete payment securely.</p>
-    </aside>
+    </form>
   </section>
 </template>
