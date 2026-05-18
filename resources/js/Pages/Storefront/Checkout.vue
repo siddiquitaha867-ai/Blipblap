@@ -15,7 +15,6 @@ const props = defineProps({
 const page = usePage();
 const customerName = ref(page.props.auth.user?.name || '');
 const customerEmail = ref(page.props.auth.user?.email || '');
-const paymentMethod = ref('card');
 
 const goToPayment = () => {
   router.get(`/checkout/${props.plan.slug}/payment`, {
@@ -49,17 +48,15 @@ const goToPayment = () => {
           <div class="checkout-method-tabs">
             <button
               type="button"
-              :class="{ active: paymentMethod === 'card' }"
-              @click="paymentMethod = 'card'"
+              class="active"
             >
               Card
             </button>
             <button
               type="button"
-              :class="{ active: paymentMethod === 'wallet' }"
-              @click="paymentMethod = 'wallet'"
+              disabled
             >
-              Wallet
+              Wallet <small>Coming soon</small>
             </button>
           </div>
         </fieldset>

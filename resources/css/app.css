@@ -4484,15 +4484,30 @@ input {
   cursor: pointer;
   display: inline-flex;
   font-weight: 700;
+  gap: 6px;
   justify-content: center;
   min-height: 42px;
   transition: background 160ms ease, box-shadow 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.checkout-method-tabs button small {
+  background: #e5ebf2;
+  border-radius: 999px;
+  color: #7b8797;
+  font-size: 10px;
+  font-weight: 800;
+  padding: 4px 7px;
 }
 
 .checkout-method-tabs button.active {
   background: #ffffff;
   box-shadow: 0 10px 24px rgba(16, 44, 76, 0.1);
   color: var(--bb-blue);
+}
+
+.checkout-method-tabs button:disabled {
+  cursor: not-allowed;
+  opacity: 0.78;
 }
 
 .checkout-method-tabs button:hover {
@@ -4537,35 +4552,6 @@ input {
   line-height: 1.5;
   margin: 0;
   text-align: center;
-}
-
-.payment-progress-tabs {
-  background: #e9eef5;
-  border: 1px solid #dde7f0;
-  border-radius: 999px;
-  display: grid;
-  gap: 4px;
-  grid-template-columns: repeat(3, 1fr);
-  max-width: 650px;
-  padding: 5px;
-}
-
-.payment-progress-tabs span {
-  align-items: center;
-  border-radius: 999px;
-  color: #657383;
-  display: inline-flex;
-  font-size: 12px;
-  font-weight: 800;
-  justify-content: center;
-  min-height: 34px;
-  text-align: center;
-}
-
-.payment-progress-tabs span.active {
-  background: #ffffff;
-  box-shadow: 0 10px 24px rgba(16, 44, 76, 0.1);
-  color: var(--bb-blue);
 }
 
 .stripe-test-box {
