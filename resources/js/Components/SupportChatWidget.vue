@@ -68,14 +68,14 @@ const sendMessage = async (preset = '') => {
 
 <template>
   <div v-if="visible" class="support-chat">
-    <button type="button" class="support-chat-toggle" @click="open = !open">
-      <span>AI Support</span>
+    <button v-if="!open" type="button" class="support-chat-toggle" @click="open = true">
+      <span>Ask AI</span>
     </button>
 
     <section v-if="open" class="support-chat-panel">
       <header class="support-chat-header">
         <div>
-          <strong>BlipBlap AI Support</strong>
+          <strong>Ask AI</strong>
           <small>Plans, checkout, install help, and FAQs</small>
         </div>
         <button type="button" class="support-chat-close" @click="open = false">Close</button>
