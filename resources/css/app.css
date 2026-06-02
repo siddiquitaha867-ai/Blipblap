@@ -5221,7 +5221,7 @@ input {
     display: none;
     gap: 10px;
     grid-column: 1 / -1;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
     justify-content: stretch;
     order: 2;
     width: 100%;
