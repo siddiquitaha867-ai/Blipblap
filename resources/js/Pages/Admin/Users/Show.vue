@@ -1,6 +1,6 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
-import { Link } from '@inertiajs/vue3';
+import { Link, router } from '@inertiajs/vue3';
 
 defineOptions({ layout: AdminLayout });
 
@@ -18,6 +18,26 @@ defineProps({
     default: () => [],
   },
 });
+
+const toggleBan = (customer) => {
+  router.patch(`/admin/users/${customer.id}/${customer.is_banned ? 'unban' : 'ban'}`, {}, {
+    preserveScroll: true,
+  });
+};
+
+const sendResetPassword = (customer) => {
+  router.post(`/admin/users/${customer.id}/reset-password`, {}, {
+    preserveScroll: true,
+  });
+};
+
+const deleteUser = (customer) => {
+  if (!window.confirm(`Delete ${customer.email}? This cannot be undone.`)) {
+    return;
+  }
+
+  router.delete(`/admin/users/${customer.id}`);
+};
 </script>
 
 <template>
@@ -40,11 +60,19 @@ defineProps({
           <div><dt>Email</dt><dd>{{ customer.email }}</dd></div>
           <div><dt>Verified</dt><dd>{{ customer.email_verified_at ? 'Yes' : 'No' }}</dd></div>
           <div><dt>Admin</dt><dd>{{ customer.is_admin ? 'Yes' : 'No' }}</dd></div>
+          <div><dt>Status</dt><dd>{{ customer.is_banned ? 'Banned' : 'Active' }}</dd></div>
           <div><dt>Marketing</dt><dd>{{ customer.marketing_opt_in ? 'Opted in' : 'No' }}</dd></div>
           <div><dt>Referral</dt><dd>{{ customer.referral_code || '—' }}</dd></div>
           <div><dt>Last login</dt><dd>{{ customer.last_login_at || 'Never' }}</dd></div>
           <div><dt>Joined</dt><dd>{{ customer.created_at }}</dd></div>
         </dl>
+        <div class="auth-required-actions" style="margin-top: 20px;">
+          <button type="button" class="auth-required-secondary" @click="sendResetPassword(customer)">Send reset password</button>
+          <button type="button" class="auth-required-secondary" @click="toggleBan(customer)">
+            {{ customer.is_banned ? 'Unban account' : 'Ban account' }}
+          </button>
+          <button type="button" class="auth-required-secondary" @click="deleteUser(customer)">Delete account</button>
+        </div>
       </section>
 
       <section class="admin-panel">

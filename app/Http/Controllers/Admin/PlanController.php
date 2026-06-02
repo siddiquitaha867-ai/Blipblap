@@ -36,6 +36,13 @@ class PlanController extends Controller
             'filters' => [
                 'search' => $search,
             ],
+            'bulkScopes' => [
+                'all' => 'All packages',
+                'country' => 'One country',
+                'region' => 'One region',
+                'coverage' => 'Coverage type',
+                'title' => 'Title / keyword',
+            ],
         ]);
     }
 
@@ -56,7 +63,7 @@ class PlanController extends Controller
 
         return Inertia::render('Admin/Plans/Country', [
             'country' => $country,
-            'plans' => $plans,
+            'plans' => $plans->map(fn (EsimPlan $plan): array => $this->planPayload($plan))->values(),
         ]);
     }
 
@@ -87,5 +94,93 @@ class PlanController extends Controller
         $plan->update($data);
 
         return back()->with('status', 'Plan updated.');
+    }
+
+    public function bulkUpdate(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'scope_type' => ['required', 'in:all,country,region,coverage,title'],
+            'scope_value' => ['nullable', 'string', 'max:255'],
+            'duration_days' => ['nullable', 'integer', 'min:1'],
+            'unlimited' => ['nullable', 'boolean'],
+            'margin_percent' => ['required', 'numeric', 'min:0'],
+            'fixed_markup' => ['required', 'numeric', 'min:0'],
+            'tax_percent' => ['required', 'numeric', 'min:0'],
+            'featured_only' => ['nullable', 'boolean'],
+            'active_only' => ['nullable', 'boolean'],
+        ]);
+
+        $query = EsimPlan::query();
+
+        if ((bool) ($data['active_only'] ?? true)) {
+            $query->where('is_active', true);
+        }
+
+        if ((bool) ($data['featured_only'] ?? false)) {
+            $query->where('is_featured', true);
+        }
+
+        if (array_key_exists('unlimited', $data) && $data['unlimited'] !== null) {
+            $query->where('unlimited', (bool) $data['unlimited']);
+        }
+
+        if (! empty($data['duration_days'])) {
+            $query->where('duration_days', (int) $data['duration_days']);
+        }
+
+        $scopeValue = trim((string) ($data['scope_value'] ?? ''));
+
+        match ($data['scope_type']) {
+            'country' => $query->where('country_name', $scopeValue),
+            'region' => $query->where('region_name', $scopeValue),
+            'coverage' => $query->where('coverage_type', $scopeValue),
+            'title' => $query->where('title', 'like', '%' . $scopeValue . '%'),
+            default => null,
+        };
+
+        $plans = $query->get();
+
+        if ($plans->isEmpty()) {
+            return back()->with('status', 'No plans matched the selected pricing filters.');
+        }
+
+        $marginPercent = (float) $data['margin_percent'];
+        $fixedMarkup = (float) $data['fixed_markup'];
+        $taxPercent = (float) $data['tax_percent'];
+
+        foreach ($plans as $plan) {
+            $supplierPrice = (float) $plan->supplier_price;
+            $subtotal = $supplierPrice + $fixedMarkup;
+            $withMargin = $subtotal * (1 + ($marginPercent / 100));
+            $retail = round($withMargin * (1 + ($taxPercent / 100)), 2);
+
+            $plan->update([
+                'retail_price' => max(0, $retail),
+            ]);
+        }
+
+        return back()->with('status', sprintf(
+            'Updated %d plans with %.2f%% margin, %.2f fixed markup, and %.2f%% tax.',
+            $plans->count(),
+            $marginPercent,
+            $fixedMarkup,
+            $taxPercent,
+        ));
+    }
+
+    private function planPayload(EsimPlan $plan): array
+    {
+        $supplierPrice = (float) $plan->supplier_price;
+        $retailPrice = (float) $plan->retail_price;
+        $marginAmount = round($retailPrice - $supplierPrice, 2);
+        $marginPercent = $supplierPrice > 0
+            ? round(($marginAmount / $supplierPrice) * 100, 2)
+            : null;
+
+        return [
+            ...$plan->toArray(),
+            'margin_amount' => $marginAmount,
+            'margin_percent' => $marginPercent,
+        ];
     }
 }

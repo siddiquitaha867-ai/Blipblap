@@ -26,8 +26,12 @@ class HandleInertiaRequests extends Middleware
                     'email' => $request->user()->email,
                     'email_verified_at' => $request->user()->email_verified_at,
                     'is_admin' => (bool) $request->user()->is_admin,
+                    'is_banned' => (bool) $request->user()->is_banned,
                     'customer_esims_count' => CustomerEsim::query()
-                        ->where('user_id', $request->user()->id)
+                        ->where(function ($query) use ($request): void {
+                            $query->where('user_id', $request->user()->id)
+                                ->orWhere('customer_email', $request->user()->email);
+                        })
                         ->count(),
                 ] : null,
             ],

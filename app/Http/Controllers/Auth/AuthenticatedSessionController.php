@@ -32,6 +32,14 @@ class AuthenticatedSessionController extends Controller
             ]);
         }
 
+        if ((bool) $request->user()?->is_banned) {
+            Auth::guard('web')->logout();
+
+            throw ValidationException::withMessages([
+                'email' => 'This account has been disabled. Please contact support.',
+            ]);
+        }
+
         $request->session()->regenerate();
 
         $request->user()?->forceFill([

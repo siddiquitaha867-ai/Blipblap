@@ -18,6 +18,34 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  customerPhone: {
+    type: String,
+    default: '',
+  },
+  addressLine1: {
+    type: String,
+    default: '',
+  },
+  addressLine2: {
+    type: String,
+    default: '',
+  },
+  city: {
+    type: String,
+    default: '',
+  },
+  state: {
+    type: String,
+    default: '',
+  },
+  postalCode: {
+    type: String,
+    default: '',
+  },
+  country: {
+    type: String,
+    default: '',
+  },
   csrfToken: {
     type: String,
     required: true,
@@ -26,6 +54,13 @@ const props = defineProps({
 
 const page = usePage();
 const customerEmail = ref(props.customerEmail);
+const customerPhone = ref(props.customerPhone);
+const addressLine1 = ref(props.addressLine1);
+const addressLine2 = ref(props.addressLine2);
+const city = ref(props.city);
+const state = ref(props.state);
+const postalCode = ref(props.postalCode);
+const country = ref(props.country);
 const stripeAction = `/checkout/${props.plan.slug}/stripe`;
 </script>
 
@@ -53,6 +88,13 @@ const stripeAction = `/checkout/${props.plan.slug}/stripe`;
 
       <input type="hidden" name="_token" :value="props.csrfToken">
       <input type="hidden" name="customer_name" :value="props.customerName">
+      <input type="hidden" name="customer_phone" :value="customerPhone">
+      <input type="hidden" name="address_line1" :value="addressLine1">
+      <input type="hidden" name="address_line2" :value="addressLine2">
+      <input type="hidden" name="city" :value="city">
+      <input type="hidden" name="state" :value="state">
+      <input type="hidden" name="postal_code" :value="postalCode">
+      <input type="hidden" name="country" :value="country">
 
       <div class="payment-card-top">
         <span>Order summary</span>
@@ -76,8 +118,40 @@ const stripeAction = `/checkout/${props.plan.slug}/stripe`;
 
       <div class="payment-method-preview">
         <label>
+          <span>Full name</span>
+          <input :value="props.customerName" type="text" readonly>
+        </label>
+        <label>
           <span>Delivery email</span>
           <input v-model="customerEmail" name="customer_email" type="email" placeholder="you@example.com" required>
+        </label>
+        <label>
+          <span>Phone</span>
+          <input v-model="customerPhone" type="text" readonly>
+        </label>
+        <label>
+          <span>Country</span>
+          <input v-model="country" type="text" readonly>
+        </label>
+        <label>
+          <span>Address line 1</span>
+          <input v-model="addressLine1" type="text" readonly>
+        </label>
+        <label>
+          <span>Address line 2</span>
+          <input v-model="addressLine2" type="text" readonly>
+        </label>
+        <label>
+          <span>City</span>
+          <input v-model="city" type="text" readonly>
+        </label>
+        <label>
+          <span>State / province</span>
+          <input v-model="state" type="text" readonly>
+        </label>
+        <label>
+          <span>Postal code</span>
+          <input v-model="postalCode" type="text" readonly>
         </label>
       </div>
 

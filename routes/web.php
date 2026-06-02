@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Storefront\DestinationController;
+use App\Http\Controllers\Storefront\ContentPageController;
 use App\Http\Controllers\Storefront\HomeController;
 use App\Http\Controllers\Storefront\CheckoutController;
 use App\Http\Controllers\Storefront\MyEsimController;
@@ -12,6 +13,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\DiagnosticsController as AdminDiagnosticsController;
+use App\Http\Controllers\Admin\ContentController as AdminContentController;
 use App\Http\Controllers\Admin\LogController as AdminLogController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\PlanController as AdminPlanController;
@@ -69,6 +71,7 @@ Route::get('/checkout/{plan:slug}/payment', [CheckoutController::class, 'payment
 Route::post('/checkout/{plan:slug}/stripe', [CheckoutController::class, 'stripe'])->name('checkout.stripe');
 Route::get('/checkout/{plan:slug}/success', [CheckoutController::class, 'success'])->name('checkout.success');
 Route::post('/stripe/webhook', [CheckoutController::class, 'webhook'])->name('stripe.webhook');
+Route::get('/pages/{page:slug}', [ContentPageController::class, 'show'])->name('pages.show');
 
 Route::middleware('guest')->group(function (): void {
     Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
@@ -103,6 +106,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/storefront', AdminStorefrontPreviewController::class)->name('storefront');
     Route::get('/plans', [AdminPlanController::class, 'index'])->name('plans.index');
     Route::get('/plans/country/{country}', [AdminPlanController::class, 'country'])->name('plans.country');
+    Route::post('/plans/bulk-update', [AdminPlanController::class, 'bulkUpdate'])->name('plans.bulk-update');
     Route::patch('/plans/{plan}', [AdminPlanController::class, 'update'])->name('plans.update');
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/export', [AdminOrderController::class, 'export'])->name('orders.export');
@@ -110,8 +114,18 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/promotions', [AdminPromotionController::class, 'index'])->name('promotions.index');
     Route::post('/promotions', [AdminPromotionController::class, 'store'])->name('promotions.store');
     Route::patch('/promotions/{promotion}', [AdminPromotionController::class, 'update'])->name('promotions.update');
+    Route::get('/content', [AdminContentController::class, 'index'])->name('content.index');
+    Route::patch('/content/homepage', [AdminContentController::class, 'updateHomepage'])->name('content.homepage');
+    Route::patch('/content/email', [AdminContentController::class, 'updateEmail'])->name('content.email');
+    Route::post('/content/pages', [AdminContentController::class, 'storePage'])->name('content.pages.store');
+    Route::patch('/content/pages/{page}', [AdminContentController::class, 'updatePage'])->name('content.pages.update');
+    Route::delete('/content/pages/{page}', [AdminContentController::class, 'destroyPage'])->name('content.pages.destroy');
     Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
     Route::get('/users/{user}', [AdminUserController::class, 'show'])->name('users.show');
+    Route::patch('/users/{user}/ban', [AdminUserController::class, 'ban'])->name('users.ban');
+    Route::patch('/users/{user}/unban', [AdminUserController::class, 'unban'])->name('users.unban');
+    Route::post('/users/{user}/reset-password', [AdminUserController::class, 'sendResetPassword'])->name('users.reset-password');
+    Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
 });
 
 Route::get('/{country}-esim', [DestinationController::class, 'show'])->name('country.esim');

@@ -5,6 +5,7 @@ namespace App\Mail;
 use App\Models\CustomerEsim;
 use App\Models\EsimOrder;
 use App\Models\EsimPlan;
+use App\Models\SiteContent;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
@@ -20,18 +21,21 @@ class EsimReadyMail extends Mailable
 
     public string $qrMime = 'image/png';
 
+    public array $contentConfig = [];
+
     public function __construct(
         public readonly CustomerEsim $esim,
         public readonly EsimOrder $order,
         public readonly ?EsimPlan $plan = null,
     ) {
+        $this->contentConfig = SiteContent::value('emails.esim_ready', []);
         $this->prepareQrImage();
     }
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Your BlipBlap eSIM is ready to install',
+            subject: $this->contentConfig['subject'] ?? 'Your BlipBlap eSIM is ready to install',
         );
     }
 

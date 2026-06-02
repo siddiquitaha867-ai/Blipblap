@@ -95,6 +95,22 @@ watchEffect(async () => {
           <dt>Activation code</dt>
           <dd class="install-code">{{ esim.activation_code }}</dd>
         </div>
+        <div v-if="esim?.install_details?.assignment?.iosInstallUrl || esim?.install_details?.response?.iosInstallUrl">
+          <dt>Apple install URL</dt>
+          <dd>
+            <a :href="esim.install_details.assignment?.iosInstallUrl || esim.install_details.response?.iosInstallUrl" target="_blank" rel="noopener">
+              Open iPhone / iPad install link
+            </a>
+          </dd>
+        </div>
+        <div v-if="esim?.install_details?.assignment?.androidInstallUrl || esim?.install_details?.response?.androidInstallUrl">
+          <dt>Android install URL</dt>
+          <dd>
+            <a :href="esim.install_details.assignment?.androidInstallUrl || esim.install_details.response?.androidInstallUrl" target="_blank" rel="noopener">
+              Open Android install link
+            </a>
+          </dd>
+        </div>
         <div>
           <dt>Status</dt>
           <dd>{{ installStatus }}</dd>
@@ -104,6 +120,11 @@ watchEffect(async () => {
           <dd>{{ order.order_reference }}</dd>
         </div>
       </dl>
+    </div>
+
+    <div class="auth-required-actions" style="margin-top: 24px;">
+      <a href="/my-esims" class="auth-required-primary">Open My eSIMs</a>
+      <a href="/esim-plans" class="auth-required-secondary">Buy another eSIM</a>
     </div>
   </section>
 </template>

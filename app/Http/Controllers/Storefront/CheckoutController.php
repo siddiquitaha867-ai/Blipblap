@@ -50,6 +50,13 @@ class CheckoutController extends Controller
             'plan' => $plan,
             'customerName' => (string) $request->query('name', ''),
             'customerEmail' => (string) $request->query('email', $request->user()?->email ?? ''),
+            'customerPhone' => (string) $request->query('phone', ''),
+            'addressLine1' => (string) $request->query('address_line1', ''),
+            'addressLine2' => (string) $request->query('address_line2', ''),
+            'city' => (string) $request->query('city', ''),
+            'state' => (string) $request->query('state', ''),
+            'postalCode' => (string) $request->query('postal_code', ''),
+            'country' => (string) $request->query('country', ''),
             'csrfToken' => csrf_token(),
             'stripePublishableKey' => config('services.stripe.key'),
         ]);
@@ -70,6 +77,13 @@ class CheckoutController extends Controller
         $data = $request->validate([
             'customer_name' => ['nullable', 'string', 'max:255'],
             'customer_email' => ['required', 'email', 'max:255'],
+            'customer_phone' => ['nullable', 'string', 'max:50'],
+            'address_line1' => ['nullable', 'string', 'max:255'],
+            'address_line2' => ['nullable', 'string', 'max:255'],
+            'city' => ['nullable', 'string', 'max:120'],
+            'state' => ['nullable', 'string', 'max:120'],
+            'postal_code' => ['nullable', 'string', 'max:40'],
+            'country' => ['nullable', 'string', 'max:120'],
         ]);
 
         $secret = (string) config('services.stripe.secret');
@@ -94,6 +108,13 @@ class CheckoutController extends Controller
                 'plan_id' => $plan->id,
                 'plan_slug' => $plan->slug,
                 'customer_name' => $data['customer_name'] ?? null,
+                'customer_phone' => $data['customer_phone'] ?? null,
+                'address_line1' => $data['address_line1'] ?? null,
+                'address_line2' => $data['address_line2'] ?? null,
+                'city' => $data['city'] ?? null,
+                'state' => $data['state'] ?? null,
+                'postal_code' => $data['postal_code'] ?? null,
+                'country' => $data['country'] ?? null,
             ],
         ]);
 

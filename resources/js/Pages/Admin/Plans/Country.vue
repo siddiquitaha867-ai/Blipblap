@@ -148,8 +148,20 @@ const updatePlan = (plan) => {
                   <input v-model="drafts[plan.id].title" type="text" />
                 </label>
                 <label>
+                  <span>Cost</span>
+                  <input :value="Number(plan.supplier_price || 0).toFixed(2)" type="text" readonly />
+                </label>
+                <label>
                   <span>Retail</span>
                   <input v-model="drafts[plan.id].retail_price" type="number" min="0" step="0.01" />
+                </label>
+                <label>
+                  <span>Margin</span>
+                  <input :value="Number(plan.margin_amount || 0).toFixed(2)" type="text" readonly />
+                </label>
+                <label>
+                  <span>Margin %</span>
+                  <input :value="plan.margin_percent === null ? 'n/a' : `${Number(plan.margin_percent).toFixed(2)}%`" type="text" readonly />
                 </label>
                 <label>
                   <span>Days</span>

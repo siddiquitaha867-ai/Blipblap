@@ -15,11 +15,25 @@ const props = defineProps({
 const page = usePage();
 const customerName = ref(page.props.auth.user?.name || '');
 const customerEmail = ref(page.props.auth.user?.email || '');
+const customerPhone = ref('');
+const addressLine1 = ref('');
+const addressLine2 = ref('');
+const city = ref('');
+const state = ref('');
+const postalCode = ref('');
+const country = ref('');
 
 const goToPayment = () => {
   router.get(`/checkout/${props.plan.slug}/payment`, {
     name: customerName.value,
     email: customerEmail.value,
+    phone: customerPhone.value,
+    address_line1: addressLine1.value,
+    address_line2: addressLine2.value,
+    city: city.value,
+    state: state.value,
+    postal_code: postalCode.value,
+    country: country.value,
   });
 };
 </script>
@@ -42,6 +56,34 @@ const goToPayment = () => {
         <label>
           <span>Email for eSIM delivery</span>
           <input v-model="customerEmail" type="email" placeholder="you@example.com" autocomplete="email" required>
+        </label>
+        <label>
+          <span>Phone</span>
+          <input v-model="customerPhone" type="text" placeholder="+1 555 123 4567" autocomplete="tel">
+        </label>
+        <label>
+          <span>Address line 1</span>
+          <input v-model="addressLine1" type="text" placeholder="Street address" autocomplete="address-line1">
+        </label>
+        <label>
+          <span>Address line 2</span>
+          <input v-model="addressLine2" type="text" placeholder="Apartment, suite, etc." autocomplete="address-line2">
+        </label>
+        <label>
+          <span>City</span>
+          <input v-model="city" type="text" placeholder="City" autocomplete="address-level2">
+        </label>
+        <label>
+          <span>State / province</span>
+          <input v-model="state" type="text" placeholder="State or province" autocomplete="address-level1">
+        </label>
+        <label>
+          <span>Postal code</span>
+          <input v-model="postalCode" type="text" placeholder="Postal code" autocomplete="postal-code">
+        </label>
+        <label>
+          <span>Country</span>
+          <input v-model="country" type="text" placeholder="Country" autocomplete="country-name">
         </label>
         <fieldset class="checkout-method-group checkout-wide">
           <legend>Payment method</legend>

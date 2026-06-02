@@ -46,6 +46,7 @@ const submit = () => {
               <th>Name</th>
               <th>Email</th>
               <th>Admin</th>
+              <th>Status</th>
               <th>Verified</th>
               <th>Joined</th>
               <th></th>
@@ -57,6 +58,7 @@ const submit = () => {
               <td>{{ user.name }}</td>
               <td>{{ user.email }}</td>
               <td>{{ user.is_admin ? 'Yes' : 'No' }}</td>
+              <td>{{ user.is_banned ? 'Banned' : 'Active' }}</td>
               <td>{{ user.email_verified_at ? 'Yes' : 'No' }}</td>
               <td>{{ user.created_at }}</td>
               <td><Link :href="`/admin/users/${user.id}`">Details</Link></td>

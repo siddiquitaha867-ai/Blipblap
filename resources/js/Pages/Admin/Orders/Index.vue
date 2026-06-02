@@ -58,7 +58,7 @@ const submit = () => {
     </div>
 
     <form class="admin-search" @submit.prevent="submit">
-      <input v-model="search" type="search" placeholder="Search email, order, payment, bundle, ICCID" />
+      <input v-model="search" type="search" placeholder="Search customer, email, order, payment, bundle, ICCID" />
       <button type="submit">Search</button>
       <div class="admin-order-actions">
         <select v-model="range" class="admin-range-select" @change="submit">
@@ -77,6 +77,7 @@ const submit = () => {
             <tr>
               <th>Order</th>
               <th>Customer</th>
+              <th>Details</th>
               <th>Bundle</th>
               <th>Status</th>
               <th>Fulfillment</th>
@@ -91,7 +92,19 @@ const submit = () => {
                 <strong>#{{ order.id }}</strong>
                 <small>{{ order.order_reference || order.payment_reference || 'No reference' }}</small>
               </td>
-              <td>{{ order.customer_email }}</td>
+              <td>
+                <strong>{{ order.customer_name || 'No name' }}</strong>
+                <small>{{ order.customer_email }}</small>
+              </td>
+              <td>
+                <strong>{{ order.payment_method || 'stripe' }}</strong>
+                <small v-if="order.payment_brand || order.payment_last4">
+                  {{ [order.payment_brand, order.payment_last4 ? `•••• ${order.payment_last4}` : ''].filter(Boolean).join(' ') }}
+                </small>
+                <small v-if="order.country || order.city">
+                  {{ [order.city, order.state, order.country].filter(Boolean).join(', ') }}
+                </small>
+              </td>
               <td>{{ order.bundle_code }}</td>
               <td><span class="admin-badge">{{ order.status }}</span></td>
               <td>{{ order.fulfillment_status }}</td>

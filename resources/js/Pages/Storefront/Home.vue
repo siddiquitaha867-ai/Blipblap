@@ -20,6 +20,10 @@ const props = defineProps({
     type: Object,
     default: () => ({}),
   },
+  content: {
+    type: Object,
+    default: () => ({}),
+  },
 });
 
 const trustItems = [
@@ -44,6 +48,18 @@ const trustItems = [
     image: '/images/blipblap/trust-support-24-7.svg',
   },
 ];
+
+const homepageContent = computed(() => props.content || {});
+const heroEyebrow = computed(() => homepageContent.value.hero_eyebrow || 'Complete eSIM Connectivity Platform');
+const heroTitle = computed(() => homepageContent.value.hero_title || 'Blip Blap Fast, Reliable ESIM');
+const heroText = computed(() => homepageContent.value.hero_text || 'Instant Canada & Global eSIM plans, activate in seconds with zero hassle. Connect across 190+ countries with affordable data and 24/7 support.');
+const heroCtaLabel = computed(() => homepageContent.value.hero_cta_label || 'Explore eSIM Plans');
+const heroCtaUrl = computed(() => homepageContent.value.hero_cta_url || '/esim-plans');
+const heroImageUrl = computed(() => homepageContent.value.hero_image_url || '/images/blipblap/trust-icon.webp');
+const contentTrustItems = computed(() => homepageContent.value.trust_items?.length ? homepageContent.value.trust_items : trustItems);
+const promoBanners = computed(() => (homepageContent.value.promo_banners || []).filter((item) => item?.title || item?.text));
+const faqHeading = computed(() => homepageContent.value.faq_heading || 'Our FAQs Are A Great Place To Find Answers Quickly.');
+const faqIntro = computed(() => homepageContent.value.faq_intro || 'A compilation of questions and answers that will help you decide.');
 
 const activeTab = ref('Top Destinations');
 const activeStep = ref(0);
@@ -144,42 +160,53 @@ onBeforeUnmount(() => {
   window.clearInterval(stepTimer);
 });
 
-const faqs = [
-  'How do I activate my eSIM?',
-  'Which devices are supported?',
-  'Can I keep my physical SIM?',
-  'How do loyalty rewards work?',
-];
+const faqs = computed(() => {
+  if (homepageContent.value.faqs?.length) {
+    return homepageContent.value.faqs;
+  }
+
+  return [
+    { question: 'How do I activate my eSIM?', answer: 'Scan the QR and install instantly from your BlipBlap account.' },
+    { question: 'Which devices are supported?', answer: 'Most modern iPhone and Android devices with eSIM support will work.' },
+    { question: 'Can I keep my physical SIM?', answer: 'Yes, you can use your eSIM alongside your original physical SIM.' },
+    { question: 'How do loyalty rewards work?', answer: 'Earn points on eligible purchases and referrals, then redeem them for rewards.' },
+  ];
+});
 </script>
 
 <template>
   <section class="hero-section">
     <div class="hero-grid">
       <div class="hero-copy">
-        <p class="eyebrow">Complete eSIM Connectivity Platform</p>
-        <h1>Blip Blap Fast, Reliable ESIM</h1>
-        <p class="hero-text">
-          Instant Canada & Global eSIM plans, activate in seconds with zero hassle.
-          Connect across 190+ countries with affordable data and 24/7 support.
-        </p>
-        <a href="/esim-plans" class="primary-cta">Explore eSIM Plans</a>
+        <p class="eyebrow">{{ heroEyebrow }}</p>
+        <h1>{{ heroTitle }}</h1>
+        <p class="hero-text">{{ heroText }}</p>
+        <a :href="heroCtaUrl" class="primary-cta">{{ heroCtaLabel }}</a>
       </div>
 
       <div class="hero-art" aria-hidden="true">
         <img
           class="hero-photo-img"
-          src="/images/blipblap/trust-icon.webp"
+          :src="heroImageUrl"
           alt="Travelers using BlipBlap eSIM"
         />
       </div>
     </div>
   </section>
 
+  <section v-if="promoBanners.length" class="plans-index-strip">
+    <div v-for="(banner, index) in promoBanners" :key="`${banner.title}-${index}`">
+      <strong>{{ banner.title }}</strong>
+      <p>{{ banner.text }}</p>
+      <a v-if="banner.cta_label && banner.cta_url" :href="banner.cta_url">{{ banner.cta_label }}</a>
+    </div>
+  </section>
+
   <section class="trust-panel">
     <span class="shape shape-lines"></span>
-    <h2>Why Travelers Worldwide<br />Trust Blip Blap ESIM</h2>
+    <h2>{{ homepageContent.trust_heading || 'Why Travelers Worldwide Trust Blip Blap ESIM' }}</h2>
     <div class="trust-grid">
-      <article v-for="item in trustItems" :key="item.title">
+      <article v-for="item in contentTrustItems" :key="item.title">
         <img class="trust-icon-img" :src="item.image" :alt="item.title" />
         <h3>{{ item.title }}</h3>
         <p>{{ item.text }}</p>
@@ -281,15 +308,12 @@ const faqs = [
   </section>
 
   <section id="faqs" class="faq-section">
-    <h2>Our FAQs Are A Great Place<br />To Find Answers Quickly.</h2>
-    <p>A compilation of questions and answers that will help you decide.</p>
+    <h2>{{ faqHeading }}</h2>
+    <p>{{ faqIntro }}</p>
     <div class="faq-list">
-      <details v-for="question in faqs" :key="question">
-        <summary>{{ question }}</summary>
-        <p v-if="question.includes('activate')">Scan the QR and install instantly from your BlipBlap account.</p>
-        <p v-else-if="question.includes('devices')">Most modern iPhone and Android devices with eSIM support will work.</p>
-        <p v-else-if="question.includes('physical')">Yes, you can use your eSIM alongside your original physical SIM.</p>
-        <p v-else>Earn points on eligible purchases and referrals, then redeem them for rewards.</p>
+      <details v-for="item in faqs" :key="item.question">
+        <summary>{{ item.question }}</summary>
+        <p>{{ item.answer }}</p>
       </details>
     </div>
   </section>

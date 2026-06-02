@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Storefront;
 
 use App\Http\Controllers\Controller;
 use App\Models\EsimPlan;
+use App\Models\SiteContent;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -21,6 +22,7 @@ class HomeController extends Controller
             'featuredDestinations' => $this->featuredDestinations(),
             'destinationGroups' => $this->destinationGroups(),
             'featuredPlans' => $this->featuredPlans(),
+            'content' => SiteContent::value('homepage', []),
         ]);
     }
 
@@ -207,23 +209,31 @@ class HomeController extends Controller
             ->where('is_featured', true)
             ->orderBy('duration_days')
             ->orderBy('retail_price')
-            ->limit(6)
             ->get($this->planColumns());
 
-        if ($plans->count() >= 6) {
-            return $plans;
+        $featured = $plans
+            ->unique(fn (EsimPlan $plan) => strtolower((string) ($plan->country_name ?: $plan->region_name ?: $plan->coverage_type ?: $plan->title)))
+            ->take(6)
+            ->values();
+
+        if ($featured->count() >= 6) {
+            return $featured;
         }
 
         $extraPlans = EsimPlan::query()
             ->where('is_active', true)
-            ->when($plans->isNotEmpty(), fn ($query) => $query->whereNotIn('id', $plans->pluck('id')))
+            ->when($featured->isNotEmpty(), fn ($query) => $query->whereNotIn('id', $featured->pluck('id')))
             ->orderByRaw('COALESCE(country_name, region_name, coverage_type)')
             ->orderBy('duration_days')
             ->orderBy('retail_price')
-            ->limit(6 - $plans->count())
+            ->limit(12)
             ->get($this->planColumns());
 
-        return $plans->concat($extraPlans)->values();
+        return $featured
+            ->concat($extraPlans)
+            ->unique(fn (EsimPlan $plan) => strtolower((string) ($plan->country_name ?: $plan->region_name ?: $plan->coverage_type ?: $plan->title)))
+            ->take(6)
+            ->values();
     }
 
     private function planColumns(): array

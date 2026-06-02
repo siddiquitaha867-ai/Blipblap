@@ -23,6 +23,35 @@ class OrderController extends Controller
             ->paginate(20)
             ->withQueryString();
 
+        $orders->through(function (EsimOrder $order): array {
+            return [
+                'id' => $order->id,
+                'order_reference' => $order->order_reference,
+                'payment_reference' => $order->payment_reference,
+                'bundle_code' => $order->bundle_code,
+                'status' => $order->status,
+                'fulfillment_status' => $order->fulfillment_status,
+                'currency' => $order->currency,
+                'total' => (float) $order->total,
+                'subtotal' => (float) $order->subtotal,
+                'paid_at' => optional($order->paid_at)?->toDateTimeString(),
+                'created_at' => optional($order->created_at)?->toDateTimeString(),
+                'customer_email' => $order->customer_email,
+                'customer_name' => (string) data_get($order->request_payload, 'customer_name', ''),
+                'customer_phone' => (string) data_get($order->request_payload, 'customer_phone', ''),
+                'address_line1' => (string) data_get($order->request_payload, 'address_line1', ''),
+                'address_line2' => (string) data_get($order->request_payload, 'address_line2', ''),
+                'city' => (string) data_get($order->request_payload, 'city', ''),
+                'state' => (string) data_get($order->request_payload, 'state', ''),
+                'postal_code' => (string) data_get($order->request_payload, 'postal_code', ''),
+                'country' => (string) data_get($order->request_payload, 'country', ''),
+                'payment_method' => $this->paymentMethod($order),
+                'payment_brand' => (string) data_get($order->response_payload, 'payment_method_details.card.brand', ''),
+                'payment_last4' => (string) data_get($order->response_payload, 'payment_method_details.card.last4', ''),
+                'iccid' => (string) $order->iccid,
+            ];
+        });
+
         return Inertia::render('Admin/Orders/Index', [
             'orders' => $orders,
             'filters' => [
@@ -110,6 +139,7 @@ class OrderController extends Controller
             ->when($search !== '', function ($query) use ($search): void {
                 $query->where(function ($inner) use ($search): void {
                     $inner->where('customer_email', 'like', "%{$search}%")
+                        ->orWhere('request_payload->customer_name', 'like', "%{$search}%")
                         ->orWhere('order_reference', 'like', "%{$search}%")
                         ->orWhere('payment_reference', 'like', "%{$search}%")
                         ->orWhere('bundle_code', 'like', "%{$search}%")

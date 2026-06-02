@@ -20,6 +20,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'marketing_opt_in',
         'is_admin',
+        'is_banned',
         'last_login_at',
         'referral_code',
     ];
@@ -36,6 +37,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
             'marketing_opt_in' => 'boolean',
             'is_admin' => 'boolean',
+            'is_banned' => 'boolean',
             'last_login_at' => 'datetime',
         ];
     }
