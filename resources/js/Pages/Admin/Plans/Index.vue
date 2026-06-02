@@ -111,7 +111,8 @@ const applyBulkPricing = () => {
 
     <section class="admin-panel admin-form-panel">
       <h2>Bulk pricing and margin control</h2>
-      <form class="admin-create-grid" @submit.prevent="applyBulkPricing">
+      <p class="admin-panel-intro">Update margins, markup, and tax in one place without breaking the pricing layout.</p>
+      <form class="admin-create-grid admin-bulk-grid" @submit.prevent="applyBulkPricing">
         <label>
           <span>Apply to</span>
           <select v-model="bulkForm.scope_type">
@@ -154,7 +155,9 @@ const applyBulkPricing = () => {
           <input v-model="bulkForm.featured_only" type="checkbox" />
           Featured only
         </label>
-        <button type="submit" :disabled="bulkForm.processing">Apply pricing</button>
+        <div class="admin-bulk-submit">
+          <button type="submit" :disabled="bulkForm.processing">Apply pricing</button>
+        </div>
       </form>
     </section>
 

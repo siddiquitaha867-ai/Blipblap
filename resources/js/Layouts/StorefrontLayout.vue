@@ -113,7 +113,7 @@ onBeforeUnmount(() => {
             <span class="sr-only">Toggle navigation</span>
           </button>
 
-          <div class="air-header-actions" :class="{ 'is-open': mobileMenuOpen }">
+          <div class="air-header-actions air-header-actions--desktop">
             <template v-if="user">
               <Link v-if="hasCustomerEsims" href="/my-esims" class="account-link" @click="mobileMenuOpen = false">My eSIMs</Link>
               <button v-else type="button" class="account-link account-link--disabled" aria-disabled="true">
@@ -158,6 +158,37 @@ onBeforeUnmount(() => {
             <a :href="`${homeHref}#faqs`" @click="mobileMenuOpen = false">FAQs</a>
             <a :href="`${homeHref}#contact`" @click="mobileMenuOpen = false">Contact Us</a>
           </nav>
+
+          <div class="air-header-actions air-header-actions--mobile">
+            <template v-if="user">
+              <Link v-if="hasCustomerEsims" href="/my-esims" class="account-link" @click="mobileMenuOpen = false">My eSIMs</Link>
+              <button v-else type="button" class="account-link account-link--disabled" aria-disabled="true">
+                My eSIMs
+              </button>
+
+              <div class="account-menu-wrap" @focusout="closeAccountWhenLeaving">
+                <button
+                  type="button"
+                  class="pill account-trigger"
+                  :aria-expanded="accountOpen"
+                  @click="accountOpen = !accountOpen"
+                >
+                  My Account
+                </button>
+
+                <div v-show="accountOpen" class="account-menu">
+                  <span>Signed in as</span>
+                  <strong>{{ displayName }}</strong>
+                  <small>{{ user.email }}</small>
+                  <Link href="/logout" method="post" as="button" class="account-logout">Logout</Link>
+                </div>
+              </div>
+            </template>
+            <template v-else>
+              <Link href="/auth/login" class="pill pill-soft" @click="mobileMenuOpen = false">Log in</Link>
+              <Link href="/auth/signup" class="pill" @click="mobileMenuOpen = false">Sign up</Link>
+            </template>
+          </div>
 
           <div class="air-search-row">
             <span class="air-line"></span>
