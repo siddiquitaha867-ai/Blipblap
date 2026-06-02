@@ -1164,7 +1164,7 @@ input {
   color: var(--bb-muted);
   font-size: 14px;
   line-height: 1.5;
-  margin: -4px 0 18px;
+  margin: 0 0 10px;
   max-width: 720px;
 }
 
@@ -1182,6 +1182,10 @@ input {
   border-radius: 22px;
   box-shadow: 0 16px 40px rgba(15, 23, 42, 0.04);
   padding: 24px;
+}
+
+.admin-form-panel {
+  padding: 18px 22px;
 }
 
 .stat-grid span {
@@ -1202,7 +1206,7 @@ input {
   color: var(--bb-ink);
   font-size: 24px;
   font-weight: 500;
-  margin: 0 0 18px;
+  margin: 0 0 8px;
 }
 
 .admin-table {
@@ -1316,7 +1320,7 @@ input {
 
 .admin-bulk-grid {
   align-items: end;
-  gap: 18px 14px;
+  gap: 10px 12px;
   grid-template-columns: repeat(8, minmax(0, 1fr));
 }
 
@@ -1356,12 +1360,12 @@ input {
 
 .admin-create-grid label {
   display: grid;
-  gap: 7px;
+  gap: 5px;
 }
 
 .admin-create-grid label span {
   color: var(--bb-muted);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -1373,9 +1377,9 @@ input {
 .admin-check-row {
   align-items: center;
   display: flex !important;
-  gap: 8px !important;
+  gap: 6px !important;
   justify-content: center;
-  min-height: 42px;
+  min-height: 34px;
 }
 
 .admin-plan-groups {
