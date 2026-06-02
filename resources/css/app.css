@@ -1101,7 +1101,7 @@ input {
 
 .admin-main {
   min-width: 0;
-  padding: 18px 18px 28px 0;
+  padding: 18px 18px 36px 0;
 }
 
 .admin-top {
@@ -1141,7 +1141,7 @@ input {
 }
 
 .admin-page {
-  padding: 28px 14px 0 14px;
+  padding: 40px 14px 0 14px;
   max-width: 1320px;
 }
 
@@ -1316,7 +1316,8 @@ input {
 
 .admin-bulk-grid {
   align-items: end;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 18px 14px;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
 }
 
 .admin-bulk-grid > label:nth-child(1) {
@@ -1328,7 +1329,7 @@ input {
 }
 
 .admin-bulk-grid > label:nth-child(3) {
-  grid-column: span 2;
+  grid-column: span 1;
 }
 
 .admin-bulk-grid > label:nth-child(4) {
@@ -1350,7 +1351,7 @@ input {
 .admin-bulk-submit {
   display: flex;
   grid-column: span 2;
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 
 .admin-create-grid label {
@@ -1893,6 +1894,27 @@ input {
 
   .admin-bulk-grid > label:nth-child(2) {
     grid-column: span 4;
+  }
+}
+
+@media (max-width: 1440px) {
+  .admin-bulk-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .admin-bulk-grid > label:nth-child(1),
+  .admin-bulk-grid > label:nth-child(3),
+  .admin-bulk-grid > label:nth-child(4),
+  .admin-bulk-grid > label:nth-child(5),
+  .admin-bulk-grid > label:nth-child(6),
+  .admin-bulk-grid > label:nth-child(7),
+  .admin-bulk-grid > label.admin-check-row,
+  .admin-bulk-submit {
+    grid-column: span 2;
+  }
+
+  .admin-bulk-grid > label:nth-child(2) {
+    grid-column: 1 / -1;
   }
 }
 
