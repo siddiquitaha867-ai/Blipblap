@@ -1,4 +1,5 @@
 <script setup>
+import SupportChatWidget from '@/Components/SupportChatWidget.vue';
 import { Link, usePage } from '@inertiajs/vue3';
 import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 
@@ -252,5 +253,7 @@ onBeforeUnmount(() => {
     <main>
       <slot />
     </main>
+
+    <SupportChatWidget :hidden="isAdminPreview" />
   </div>
 </template>

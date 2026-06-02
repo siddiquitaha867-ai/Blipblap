@@ -7,6 +7,7 @@ use App\Http\Controllers\Storefront\CheckoutController;
 use App\Http\Controllers\Storefront\MyEsimController;
 use App\Http\Controllers\Storefront\PlanController;
 use App\Http\Controllers\Storefront\PlansIndexController;
+use App\Http\Controllers\Storefront\SupportChatController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
@@ -71,6 +72,7 @@ Route::get('/checkout/{plan:slug}/payment', [CheckoutController::class, 'payment
 Route::post('/checkout/{plan:slug}/stripe', [CheckoutController::class, 'stripe'])->name('checkout.stripe');
 Route::get('/checkout/{plan:slug}/success', [CheckoutController::class, 'success'])->name('checkout.success');
 Route::post('/stripe/webhook', [CheckoutController::class, 'webhook'])->name('stripe.webhook');
+Route::post('/support/chat', SupportChatController::class)->name('support.chat');
 Route::get('/pages/{page:slug}', [ContentPageController::class, 'show'])->name('pages.show');
 
 Route::middleware('guest')->group(function (): void {
