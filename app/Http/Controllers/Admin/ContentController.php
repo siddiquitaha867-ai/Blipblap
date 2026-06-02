@@ -18,7 +18,7 @@ class ContentController extends Controller
         return Inertia::render('Admin/Content/Index', [
             'homeContent' => SiteContent::value('homepage', $this->defaultHomeContent()),
             'emailContent' => SiteContent::value('emails.esim_ready', $this->defaultEmailContent()),
-            'pages' => ContentPage::query()->latest()->get(),
+            'pages' => ContentPage::safeLatest(),
         ]);
     }
 
@@ -48,10 +48,9 @@ class ContentController extends Controller
             'promo_banners.*.cta_url' => ['nullable', 'string', 'max:255'],
         ]);
 
-        SiteContent::query()->updateOrCreate(
-            ['key' => 'homepage'],
-            ['title' => 'Homepage content', 'content' => $data],
-        );
+        if (! SiteContent::storeValue('homepage', 'Homepage content', $data)) {
+            return back()->with('error', 'Homepage content table is not available yet. Please run migrations.');
+        }
 
         return back()->with('status', 'Homepage content updated.');
     }
@@ -71,16 +70,19 @@ class ContentController extends Controller
             'android_label' => ['required', 'string', 'max:120'],
         ]);
 
-        SiteContent::query()->updateOrCreate(
-            ['key' => 'emails.esim_ready'],
-            ['title' => 'Ready email template', 'content' => $data],
-        );
+        if (! SiteContent::storeValue('emails.esim_ready', 'Ready email template', $data)) {
+            return back()->with('error', 'Email content table is not available yet. Please run migrations.');
+        }
 
         return back()->with('status', 'Ready email content updated.');
     }
 
     public function storePage(Request $request): RedirectResponse
     {
+        if (! ContentPage::tableAvailable()) {
+            return back()->with('error', 'Content pages table is not available yet. Please run migrations.');
+        }
+
         $data = $this->validatePage($request);
         $data['slug'] = $data['slug'] ?: Str::slug($data['title']);
 
@@ -91,6 +93,10 @@ class ContentController extends Controller
 
     public function updatePage(Request $request, ContentPage $page): RedirectResponse
     {
+        if (! ContentPage::tableAvailable()) {
+            return back()->with('error', 'Content pages table is not available yet. Please run migrations.');
+        }
+
         $data = $this->validatePage($request, $page->id);
         $data['slug'] = $data['slug'] ?: Str::slug($data['title']);
 
@@ -101,6 +107,10 @@ class ContentController extends Controller
 
     public function destroyPage(ContentPage $page): RedirectResponse
     {
+        if (! ContentPage::tableAvailable()) {
+            return back()->with('error', 'Content pages table is not available yet. Please run migrations.');
+        }
+
         $page->delete();
 
         return back()->with('status', 'Page deleted.');
