@@ -22,7 +22,7 @@ defineProps({
     </section>
 
     <section class="plans-index-section">
-      <div class="admin-panel" style="max-width: 960px; margin: 0 auto;">
+      <div class="content-page-card">
         <div v-html="page.body_html"></div>
       </div>
     </section>
