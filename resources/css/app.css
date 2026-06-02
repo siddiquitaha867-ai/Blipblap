@@ -9,6 +9,8 @@
   --bb-muted: #6f7782;
   --bb-yellow: #f7d77b;
   --bb-pink: #f3b9d5;
+  --bb-page-gutter: clamp(18px, 4vw, 48px);
+  --bb-mobile-gutter: 16px;
 }
 
 * {
@@ -26,11 +28,17 @@ body {
   font-family: 'Comfortaa', 'Lexend', system-ui, sans-serif;
   font-size: 14px;
   letter-spacing: 0;
+  overflow-x: hidden;
 }
 
 a {
   color: inherit;
   text-decoration: none;
+}
+
+img {
+  height: auto;
+  max-width: 100%;
 }
 
 button,
@@ -40,16 +48,22 @@ input {
 
 .site-shell {
   min-height: 100vh;
-  overflow: hidden;
+  overflow-x: clip;
+  overflow-y: visible;
   position: relative;
 }
 
 .air-header {
   background: rgba(255, 255, 255, 0.96);
   border-top: 1px solid rgba(13, 46, 163, 0.35);
-  padding: 8px 48px 12px;
+  padding: 12px var(--bb-page-gutter) 18px;
   position: relative;
   z-index: 10;
+}
+
+.air-header-inner {
+  margin: 0 auto;
+  max-width: 1240px;
 }
 
 .preview-bar {
@@ -66,8 +80,9 @@ input {
 
 .air-header-top {
   align-items: center;
-  display: flex;
-  justify-content: center;
+  display: grid;
+  gap: 24px;
+  grid-template-columns: auto 1fr auto;
   min-height: 40px;
   position: relative;
 }
@@ -103,9 +118,21 @@ input {
 .air-header-actions {
   align-items: center;
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
-  position: absolute;
-  right: 0;
+  grid-column: 3;
+  justify-content: flex-end;
+}
+
+.air-header-body {
+  display: grid;
+  gap: 16px;
+  margin-top: 14px;
+}
+
+.mobile-menu-toggle,
+.sr-only {
+  display: none;
 }
 
 .icon-button {
@@ -130,9 +157,10 @@ input {
 .air-nav {
   align-items: center;
   display: flex;
-  gap: 42px;
+  flex-wrap: wrap;
+  gap: 14px 34px;
   justify-content: center;
-  margin: 10px 0 12px;
+  margin: 0;
 }
 
 .air-nav a,
@@ -201,7 +229,7 @@ input {
 .air-search-row {
   align-items: center;
   display: flex;
-  gap: 28px;
+  gap: 20px;
   justify-content: center;
 }
 
@@ -221,14 +249,16 @@ input {
   grid-template-columns: auto 1fr auto;
   height: 58px;
   max-width: 1010px;
-  min-width: min(78vw, 1010px);
+  min-width: 0;
+  width: 100%;
   overflow: visible;
 }
 
 .air-search-wrap {
   max-width: 1010px;
-  min-width: min(78vw, 1010px);
+  min-width: 0;
   position: relative;
+  width: min(100%, 1010px);
 }
 
 .air-search-wrap .air-search {
@@ -250,8 +280,10 @@ input {
   color: #576477;
   font-size: 16px;
   font-weight: 500;
+  min-width: 0;
   outline: 0;
   padding: 0 18px;
+  width: 100%;
 }
 
 .air-search button {
@@ -3157,6 +3189,7 @@ input {
   display: block;
   font-size: 13px;
   margin: 0 0 14px;
+  overflow-wrap: anywhere;
 }
 
 .how-page {
@@ -5016,27 +5049,85 @@ input {
 
 @media (max-width: 900px) {
   .air-header {
-    padding: 22px 16px 12px;
+    padding: 16px var(--bb-mobile-gutter) 18px;
   }
 
-  .air-header-top,
-  .air-nav,
-  .air-header-actions {
-    flex-wrap: wrap;
+  .mobile-menu-toggle {
+    align-items: center;
+    background: #eef6ff;
+    border: 1px solid #d8e7ff;
+    border-radius: 14px;
+    color: var(--bb-blue);
+    cursor: pointer;
+    display: inline-flex;
+    flex-direction: column;
+    gap: 4px;
+    height: 46px;
     justify-content: center;
+    width: 46px;
+  }
+
+  .mobile-menu-toggle span:not(.sr-only) {
+    background: currentColor;
+    border-radius: 999px;
+    display: block;
+    height: 2px;
+    width: 18px;
+  }
+
+  .sr-only {
+    border: 0;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    display: block;
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
   }
 
   .air-header-top {
-    gap: 18px;
+    gap: 14px;
+    grid-template-columns: 1fr auto;
+  }
+
+  .air-header-body {
+    display: none;
+    margin-top: 16px;
+  }
+
+  .air-header-body.is-open {
+    display: grid;
   }
 
   .air-header-actions {
-    position: static;
+    display: none;
+    gap: 10px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-column: 1 / -1;
+    justify-content: stretch;
+    margin-top: 4px;
+  }
+
+  .air-header-actions.is-open {
+    display: grid;
   }
 
   .air-nav {
-    gap: 18px;
-    margin: 28px 0 24px;
+    display: grid;
+    gap: 10px;
+    justify-content: stretch;
+    text-align: left;
+  }
+
+  .air-nav a {
+    background: #f8fbff;
+    border: 1px solid #dbe7ef;
+    border-radius: 14px;
+    padding: 14px 16px;
   }
 
   .plans-menu {
@@ -5045,7 +5136,8 @@ input {
   }
 
   .air-search-row {
-    gap: 10px;
+    display: grid;
+    gap: 12px;
   }
 
   .air-line {
@@ -5053,11 +5145,51 @@ input {
   }
 
   .air-search {
-    min-width: 100%;
+    border-radius: 24px;
+    gap: 12px;
+    grid-template-columns: 1fr;
+    height: auto;
+    padding: 16px;
   }
 
   .air-search-wrap {
     min-width: 100%;
+    width: 100%;
+  }
+
+  .air-search > span {
+    padding-left: 0;
+  }
+
+  .air-search input {
+    background: #f8fbfd;
+    border: 1px solid #dce7ef;
+    border-radius: 14px;
+    min-height: 46px;
+    padding: 0 14px;
+  }
+
+  .air-search button {
+    height: 46px;
+    margin-right: 0;
+    width: 100%;
+  }
+
+  .destination-search-menu {
+    left: 0;
+    right: 0;
+    transform: none;
+    width: 100%;
+  }
+
+  .pill,
+  .account-link,
+  .account-trigger {
+    width: 100%;
+  }
+
+  .account-menu-wrap {
+    width: 100%;
   }
 
   .hero-grid,
@@ -5300,7 +5432,186 @@ input {
   }
 
   .account-menu {
-    right: 50%;
-    transform: translateX(50%);
+    left: 0;
+    right: 0;
+    transform: none;
+    width: 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .preview-bar {
+    border-radius: 18px;
+    margin-bottom: 12px;
+    padding: 10px 14px;
+  }
+
+  .air-header-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-section,
+  .airalo-flow-page,
+  .checkout-page,
+  .payment-page,
+  .success-page,
+  .my-esims-page {
+    padding-left: var(--bb-mobile-gutter);
+    padding-right: var(--bb-mobile-gutter);
+  }
+
+  .destinations-section,
+  .support-band,
+  .comment-section,
+  .plans-index-final {
+    padding-left: var(--bb-mobile-gutter);
+    padding-right: var(--bb-mobile-gutter);
+  }
+
+  .destination-tabs,
+  .duration-tabs,
+  .checkout-method-tabs {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 2px;
+    scrollbar-width: thin;
+  }
+
+  .destination-tabs button,
+  .duration-tab,
+  .checkout-method-tabs button {
+    flex: 0 0 auto;
+  }
+
+  .destination-tabs {
+    border-bottom: 0;
+    margin-top: 28px;
+  }
+
+  .destination-tabs button {
+    border: 1px solid #dce7ef;
+    border-bottom-width: 1px;
+    border-radius: 999px;
+    min-height: 42px;
+    padding: 10px 16px;
+    white-space: nowrap;
+  }
+
+  .destination-tabs button.active {
+    background: var(--bb-blue);
+    border-color: var(--bb-blue);
+    color: white;
+  }
+
+  .hero-grid,
+  .plans-index-hero,
+  .detail-hero,
+  .steps-section,
+  .comment-section,
+  .support-band > div,
+  .footer {
+    gap: 24px;
+  }
+
+  .hero-art {
+    min-height: 280px;
+  }
+
+  .hero-photo-img,
+  .group-photo {
+    max-width: 100%;
+  }
+
+  .featured-plan-tile,
+  .destination-tile,
+  .plans-index-card,
+  .package-card,
+  .my-esim-card,
+  .checkout-form,
+  .checkout-summary,
+  .payment-card,
+  .comment-section,
+  .my-esims-empty {
+    border-radius: 18px;
+  }
+
+  .checkout-form,
+  .stripe-test-box,
+  .checkout-summary,
+  .payment-card,
+  .comment-section,
+  .support-band article,
+  .install-preview {
+    padding: 20px;
+  }
+
+  .compatibility-dialog {
+    max-height: min(88vh, 760px);
+    padding: 18px;
+  }
+
+  .compatibility-head {
+    padding-right: 34px;
+  }
+}
+
+@media (max-width: 480px) {
+  .air-header {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .brand img {
+    height: 28px;
+  }
+
+  .hero-copy h1,
+  .plans-index-hero h1,
+  .detail-hero h1,
+  .checkout-page h1,
+  .payment-page h1,
+  .my-esims-hero h1 {
+    font-size: clamp(34px, 11vw, 44px);
+  }
+
+  .hero-text,
+  .detail-hero p,
+  .checkout-page > div > p,
+  .payment-page > div > p,
+  .my-esims-hero p,
+  .comment-copy p {
+    font-size: 14px;
+  }
+
+  .destination-search-menu,
+  .account-menu {
+    border-radius: 16px;
+  }
+
+  .checkout-form,
+  .stripe-test-box,
+  .checkout-summary,
+  .payment-card,
+  .support-band article,
+  .comment-section,
+  .my-esim-card,
+  .my-esims-empty,
+  .install-preview {
+    padding: 18px;
+  }
+
+  .my-esim-card__top,
+  .checkout-summary-top,
+  .payment-card-top {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .install-qr,
+  .my-esim-install > img,
+  .my-esim-install > span {
+    height: min(72vw, 180px);
+    width: min(72vw, 180px);
   }
 }

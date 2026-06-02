@@ -1,6 +1,6 @@
 <script setup>
 import { Link, usePage } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 
 const page = usePage();
 const searchOpen = ref(false);
@@ -8,6 +8,7 @@ const searchLoading = ref(false);
 const searchQuery = ref('');
 const destinations = ref([]);
 const accountOpen = ref(false);
+const mobileMenuOpen = ref(false);
 
 const user = computed(() => page.props.auth.user);
 const isAdminPreview = computed(() => Boolean(user.value?.is_admin));
@@ -70,112 +71,150 @@ const closeAccountWhenLeaving = (event) => {
 
   accountOpen.value = false;
 };
+
+const syncDesktopState = () => {
+  if (window.innerWidth > 900) {
+    mobileMenuOpen.value = false;
+  }
+};
+
+onMounted(() => {
+  syncDesktopState();
+  window.addEventListener('resize', syncDesktopState);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', syncDesktopState);
+});
 </script>
 
 <template>
   <div class="site-shell">
     <header class="air-header">
-      <div v-if="isAdminPreview" class="preview-bar">
-        Admin storefront preview. Purchases are disabled.
-      </div>
-      <div class="air-header-top">
-        <Link :href="homeHref" class="brand" aria-label="BlipBlap home">
-          <img src="/images/blipblap/logo-blue.png" alt="BlipBlap" />
-        </Link>
+      <div class="air-header-inner">
+        <div v-if="isAdminPreview" class="preview-bar">
+          Admin storefront preview. Purchases are disabled.
+        </div>
+        <div class="air-header-top">
+          <Link :href="homeHref" class="brand" aria-label="BlipBlap home">
+            <img src="/images/blipblap/logo-blue.png" alt="BlipBlap" />
+          </Link>
 
-        <div class="air-header-actions">
-          <template v-if="user">
-            <Link v-if="hasCustomerEsims" href="/my-esims" class="account-link">My eSIMs</Link>
-            <button v-else type="button" class="account-link account-link--disabled" aria-disabled="true">
-              My eSIMs
-            </button>
+          <button
+            type="button"
+            class="mobile-menu-toggle"
+            :aria-expanded="mobileMenuOpen"
+            aria-controls="site-navigation-panel"
+            @click="mobileMenuOpen = !mobileMenuOpen"
+          >
+            <span></span>
+            <span></span>
+            <span></span>
+            <span class="sr-only">Toggle navigation</span>
+          </button>
 
-            <div class="account-menu-wrap" @focusout="closeAccountWhenLeaving">
-              <button
-                type="button"
-                class="pill account-trigger"
-                :aria-expanded="accountOpen"
-                @click="accountOpen = !accountOpen"
-              >
-                My Account
+          <div class="air-header-actions" :class="{ 'is-open': mobileMenuOpen }">
+            <template v-if="user">
+              <Link v-if="hasCustomerEsims" href="/my-esims" class="account-link" @click="mobileMenuOpen = false">My eSIMs</Link>
+              <button v-else type="button" class="account-link account-link--disabled" aria-disabled="true">
+                My eSIMs
               </button>
 
-              <div v-show="accountOpen" class="account-menu">
-                <span>Signed in as</span>
-                <strong>{{ displayName }}</strong>
-                <small>{{ user.email }}</small>
-                <Link href="/logout" method="post" as="button" class="account-logout">Logout</Link>
-              </div>
-            </div>
-          </template>
-          <template v-else>
-            <Link href="/auth/login" class="pill pill-soft">Log in</Link>
-            <Link href="/auth/signup" class="pill">Sign up</Link>
-          </template>
-        </div>
-      </div>
-
-      <nav class="air-nav" aria-label="Primary navigation">
-        <Link :href="homeHref">Home</Link>
-        <Link href="/esim-plans">ESIM Plans</Link>
-        <Link href="/how-blipblap-works">How BlipBlap Works</Link>
-        <a :href="`${homeHref}#faqs`">FAQs</a>
-        <a :href="`${homeHref}#contact`">Contact Us</a>
-      </nav>
-
-      <div class="air-search-row">
-        <span class="air-line"></span>
-        <div class="air-search-wrap" @focusout="closeSearchWhenLeaving">
-          <form class="air-search" @submit.prevent="loadDestinations">
-            <span>Search</span>
-            <input
-              v-model="searchQuery"
-              type="search"
-              placeholder="Where do you need an eSIM?"
-              autocomplete="off"
-              @focus="loadDestinations"
-              @input="loadDestinations"
-            />
-            <button type="button" @click="loadDestinations">Locations</button>
-          </form>
-
-          <div v-show="searchOpen" class="destination-search-menu">
-            <label>
-              <span>Search country</span>
-              <input
-                v-model="searchQuery"
-                type="search"
-                placeholder="Type country name..."
-                autocomplete="off"
-                @focus="searchOpen = true"
-              />
-            </label>
-
-            <div class="destination-search-list">
-              <p v-if="searchLoading" class="destination-search-state">Loading destinations...</p>
-              <p v-else-if="!filteredDestinations.length" class="destination-search-state">No countries found.</p>
-              <template v-else>
-                <Link
-                  v-for="destination in filteredDestinations"
-                  :key="destination.name"
-                  :href="destination.url"
-                  class="destination-search-item"
-                  @mousedown.prevent
+              <div class="account-menu-wrap" @focusout="closeAccountWhenLeaving">
+                <button
+                  type="button"
+                  class="pill account-trigger"
+                  :aria-expanded="accountOpen"
+                  @click="accountOpen = !accountOpen"
                 >
-                  <span class="destination-search-flag">
-                    <img v-if="destination.flag_url" :src="destination.flag_url" :alt="`${destination.name} flag`">
-                    <span v-else>{{ destination.iso }}</span>
-                  </span>
-                  <span>
-                    <strong>{{ destination.name }}</strong>
-                    <small>{{ destinationMeta(destination) }}</small>
-                  </span>
-                </Link>
-              </template>
-            </div>
+                  My Account
+                </button>
+
+                <div v-show="accountOpen" class="account-menu">
+                  <span>Signed in as</span>
+                  <strong>{{ displayName }}</strong>
+                  <small>{{ user.email }}</small>
+                  <Link href="/logout" method="post" as="button" class="account-logout">Logout</Link>
+                </div>
+              </div>
+            </template>
+            <template v-else>
+              <Link href="/auth/login" class="pill pill-soft" @click="mobileMenuOpen = false">Log in</Link>
+              <Link href="/auth/signup" class="pill" @click="mobileMenuOpen = false">Sign up</Link>
+            </template>
           </div>
         </div>
-        <span class="air-line"></span>
+
+        <div
+          id="site-navigation-panel"
+          class="air-header-body"
+          :class="{ 'is-open': mobileMenuOpen }"
+        >
+
+          <nav class="air-nav" aria-label="Primary navigation">
+            <Link :href="homeHref" @click="mobileMenuOpen = false">Home</Link>
+            <Link href="/esim-plans" @click="mobileMenuOpen = false">ESIM Plans</Link>
+            <Link href="/how-blipblap-works" @click="mobileMenuOpen = false">How BlipBlap Works</Link>
+            <a :href="`${homeHref}#faqs`" @click="mobileMenuOpen = false">FAQs</a>
+            <a :href="`${homeHref}#contact`" @click="mobileMenuOpen = false">Contact Us</a>
+          </nav>
+
+          <div class="air-search-row">
+            <span class="air-line"></span>
+            <div class="air-search-wrap" @focusout="closeSearchWhenLeaving">
+              <form class="air-search" @submit.prevent="loadDestinations">
+                <span>Search</span>
+                <input
+                  v-model="searchQuery"
+                  type="search"
+                  placeholder="Where do you need an eSIM?"
+                  autocomplete="off"
+                  @focus="loadDestinations"
+                  @input="loadDestinations"
+                />
+                <button type="button" @click="loadDestinations">Locations</button>
+              </form>
+
+              <div v-show="searchOpen" class="destination-search-menu">
+                <label>
+                  <span>Search country</span>
+                  <input
+                    v-model="searchQuery"
+                    type="search"
+                    placeholder="Type country name..."
+                    autocomplete="off"
+                    @focus="searchOpen = true"
+                  />
+                </label>
+
+                <div class="destination-search-list">
+                  <p v-if="searchLoading" class="destination-search-state">Loading destinations...</p>
+                  <p v-else-if="!filteredDestinations.length" class="destination-search-state">No countries found.</p>
+                  <template v-else>
+                    <Link
+                      v-for="destination in filteredDestinations"
+                      :key="destination.name"
+                      :href="destination.url"
+                      class="destination-search-item"
+                      @mousedown.prevent
+                      @click="mobileMenuOpen = false"
+                    >
+                      <span class="destination-search-flag">
+                        <img v-if="destination.flag_url" :src="destination.flag_url" :alt="`${destination.name} flag`">
+                        <span v-else>{{ destination.iso }}</span>
+                      </span>
+                      <span>
+                        <strong>{{ destination.name }}</strong>
+                        <small>{{ destinationMeta(destination) }}</small>
+                      </span>
+                    </Link>
+                  </template>
+                </div>
+              </div>
+            </div>
+            <span class="air-line"></span>
+          </div>
+        </div>
       </div>
     </header>
 
