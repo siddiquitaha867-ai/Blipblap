@@ -5217,12 +5217,18 @@ input {
   }
 
   .air-header-actions--mobile {
+    align-items: stretch;
     display: none;
     gap: 10px;
     grid-column: 1 / -1;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     justify-content: stretch;
     order: 2;
+    width: 100%;
+  }
+
+  .air-header-actions--mobile > * {
+    min-width: 0;
     width: 100%;
   }
 
@@ -5256,8 +5262,13 @@ input {
     display: grid;
     gap: 12px;
     grid-column: 1 / -1;
+    grid-template-columns: minmax(0, 1fr);
     order: 3;
     width: 100%;
+  }
+
+  .air-search-row > * {
+    min-width: 0;
   }
 
   .air-line {
@@ -5274,6 +5285,7 @@ input {
   }
 
   .air-search-wrap {
+    justify-self: stretch;
     max-width: none;
     min-width: 100%;
     width: 100%;
