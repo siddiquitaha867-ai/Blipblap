@@ -5226,7 +5226,9 @@ input {
 
   .air-header-body {
     display: none;
+    grid-template-columns: minmax(0, 1fr);
     margin-top: 16px;
+    width: 100%;
   }
 
   .air-header-body.is-open {
@@ -5240,8 +5242,10 @@ input {
   .air-header-actions--mobile {
     display: none;
     gap: 10px;
+    grid-column: 1 / -1;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     justify-content: stretch;
+    order: 2;
     width: 100%;
   }
 
@@ -5252,8 +5256,11 @@ input {
   .air-nav {
     display: grid;
     gap: 10px;
+    grid-column: 1 / -1;
     justify-content: stretch;
+    order: 1;
     text-align: left;
+    width: 100%;
   }
 
   .air-nav a {
@@ -5271,6 +5278,8 @@ input {
   .air-search-row {
     display: grid;
     gap: 12px;
+    grid-column: 1 / -1;
+    order: 3;
     width: 100%;
   }
 
