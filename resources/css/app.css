@@ -5413,6 +5413,10 @@ input {
   padding: 28px;
 }
 
+.my-account-hero > div {
+  min-width: 0;
+}
+
 .my-account-avatar {
   align-items: center;
   background: var(--bb-blue);
@@ -5442,6 +5446,7 @@ input {
   font-weight: 400;
   line-height: 1;
   margin: 0 0 8px;
+  overflow-wrap: anywhere;
 }
 
 .my-account-hero p {
@@ -5454,7 +5459,10 @@ input {
   background: #eef6ff;
   border-radius: 999px;
   color: var(--bb-blue);
+  display: inline-flex;
   font-weight: 800;
+  justify-content: center;
+  min-height: 44px;
   padding: 13px 18px;
   text-align: center;
 }
@@ -5473,6 +5481,11 @@ input {
   gap: 24px;
   grid-template-columns: 220px minmax(0, 1fr);
   padding: 26px;
+}
+
+.my-account-section > div,
+.my-account-grid {
+  min-width: 0;
 }
 
 .my-account-section h2 {
@@ -5508,6 +5521,7 @@ input {
   height: 52px;
   outline: 0;
   padding: 0 16px;
+  min-width: 0;
   width: 100%;
 }
 
@@ -5563,6 +5577,11 @@ input {
   font-weight: 800;
   min-height: 50px;
   padding: 0 24px;
+}
+
+.my-account-actions a,
+.my-account-actions button {
+  min-width: 0;
 }
 
 .my-account-actions button:disabled {
@@ -6310,6 +6329,11 @@ input {
     border-radius: 18px;
   }
 
+  .my-account-page {
+    padding-bottom: 64px;
+    padding-top: 28px;
+  }
+
   .checkout-form,
   .stripe-test-box,
   .checkout-summary,
@@ -6359,6 +6383,13 @@ input {
     height: 28px;
   }
 
+  .my-account-avatar {
+    border-radius: 16px;
+    font-size: 22px;
+    height: 58px;
+    width: 58px;
+  }
+
   .hero-copy h1,
   .plans-index-hero h1,
   .detail-hero h1,
@@ -6398,6 +6429,27 @@ input {
   .content-page-card,
   .auth-modal {
     padding: 18px;
+  }
+
+  .my-account-section h2 {
+    font-size: 23px;
+  }
+
+  .my-account-grid {
+    gap: 14px;
+  }
+
+  .my-account-grid input {
+    border-radius: 12px;
+    font-size: 15px;
+    height: 48px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .my-account-hero a,
+  .my-account-actions button {
+    width: 100%;
   }
 
   .plans-index-strip img,
