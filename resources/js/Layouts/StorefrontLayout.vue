@@ -110,7 +110,7 @@ watch(mobileMenuOpen, (open) => {
         </div>
         <div class="air-header-top">
           <Link :href="homeHref" class="brand" aria-label="BlipBlap home">
-            <img src="/images/blipblap/logo-blue.png" alt="BlipBlap" />
+            <img src="/images/blipblap/logo-inc.png" alt="BlipBlap" />
           </Link>
 
           <button

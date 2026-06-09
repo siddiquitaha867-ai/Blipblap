@@ -12,7 +12,7 @@ const isActive = (href) => currentPath.value === href || currentPath.value.start
   <div class="admin-shell">
     <aside class="admin-sidebar">
       <Link href="/" class="admin-brand">
-        <img src="/images/blipblap/logo-blue.png" alt="BlipBlap" />
+        <img src="/images/blipblap/logo-inc.png" alt="BlipBlap" />
       </Link>
       <nav>
         <Link href="/admin" :class="{ active: isActive('/admin') && !currentPath.startsWith('/admin/plans') && !currentPath.startsWith('/admin/orders') && !currentPath.startsWith('/admin/reports') && !currentPath.startsWith('/admin/logs') && !currentPath.startsWith('/admin/diagnostics') && !currentPath.startsWith('/admin/promotions') && !currentPath.startsWith('/admin/content') && !currentPath.startsWith('/admin/users') && !currentPath.startsWith('/admin/storefront') }">Dashboard</Link>

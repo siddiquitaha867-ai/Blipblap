@@ -98,8 +98,10 @@ input {
 
 .brand img {
   display: block;
-  height: 32px;
-  width: auto;
+  height: auto;
+  max-height: 68px;
+  object-fit: contain;
+  width: 156px;
 }
 
 .brand-mark {
@@ -1211,8 +1213,11 @@ input {
   background: white;
   border-radius: 14px;
   display: block;
-  max-width: 140px;
+  height: auto;
+  max-width: 150px;
+  object-fit: contain;
   padding: 10px;
+  width: 150px;
 }
 
 .admin-sidebar nav {
@@ -6380,7 +6385,8 @@ input {
   }
 
   .brand img {
-    height: 28px;
+    max-height: 54px;
+    width: 118px;
   }
 
   .my-account-avatar {
