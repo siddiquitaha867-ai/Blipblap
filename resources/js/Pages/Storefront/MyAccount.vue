@@ -73,7 +73,6 @@ const saveProfile = () => {
           <label>
             <span>Email</span>
             <input :value="profile.email" type="email" autocomplete="email" readonly>
-            <em>Email cannot be changed.</em>
           </label>
           <label>
             <span>Phone number</span>
