@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Storefront;
 
 use App\Http\Controllers\Controller;
 use App\Models\EsimPlan;
-use App\Support\StorefrontPlanPresenter;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -58,10 +57,10 @@ class PlansIndexController extends Controller
                 };
 
                 return [
-                    'name' => StorefrontPlanPresenter::text($name),
-                    'iso' => StorefrontPlanPresenter::nullableText($plan->country_iso),
+                    'name' => $name,
+                    'iso' => $plan->country_iso,
                     'price' => (float) $plan->retail_price,
-                    'currency' => StorefrontPlanPresenter::text($plan->currency ?: config('blipblap.currency', 'USD')),
+                    'currency' => $plan->currency ?: config('blipblap.currency', 'USD'),
                 ];
             })
             ->filter(fn (array $plan): bool => trim((string) $plan['name']) !== '')
@@ -71,10 +70,10 @@ class PlansIndexController extends Controller
                 $prices = $items->pluck('price')->filter(fn (float $price): bool => $price > 0);
 
                 return [
-                    'name' => StorefrontPlanPresenter::text($name),
+                    'name' => $name,
                     'plan_count' => $items->count(),
                     'min_price' => $prices->min(),
-                    'currency' => StorefrontPlanPresenter::text($items->pluck('currency')->filter()->first() ?: config('blipblap.currency', 'USD')),
+                    'currency' => $items->pluck('currency')->filter()->first() ?: config('blipblap.currency', 'USD'),
                     'flag_url' => $type === 'local' ? $this->flagUrl($iso) : '',
                     'icon' => $type === 'global' ? 'globe' : null,
                     'url' => '/destinations/' . Str::slug($name),
