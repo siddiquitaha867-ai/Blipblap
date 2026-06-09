@@ -8,13 +8,11 @@ const searchOpen = ref(false);
 const searchLoading = ref(false);
 const searchQuery = ref('');
 const destinations = ref([]);
-const accountOpen = ref(false);
 const mobileMenuOpen = ref(false);
 
 const user = computed(() => page.props.auth.user);
 const isAdminPreview = computed(() => Boolean(user.value?.is_admin));
 const homeHref = computed(() => (isAdminPreview.value ? '/admin/storefront' : '/'));
-const displayName = computed(() => (isAdminPreview.value ? 'Admin' : user.value?.name));
 const hasCustomerEsims = computed(() => Number(user.value?.customer_esims_count || 0) > 0);
 
 const loadDestinations = async () => {
@@ -65,14 +63,6 @@ const closeSearchWhenLeaving = (event) => {
   searchOpen.value = false;
 };
 
-const closeAccountWhenLeaving = (event) => {
-  if (event.currentTarget.contains(event.relatedTarget)) {
-    return;
-  }
-
-  accountOpen.value = false;
-};
-
 const syncDesktopState = () => {
   if (window.innerWidth > 900) {
     mobileMenuOpen.value = false;
@@ -106,7 +96,6 @@ watch(mobileMenuOpen, (open) => {
   lockPageScroll(open);
 
   if (!open) {
-    accountOpen.value = false;
     searchOpen.value = false;
   }
 });
@@ -144,23 +133,7 @@ watch(mobileMenuOpen, (open) => {
                 My eSIMs
               </button>
 
-              <div class="account-menu-wrap" @focusout="closeAccountWhenLeaving">
-                <button
-                  type="button"
-                  class="pill account-trigger"
-                  :aria-expanded="accountOpen"
-                  @click="accountOpen = !accountOpen"
-                >
-                  My Account
-                </button>
-
-                <div v-show="accountOpen" class="account-menu">
-                  <span>Signed in as</span>
-                  <strong>{{ displayName }}</strong>
-                  <small>{{ user.email }}</small>
-                  <Link href="/logout" method="post" as="button" class="account-logout">Logout</Link>
-                </div>
-              </div>
+              <Link href="/my-account" class="pill account-trigger" @click="setMobileMenuOpen(false)">My Account</Link>
             </template>
             <template v-else>
               <Link href="/auth/login" class="pill pill-soft" @click="setMobileMenuOpen(false)">Log in</Link>
@@ -190,23 +163,7 @@ watch(mobileMenuOpen, (open) => {
                 My eSIMs
               </button>
 
-              <div class="account-menu-wrap" @focusout="closeAccountWhenLeaving">
-                <button
-                  type="button"
-                  class="pill account-trigger"
-                  :aria-expanded="accountOpen"
-                  @click="accountOpen = !accountOpen"
-                >
-                  My Account
-                </button>
-
-                <div v-show="accountOpen" class="account-menu">
-                  <span>Signed in as</span>
-                  <strong>{{ displayName }}</strong>
-                  <small>{{ user.email }}</small>
-                  <Link href="/logout" method="post" as="button" class="account-logout">Logout</Link>
-                </div>
-              </div>
+              <Link href="/my-account" class="pill account-trigger" @click="setMobileMenuOpen(false)">My Account</Link>
             </template>
             <template v-else>
               <Link href="/auth/login" class="pill pill-soft" @click="setMobileMenuOpen(false)">Log in</Link>

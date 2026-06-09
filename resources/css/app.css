@@ -5394,6 +5394,187 @@ input {
   line-break: anywhere;
 }
 
+.my-account-page {
+  margin: 0 auto;
+  max-width: 1040px;
+  padding: 54px 24px 96px;
+}
+
+.my-account-hero {
+  align-items: center;
+  background: #ffffff;
+  border: 1px solid rgba(216, 229, 239, 0.9);
+  border-radius: 22px;
+  box-shadow: 0 24px 70px rgba(16, 44, 76, 0.12);
+  display: grid;
+  gap: 22px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  margin-bottom: 22px;
+  padding: 28px;
+}
+
+.my-account-avatar {
+  align-items: center;
+  background: var(--bb-blue);
+  border-radius: 20px;
+  color: white;
+  display: inline-flex;
+  font-size: 28px;
+  font-weight: 800;
+  height: 78px;
+  justify-content: center;
+  width: 78px;
+}
+
+.my-account-hero span,
+.my-account-section > div > span {
+  color: var(--bb-blue);
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+.my-account-hero h1 {
+  color: var(--bb-ink);
+  font-size: clamp(38px, 5vw, 58px);
+  font-weight: 400;
+  line-height: 1;
+  margin: 0 0 8px;
+}
+
+.my-account-hero p {
+  color: var(--bb-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.my-account-hero a {
+  background: #eef6ff;
+  border-radius: 999px;
+  color: var(--bb-blue);
+  font-weight: 800;
+  padding: 13px 18px;
+  text-align: center;
+}
+
+.my-account-form {
+  display: grid;
+  gap: 18px;
+}
+
+.my-account-section {
+  background: #ffffff;
+  border: 1px solid rgba(216, 229, 239, 0.9);
+  border-radius: 20px;
+  box-shadow: 0 18px 42px rgba(16, 44, 76, 0.08);
+  display: grid;
+  gap: 24px;
+  grid-template-columns: 220px minmax(0, 1fr);
+  padding: 26px;
+}
+
+.my-account-section h2 {
+  color: var(--bb-ink);
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.my-account-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.my-account-grid label {
+  display: grid;
+  gap: 8px;
+}
+
+.my-account-grid label > span {
+  color: var(--bb-muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.my-account-grid input {
+  background: #f9fbfd;
+  border: 1px solid #dce7ef;
+  border-radius: 14px;
+  color: #111827;
+  height: 52px;
+  outline: 0;
+  padding: 0 16px;
+  width: 100%;
+}
+
+.my-account-grid input:focus {
+  border-color: var(--bb-blue);
+  box-shadow: 0 0 0 4px rgba(14, 80, 237, 0.12);
+}
+
+.my-account-grid input[readonly] {
+  background: #eef3f7;
+  color: #5f6b7a;
+}
+
+.my-account-grid small {
+  color: #b42318;
+  font-size: 12px;
+}
+
+.my-account-grid em {
+  color: var(--bb-muted);
+  font-size: 12px;
+  font-style: normal;
+}
+
+.my-account-wide {
+  grid-column: 1 / -1;
+}
+
+.my-account-status {
+  background: #e8f7ef;
+  border: 1px solid #bfe7cf;
+  border-radius: 14px;
+  color: #126235;
+  font-weight: 700;
+  margin: 0;
+  padding: 14px 16px;
+}
+
+.my-account-actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.my-account-actions button {
+  background: var(--bb-blue);
+  border: 0;
+  border-radius: 999px;
+  color: white;
+  cursor: pointer;
+  font-weight: 800;
+  min-height: 50px;
+  padding: 0 24px;
+}
+
+.my-account-actions button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.my-account-actions button + button {
+  background: #eef6ff;
+  color: var(--bb-blue);
+}
+
 .payment-secure-note {
   background: #e8f2ff;
   border-radius: 14px;
@@ -5830,6 +6011,9 @@ input {
   .detail-hero,
   .package-grid,
   .my-esims-grid,
+  .my-account-hero,
+  .my-account-section,
+  .my-account-grid,
   .support-band > div,
   .comment-section,
   .comment-form,
@@ -5872,6 +6056,8 @@ input {
   .payment-card,
   .install-preview,
   .my-esim-card,
+  .my-account-hero,
+  .my-account-section,
   .content-page-card {
     width: 100%;
   }
@@ -5970,6 +6156,23 @@ input {
     width: 100%;
   }
 
+  .my-account-actions {
+    display: grid;
+    justify-content: stretch;
+  }
+
+  .my-account-actions button {
+    width: 100%;
+  }
+
+  .my-account-hero {
+    align-items: start;
+  }
+
+  .my-account-hero a {
+    justify-self: start;
+  }
+
   .account-menu {
     left: auto;
     right: 0;
@@ -5995,6 +6198,7 @@ input {
   .payment-page,
   .success-page,
   .my-esims-page,
+  .my-account-page,
   .how-page,
   .plans-index-page {
     padding-left: var(--bb-mobile-gutter);
@@ -6101,12 +6305,19 @@ input {
     border-radius: 18px;
   }
 
+  .my-account-hero,
+  .my-account-section {
+    border-radius: 18px;
+  }
+
   .checkout-form,
   .stripe-test-box,
   .checkout-summary,
   .payment-card,
   .comment-section,
   .support-band article,
+  .my-account-hero,
+  .my-account-section,
   .install-preview,
   .content-page-card {
     padding: 20px;
@@ -6153,7 +6364,8 @@ input {
   .detail-hero h1,
   .checkout-page h1,
   .payment-page h1,
-  .my-esims-hero h1 {
+  .my-esims-hero h1,
+  .my-account-hero h1 {
     font-size: clamp(34px, 11vw, 44px);
   }
 
@@ -6162,6 +6374,7 @@ input {
   .checkout-page > div > p,
   .payment-page > div > p,
   .my-esims-hero p,
+  .my-account-hero p,
   .comment-copy p {
     font-size: 14px;
   }
@@ -6179,6 +6392,8 @@ input {
   .comment-section,
   .my-esim-card,
   .my-esims-empty,
+  .my-account-hero,
+  .my-account-section,
   .install-preview,
   .content-page-card,
   .auth-modal {

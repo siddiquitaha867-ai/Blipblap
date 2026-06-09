@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Storefront\DestinationController;
+use App\Http\Controllers\Storefront\AccountController;
 use App\Http\Controllers\Storefront\ContentPageController;
 use App\Http\Controllers\Storefront\HomeController;
 use App\Http\Controllers\Storefront\CheckoutController;
@@ -91,6 +92,8 @@ Route::middleware('guest')->group(function (): void {
 
 Route::middleware('auth')->group(function (): void {
     Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+    Route::get('/my-account', [AccountController::class, 'show'])->name('my-account');
+    Route::patch('/my-account', [AccountController::class, 'update'])->name('my-account.update');
     Route::get('/my-esims', MyEsimController::class)->name('my-esims');
     Route::get('/email/verify', [EmailVerificationController::class, 'notice'])->name('verification.notice');
     Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])

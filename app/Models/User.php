@@ -23,6 +23,11 @@ class User extends Authenticatable implements MustVerifyEmail
         'is_banned',
         'last_login_at',
         'referral_code',
+        'phone_number',
+        'address_line1',
+        'town',
+        'city',
+        'country',
     ];
 
     protected $hidden = [
