@@ -72,6 +72,7 @@ class PlanController extends Controller
         $data = $request->validate([
             'title' => ['required', 'string', 'max:255'],
             'retail_price' => ['required', 'numeric', 'min:0'],
+            'tax_amount' => ['required', 'numeric', 'min:0'],
             'duration_days' => ['required', 'integer', 'min:1'],
             'unlimited' => ['required', 'boolean'],
             'data_amount' => ['nullable', 'numeric', 'min:0'],
@@ -172,15 +173,23 @@ class PlanController extends Controller
     {
         $supplierPrice = (float) $plan->supplier_price;
         $retailPrice = (float) $plan->retail_price;
+        $taxAmount = (float) ($plan->tax_amount ?? 0);
         $marginAmount = round($retailPrice - $supplierPrice, 2);
+        $netProfit = round($retailPrice - $supplierPrice - $taxAmount, 2);
         $marginPercent = $supplierPrice > 0
             ? round(($marginAmount / $supplierPrice) * 100, 2)
+            : null;
+        $netProfitPercent = $supplierPrice > 0
+            ? round(($netProfit / $supplierPrice) * 100, 2)
             : null;
 
         return [
             ...$plan->toArray(),
             'margin_amount' => $marginAmount,
             'margin_percent' => $marginPercent,
+            'net_profit' => $netProfit,
+            'net_profit_percent' => $netProfitPercent,
+            'total_price' => round($retailPrice + $taxAmount, 2),
         ];
     }
 }

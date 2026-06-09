@@ -1,7 +1,7 @@
 <script setup>
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
 import { router, usePage } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 defineOptions({ layout: StorefrontLayout });
 
@@ -22,6 +22,8 @@ const city = ref('');
 const state = ref('');
 const postalCode = ref('');
 const country = ref('');
+const taxAmount = computed(() => Number(props.plan.tax_amount || 0));
+const totalAmount = computed(() => Number(props.plan.retail_price || 0) + taxAmount.value);
 
 const goToPayment = () => {
   router.get(`/checkout/${props.plan.slug}/payment`, {
@@ -125,8 +127,16 @@ const goToPayment = () => {
           <dd>{{ plan.duration_days }} days</dd>
         </div>
         <div>
-          <dt>Total</dt>
+          <dt>Plan price</dt>
           <dd>{{ plan.currency }} {{ Number(plan.retail_price).toFixed(2) }}</dd>
+        </div>
+        <div>
+          <dt>Tax</dt>
+          <dd>{{ plan.currency }} {{ taxAmount.toFixed(2) }}</dd>
+        </div>
+        <div>
+          <dt>Total</dt>
+          <dd>{{ plan.currency }} {{ totalAmount.toFixed(2) }}</dd>
         </div>
       </dl>
       <p class="checkout-note">Payment gateway will connect here before live launch.</p>

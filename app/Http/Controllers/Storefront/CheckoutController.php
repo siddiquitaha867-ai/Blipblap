@@ -92,6 +92,10 @@ class CheckoutController extends Controller
             return back()->with('status', 'Stripe secret key is missing. Add STRIPE_SECRET to .env.');
         }
 
+        $subtotal = (float) $plan->retail_price;
+        $taxAmount = (float) ($plan->tax_amount ?? 0);
+        $total = round($subtotal + $taxAmount, 2);
+
         $order = EsimOrder::query()->create([
             'user_id' => $request->user()?->id,
             'customer_email' => $data['customer_email'],
@@ -101,12 +105,13 @@ class CheckoutController extends Controller
             'status' => 'pending_payment',
             'validation_status' => 'pending',
             'fulfillment_status' => 'pending_payment',
-            'subtotal' => $plan->retail_price,
-            'total' => $plan->retail_price,
+            'subtotal' => $subtotal,
+            'total' => $total,
             'currency' => $plan->currency,
             'request_payload' => [
                 'plan_id' => $plan->id,
                 'plan_slug' => $plan->slug,
+                'tax_amount' => $taxAmount,
                 'customer_name' => $data['customer_name'] ?? null,
                 'customer_phone' => $data['customer_phone'] ?? null,
                 'address_line1' => $data['address_line1'] ?? null,
@@ -118,7 +123,7 @@ class CheckoutController extends Controller
             ],
         ]);
 
-        $amount = (int) round((float) $plan->retail_price * 100);
+        $amount = (int) round($total * 100);
         $currency = strtolower($plan->currency ?: 'usd');
 
         $response = Http::asForm()

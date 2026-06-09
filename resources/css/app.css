@@ -2623,6 +2623,21 @@ input {
   width: 100%;
 }
 
+.admin-report-filters {
+  align-items: end;
+  display: grid;
+  grid-template-columns: minmax(260px, 1fr) minmax(170px, auto) minmax(220px, auto) auto;
+}
+
+.admin-report-stats {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-bottom: 20px;
+}
+
+.admin-report-table table {
+  min-width: 1040px;
+}
+
 .covered-band h2 {
   text-align: left;
 }
@@ -2655,6 +2670,7 @@ input {
   .admin-country-tabs,
   .admin-plan-line,
   .admin-plan-edit-line,
+  .admin-report-filters,
   .diagnostic-status-grid,
   .diagnostic-grid,
   .diagnostic-actions,

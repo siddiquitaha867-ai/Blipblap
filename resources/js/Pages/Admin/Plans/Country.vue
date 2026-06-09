@@ -30,6 +30,7 @@ const dataLabel = (plan) => {
 const draftFor = (plan) => ({
   title: plan.title || '',
   retail_price: Number(plan.retail_price || 0),
+  tax_amount: Number(plan.tax_amount || 0),
   duration_days: Number(plan.duration_days || 1),
   unlimited: Boolean(plan.unlimited),
   data_amount: plan.data_amount === null ? '' : Number(plan.data_amount || 0),
@@ -95,6 +96,7 @@ const updatePlan = (plan) => {
   router.patch(`/admin/plans/${plan.id}`, {
     title: draft.title,
     retail_price: draft.retail_price,
+    tax_amount: draft.tax_amount,
     duration_days: draft.duration_days,
     unlimited: Boolean(draft.unlimited),
     data_amount: draft.unlimited ? null : draft.data_amount,
@@ -156,8 +158,16 @@ const updatePlan = (plan) => {
                   <input v-model="drafts[plan.id].retail_price" type="number" min="0" step="0.01" />
                 </label>
                 <label>
+                  <span>Tax</span>
+                  <input v-model="drafts[plan.id].tax_amount" type="number" min="0" step="0.01" />
+                </label>
+                <label>
                   <span>Margin</span>
                   <input :value="Number(plan.margin_amount || 0).toFixed(2)" type="text" readonly />
+                </label>
+                <label>
+                  <span>Profit after tax</span>
+                  <input :value="Number(plan.net_profit || 0).toFixed(2)" type="text" readonly />
                 </label>
                 <label>
                   <span>Margin %</span>

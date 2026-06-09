@@ -1,7 +1,7 @@
 <script setup>
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
 import { usePage } from '@inertiajs/vue3';
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
 
 defineOptions({ layout: StorefrontLayout });
 
@@ -62,6 +62,8 @@ const state = ref(props.state);
 const postalCode = ref(props.postalCode);
 const country = ref(props.country);
 const stripeAction = `/checkout/${props.plan.slug}/stripe`;
+const taxAmount = computed(() => Number(props.plan.tax_amount || 0));
+const totalAmount = computed(() => Number(props.plan.retail_price || 0) + taxAmount.value);
 </script>
 
 <template>
@@ -111,8 +113,16 @@ const stripeAction = `/checkout/${props.plan.slug}/stripe`;
           <dd>{{ plan.duration_days }} days</dd>
         </div>
         <div>
-          <dt>Amount due</dt>
+          <dt>Plan price</dt>
           <dd>{{ plan.currency }} {{ Number(plan.retail_price).toFixed(2) }}</dd>
+        </div>
+        <div>
+          <dt>Tax</dt>
+          <dd>{{ plan.currency }} {{ taxAmount.toFixed(2) }}</dd>
+        </div>
+        <div>
+          <dt>Amount due</dt>
+          <dd>{{ plan.currency }} {{ totalAmount.toFixed(2) }}</dd>
         </div>
       </dl>
 

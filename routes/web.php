@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\LogController as AdminLogController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\PlanController as AdminPlanController;
 use App\Http\Controllers\Admin\PromotionController as AdminPromotionController;
+use App\Http\Controllers\Admin\ReportController as AdminReportController;
 use App\Http\Controllers\Admin\StorefrontPreviewController as AdminStorefrontPreviewController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Models\EsimPlan;
@@ -112,6 +113,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::patch('/plans/{plan}', [AdminPlanController::class, 'update'])->name('plans.update');
     Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/export', [AdminOrderController::class, 'export'])->name('orders.export');
+    Route::get('/reports', [AdminReportController::class, 'index'])->name('reports.index');
     Route::get('/logs', [AdminLogController::class, 'index'])->name('logs.index');
     Route::get('/promotions', [AdminPromotionController::class, 'index'])->name('promotions.index');
     Route::post('/promotions', [AdminPromotionController::class, 'store'])->name('promotions.store');

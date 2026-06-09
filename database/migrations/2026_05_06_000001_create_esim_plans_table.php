@@ -25,6 +25,7 @@ return new class extends Migration
             $table->boolean('topup_supported')->default(false);
             $table->decimal('supplier_price', 12, 2)->default(0);
             $table->decimal('retail_price', 12, 2)->default(0);
+            $table->decimal('tax_amount', 12, 2)->default(0);
             $table->string('currency', 10)->default('USD');
             $table->json('network_json')->nullable();
             $table->json('raw_payload')->nullable();
