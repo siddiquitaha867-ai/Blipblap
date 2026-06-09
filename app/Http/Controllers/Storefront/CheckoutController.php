@@ -7,7 +7,6 @@ use App\Models\CustomerEsim;
 use App\Models\EsimOrder;
 use App\Models\EsimPlan;
 use App\Services\EsimGo\OrderProvisioningService;
-use App\Support\StorefrontPlanPresenter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -31,7 +30,7 @@ class CheckoutController extends Controller
         }
 
         return Inertia::render('Storefront/Checkout', [
-            'plan' => StorefrontPlanPresenter::present($plan),
+            'plan' => $plan,
         ]);
     }
 
@@ -48,7 +47,7 @@ class CheckoutController extends Controller
         }
 
         return Inertia::render('Storefront/Payment', [
-            'plan' => StorefrontPlanPresenter::present($plan),
+            'plan' => $plan,
             'customerName' => (string) $request->query('name', ''),
             'customerEmail' => (string) $request->query('email', $request->user()?->email ?? ''),
             'customerPhone' => (string) $request->query('phone', ''),
@@ -219,9 +218,9 @@ class CheckoutController extends Controller
             : null;
 
         return Inertia::render('Storefront/CheckoutSuccess', [
-            'plan' => StorefrontPlanPresenter::present($plan),
-            'order' => $order ? $this->presentOrder($order->refresh()) : null,
-            'esim' => $customerEsim ? $this->presentCustomerEsim($customerEsim) : null,
+            'plan' => $plan,
+            'order' => $order?->refresh(),
+            'esim' => $customerEsim,
             'provisioningError' => $provisioningError,
         ]);
     }
@@ -321,45 +320,6 @@ class CheckoutController extends Controller
         return redirect()
             ->route('auth.login', ['redirect' => $intendedUrl])
             ->with('status', 'Please log in or create an account before checkout.');
-    }
-
-    private function presentOrder(EsimOrder $order): array
-    {
-        return [
-            'id' => $order->id,
-            'order_reference' => $order->order_reference,
-            'status' => $order->status,
-            'fulfillment_status' => $order->fulfillment_status,
-            'customer_email' => $order->customer_email,
-            'iccid' => $order->iccid,
-            'total' => (float) $order->total,
-            'currency' => $order->currency,
-            'paid_at' => $order->paid_at?->toIso8601String(),
-        ];
-    }
-
-    private function presentCustomerEsim(CustomerEsim $esim): array
-    {
-        return [
-            'id' => $esim->id,
-            'iccid' => $esim->iccid,
-            'status' => $esim->status,
-            'matching_id' => $esim->matching_id,
-            'smdp_address' => $esim->smdp_address,
-            'activation_code' => $esim->activation_code,
-            'qr_code_url' => $esim->qr_code_url,
-            'install_details' => [
-                'assignment' => [
-                    'iosInstallUrl' => data_get($esim->install_details, 'assignment.iosInstallUrl'),
-                    'androidInstallUrl' => data_get($esim->install_details, 'assignment.androidInstallUrl'),
-                ],
-                'response' => [
-                    'iosInstallUrl' => data_get($esim->install_details, 'response.iosInstallUrl'),
-                    'androidInstallUrl' => data_get($esim->install_details, 'response.androidInstallUrl'),
-                ],
-            ],
-            'expires_at' => $esim->expires_at?->toIso8601String(),
-        ];
     }
 
     private function isValidStripeSignature(string $payload, string $signature, string $secret): bool
