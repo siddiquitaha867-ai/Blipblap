@@ -1874,9 +1874,9 @@ input {
   align-items: start;
   border-top: 1px solid #e8edf1;
   display: grid;
-  gap: 16px;
-  grid-template-columns: minmax(185px, 0.38fr) minmax(0, 1fr);
-  padding: 16px;
+  gap: 24px;
+  grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
+  padding: 22px 16px 26px;
 }
 
 .admin-plan-summary strong {
@@ -1899,28 +1899,20 @@ input {
 .admin-plan-edit-line {
   align-items: end;
   display: grid;
-  gap: 10px;
-  grid-template-columns:
-    minmax(210px, 1.35fr)
-    minmax(82px, 0.48fr)
-    minmax(82px, 0.48fr)
-    minmax(118px, 0.62fr)
-    minmax(92px, 0.52fr)
-    minmax(72px, 0.42fr)
-    minmax(106px, 0.52fr)
-    82px;
+  gap: 14px 12px;
+  grid-template-columns: repeat(auto-fit, minmax(132px, 1fr));
   min-width: 0;
 }
 
 .admin-plan-edit-line label {
   display: grid;
-  gap: 5px;
+  gap: 7px;
   min-width: 0;
 }
 
 .admin-plan-edit-line label span {
   color: var(--bb-muted);
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
 }
 
@@ -1929,10 +1921,11 @@ input {
 .admin-plan-edit-line select {
   background: #ffffff;
   border: 1px solid #d5dde5;
-  border-radius: 9px;
-  height: 36px;
+  border-radius: 10px;
+  font-size: 14px;
+  height: 42px;
   outline: 0;
-  padding: 0 10px;
+  padding: 0 12px;
   width: 100%;
 }
 
@@ -1949,28 +1942,30 @@ input {
 .admin-plan-edit-line .admin-check-row {
   align-items: center;
   background: #f3f7fa;
-  border-radius: 999px;
+  border-radius: 10px;
   display: flex !important;
-  gap: 7px !important;
-  height: 36px;
-  justify-content: center;
-  padding: 0 12px;
+  gap: 9px !important;
+  min-height: 42px;
+  justify-content: flex-start;
+  padding: 0 14px;
   white-space: nowrap;
 }
 
 .admin-plan-status-stack {
   display: grid;
-  gap: 6px;
+  gap: 8px;
+  min-width: 0;
 }
 
 .admin-plan-status-stack .admin-check-row {
-  height: 30px;
+  min-height: 34px;
 }
 
 .admin-plan-edit-line .admin-mini-button {
-  height: 36px;
+  height: 42px;
   padding-bottom: 0;
   padding-top: 0;
+  width: 100%;
 }
 
 .admin-search {
