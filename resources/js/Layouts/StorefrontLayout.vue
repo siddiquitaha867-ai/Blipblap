@@ -114,7 +114,7 @@ watch(mobileMenuOpen, (open) => {
 
 <template>
   <div class="site-shell">
-    <header class="air-header" :class="{ 'has-open-menu': mobileMenuOpen }">
+    <header class="air-header">
       <div class="air-header-inner">
         <div v-if="isAdminPreview" class="preview-bar">
           Admin storefront preview. Purchases are disabled.
