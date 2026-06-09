@@ -6,6 +6,7 @@ use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -29,6 +30,15 @@ class AppServiceProvider extends ServiceProvider
                     'hash' => sha1($notifiable->getEmailForVerification()),
                 ],
             );
+        });
+
+        VerifyEmail::toMailUsing(function ($notifiable, string $url): MailMessage {
+            return (new MailMessage)
+                ->subject('Welcome to BlipBlap - verify your email')
+                ->view('emails.verify-email', [
+                    'user' => $notifiable,
+                    'verifyUrl' => $url,
+                ]);
         });
     }
 
