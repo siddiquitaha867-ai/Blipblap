@@ -22,6 +22,7 @@ use App\Http\Controllers\Admin\PromotionController as AdminPromotionController;
 use App\Http\Controllers\Admin\StorefrontPreviewController as AdminStorefrontPreviewController;
 use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Models\EsimPlan;
+use App\Support\StorefrontPlanPresenter;
 use Inertia\Inertia;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
@@ -50,15 +51,16 @@ Route::get('/destinations-list', function () {
         ->map(function ($plans, string $country) use ($flagMap): array {
             $iso = strtoupper((string) $plans->pluck('country_iso')->filter()->first());
             $price = $plans->pluck('retail_price')->filter(fn ($value) => (float) $value > 0)->min();
+            $name = StorefrontPlanPresenter::text($country);
 
             return [
-                'name' => $country,
-                'iso' => $iso ?: strtoupper(substr($country, 0, 2)),
+                'name' => $name,
+                'iso' => StorefrontPlanPresenter::text($iso ?: strtoupper(substr($name, 0, 2))),
                 'flag_url' => $flagMap[$iso] ?? (strlen($iso) === 2 ? 'https://flagcdn.com/w80/' . strtolower($iso) . '.png' : ''),
                 'plan_count' => $plans->count(),
                 'min_price' => $price ? (float) $price : null,
-                'currency' => $plans->pluck('currency')->filter()->first() ?: config('blipblap.currency', 'USD'),
-                'url' => '/destinations/' . Str::slug($country),
+                'currency' => StorefrontPlanPresenter::text($plans->pluck('currency')->filter()->first() ?: config('blipblap.currency', 'USD')),
+                'url' => '/destinations/' . Str::slug($name),
             ];
         })
         ->sortBy('name')

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Storefront;
 use App\Http\Controllers\Controller;
 use App\Models\EsimPlan;
 use App\Models\SiteContent;
+use App\Support\StorefrontPlanPresenter;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -103,10 +104,10 @@ class HomeController extends Controller
                 $name = $groupByPlan ? $this->globalPlanName($plan) : $this->destinationName($plan);
 
                 return [
-                    'name' => $name,
-                    'iso' => $plan->country_iso,
+                    'name' => StorefrontPlanPresenter::text($name),
+                    'iso' => StorefrontPlanPresenter::nullableText($plan->country_iso),
                     'price' => (float) $plan->retail_price,
-                    'currency' => $plan->currency ?: config('blipblap.currency', 'USD'),
+                    'currency' => StorefrontPlanPresenter::text($plan->currency ?: config('blipblap.currency', 'USD')),
                     'icon' => $this->isGlobalPlan($plan) ? 'globe' : null,
                 ];
             })
@@ -119,11 +120,11 @@ class HomeController extends Controller
                 $currency = collect($items)->pluck('currency')->filter()->first() ?: config('blipblap.currency', 'USD');
 
                 return [
-                    'name' => $name,
-                    'iso' => $iso ?: strtoupper(substr($name, 0, 2)),
+                    'name' => StorefrontPlanPresenter::text($name),
+                    'iso' => StorefrontPlanPresenter::text($iso ?: strtoupper(substr($name, 0, 2))),
                     'plan_count' => count($items),
                     'min_price' => $minPrice,
-                    'currency' => $currency,
+                    'currency' => StorefrontPlanPresenter::text($currency),
                     'flag_url' => $this->flagUrl($iso),
                     'icon' => collect($items)->pluck('icon')->filter()->first(),
                 ];
@@ -229,11 +230,11 @@ class HomeController extends Controller
             ->limit(12)
             ->get($this->planColumns());
 
-        return $featured
+        return StorefrontPlanPresenter::collection($featured
             ->concat($extraPlans)
             ->unique(fn (EsimPlan $plan) => strtolower((string) ($plan->country_name ?: $plan->region_name ?: $plan->coverage_type ?: $plan->title)))
             ->take(6)
-            ->values();
+            ->values());
     }
 
     private function planColumns(): array
