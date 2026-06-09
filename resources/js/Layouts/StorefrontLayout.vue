@@ -1,7 +1,7 @@
 <script setup>
 import SupportChatWidget from '@/Components/SupportChatWidget.vue';
 import { Link, usePage } from '@inertiajs/vue3';
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
 const page = usePage();
 const searchOpen = ref(false);
@@ -79,6 +79,19 @@ const syncDesktopState = () => {
   }
 };
 
+const setMobileMenuOpen = (open) => {
+  mobileMenuOpen.value = open;
+};
+
+const lockPageScroll = (locked) => {
+  if (typeof document === 'undefined') {
+    return;
+  }
+
+  document.body.style.overflow = locked ? 'hidden' : '';
+  document.documentElement.style.overflow = locked ? 'hidden' : '';
+};
+
 onMounted(() => {
   syncDesktopState();
   window.addEventListener('resize', syncDesktopState);
@@ -86,6 +99,16 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', syncDesktopState);
+  lockPageScroll(false);
+});
+
+watch(mobileMenuOpen, (open) => {
+  lockPageScroll(open);
+
+  if (!open) {
+    accountOpen.value = false;
+    searchOpen.value = false;
+  }
 });
 </script>
 
@@ -106,7 +129,7 @@ onBeforeUnmount(() => {
             class="mobile-menu-toggle"
             :aria-expanded="mobileMenuOpen"
             aria-controls="site-navigation-panel"
-            @click="mobileMenuOpen = !mobileMenuOpen"
+            @click="setMobileMenuOpen(!mobileMenuOpen)"
           >
             <span></span>
             <span></span>
@@ -116,7 +139,7 @@ onBeforeUnmount(() => {
 
           <div class="air-header-actions air-header-actions--desktop">
             <template v-if="user">
-              <Link v-if="hasCustomerEsims" href="/my-esims" class="account-link" @click="mobileMenuOpen = false">My eSIMs</Link>
+              <Link v-if="hasCustomerEsims" href="/my-esims" class="account-link" @click="setMobileMenuOpen(false)">My eSIMs</Link>
               <button v-else type="button" class="account-link account-link--disabled" aria-disabled="true">
                 My eSIMs
               </button>
@@ -140,8 +163,8 @@ onBeforeUnmount(() => {
               </div>
             </template>
             <template v-else>
-              <Link href="/auth/login" class="pill pill-soft" @click="mobileMenuOpen = false">Log in</Link>
-              <Link href="/auth/signup" class="pill" @click="mobileMenuOpen = false">Sign up</Link>
+              <Link href="/auth/login" class="pill pill-soft" @click="setMobileMenuOpen(false)">Log in</Link>
+              <Link href="/auth/signup" class="pill" @click="setMobileMenuOpen(false)">Sign up</Link>
             </template>
           </div>
         </div>
@@ -153,16 +176,16 @@ onBeforeUnmount(() => {
         >
 
           <nav class="air-nav" aria-label="Primary navigation">
-            <Link :href="homeHref" @click="mobileMenuOpen = false">Home</Link>
-            <Link href="/esim-plans" @click="mobileMenuOpen = false">ESIM Plans</Link>
-            <Link href="/how-blipblap-works" @click="mobileMenuOpen = false">How BlipBlap Works</Link>
-            <a :href="`${homeHref}#faqs`" @click="mobileMenuOpen = false">FAQs</a>
-            <a :href="`${homeHref}#contact`" @click="mobileMenuOpen = false">Contact Us</a>
+            <Link :href="homeHref" @click="setMobileMenuOpen(false)">Home</Link>
+            <Link href="/esim-plans" @click="setMobileMenuOpen(false)">ESIM Plans</Link>
+            <Link href="/how-blipblap-works" @click="setMobileMenuOpen(false)">How BlipBlap Works</Link>
+            <a :href="`${homeHref}#faqs`" @click="setMobileMenuOpen(false)">FAQs</a>
+            <a :href="`${homeHref}#contact`" @click="setMobileMenuOpen(false)">Contact Us</a>
           </nav>
 
           <div class="air-header-actions air-header-actions--mobile">
             <template v-if="user">
-              <Link v-if="hasCustomerEsims" href="/my-esims" class="account-link" @click="mobileMenuOpen = false">My eSIMs</Link>
+              <Link v-if="hasCustomerEsims" href="/my-esims" class="account-link" @click="setMobileMenuOpen(false)">My eSIMs</Link>
               <button v-else type="button" class="account-link account-link--disabled" aria-disabled="true">
                 My eSIMs
               </button>
@@ -186,8 +209,8 @@ onBeforeUnmount(() => {
               </div>
             </template>
             <template v-else>
-              <Link href="/auth/login" class="pill pill-soft" @click="mobileMenuOpen = false">Log in</Link>
-              <Link href="/auth/signup" class="pill" @click="mobileMenuOpen = false">Sign up</Link>
+              <Link href="/auth/login" class="pill pill-soft" @click="setMobileMenuOpen(false)">Log in</Link>
+              <Link href="/auth/signup" class="pill" @click="setMobileMenuOpen(false)">Sign up</Link>
             </template>
           </div>
 
@@ -229,7 +252,7 @@ onBeforeUnmount(() => {
                       :href="destination.url"
                       class="destination-search-item"
                       @mousedown.prevent
-                      @click="mobileMenuOpen = false"
+                      @click="setMobileMenuOpen(false)"
                     >
                       <span class="destination-search-flag">
                         <img v-if="destination.flag_url" :src="destination.flag_url" :alt="`${destination.name} flag`">
@@ -254,6 +277,6 @@ onBeforeUnmount(() => {
       <slot />
     </main>
 
-    <SupportChatWidget :hidden="isAdminPreview" />
+    <SupportChatWidget :hidden="isAdminPreview || mobileMenuOpen" />
   </div>
 </template>
