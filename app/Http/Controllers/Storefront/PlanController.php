@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Storefront;
 
 use App\Http\Controllers\Controller;
 use App\Models\EsimPlan;
+use App\Support\StorefrontPlanPresenter;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -22,8 +23,8 @@ class PlanController extends Controller
             ->get();
 
         return Inertia::render('Storefront/PlanShow', [
-            'plan' => $plan,
-            'relatedPlans' => $related,
+            'plan' => StorefrontPlanPresenter::present($plan),
+            'relatedPlans' => StorefrontPlanPresenter::collection($related),
         ]);
     }
 }
