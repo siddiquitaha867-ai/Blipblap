@@ -1,10 +1,11 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
 import { Link, router } from '@inertiajs/vue3';
+import { computed } from 'vue';
 
 defineOptions({ layout: AdminLayout });
 
-defineProps({
+const props = defineProps({
   customer: {
     type: Object,
     required: true,
@@ -18,6 +19,29 @@ defineProps({
     default: () => [],
   },
 });
+
+const initials = computed(() => {
+  const first = (props.customer.first_name || props.customer.name || '').trim().charAt(0);
+  const last = (props.customer.last_name || '').trim().charAt(0);
+
+  return `${first}${last || ''}`.toUpperCase() || 'BB';
+});
+
+const accountDetails = computed(() => [
+  ['ID', `#${props.customer.id}`],
+  ['First name', props.customer.first_name || '-'],
+  ['Last name', props.customer.last_name || '-'],
+  ['Email', props.customer.email],
+  ['Verified', props.customer.email_verified_at ? 'Yes' : 'No', props.customer.email_verified_at ? 'success' : 'warning'],
+  ['Admin', props.customer.is_admin ? 'Yes' : 'No', props.customer.is_admin ? 'info' : 'neutral'],
+  ['Status', props.customer.is_banned ? 'Banned' : 'Active', props.customer.is_banned ? 'danger' : 'success'],
+  ['Marketing', props.customer.marketing_opt_in ? 'Opted in' : 'No', props.customer.marketing_opt_in ? 'info' : 'neutral'],
+  ['Referral', props.customer.referral_code || '-'],
+  ['Last login', props.customer.last_login_at || 'Never'],
+  ['Joined', props.customer.created_at],
+]);
+
+const paidOrdersCount = computed(() => props.orders.filter((order) => order.paid_at).length);
 
 const toggleBan = (customer) => {
   router.patch(`/admin/users/${customer.id}/${customer.is_banned ? 'unban' : 'ban'}`, {}, {
@@ -38,59 +62,97 @@ const deleteUser = (customer) => {
 
   router.delete(`/admin/users/${customer.id}`);
 };
+
+const badgeClass = (tone) => `admin-user-badge admin-user-badge--${tone || 'neutral'}`;
 </script>
 
 <template>
-  <section class="admin-page">
-    <div class="admin-heading">
+  <section class="admin-page admin-user-page">
+    <div class="admin-user-hero">
+      <div class="admin-user-avatar">{{ initials }}</div>
       <div>
         <p>User detail</p>
         <h1>{{ customer.name }}</h1>
+        <span>{{ customer.email }}</span>
       </div>
-      <Link href="/admin/users">Back to users</Link>
+      <div class="admin-user-hero-actions">
+        <Link href="/admin/users">Back to users</Link>
+      </div>
+    </div>
+
+    <div class="admin-user-stats">
+      <article>
+        <span>Orders</span>
+        <strong>{{ orders.length }}</strong>
+      </article>
+      <article>
+        <span>Paid orders</span>
+        <strong>{{ paidOrdersCount }}</strong>
+      </article>
+      <article>
+        <span>Customer eSIMs</span>
+        <strong>{{ esims.length }}</strong>
+      </article>
     </div>
 
     <div class="detail-grid">
-      <section class="admin-panel">
-        <h2>Account</h2>
-        <dl class="admin-dl">
-          <div><dt>ID</dt><dd>#{{ customer.id }}</dd></div>
-          <div><dt>First name</dt><dd>{{ customer.first_name }}</dd></div>
-          <div><dt>Last name</dt><dd>{{ customer.last_name || '—' }}</dd></div>
-          <div><dt>Email</dt><dd>{{ customer.email }}</dd></div>
-          <div><dt>Verified</dt><dd>{{ customer.email_verified_at ? 'Yes' : 'No' }}</dd></div>
-          <div><dt>Admin</dt><dd>{{ customer.is_admin ? 'Yes' : 'No' }}</dd></div>
-          <div><dt>Status</dt><dd>{{ customer.is_banned ? 'Banned' : 'Active' }}</dd></div>
-          <div><dt>Marketing</dt><dd>{{ customer.marketing_opt_in ? 'Opted in' : 'No' }}</dd></div>
-          <div><dt>Referral</dt><dd>{{ customer.referral_code || '—' }}</dd></div>
-          <div><dt>Last login</dt><dd>{{ customer.last_login_at || 'Never' }}</dd></div>
-          <div><dt>Joined</dt><dd>{{ customer.created_at }}</dd></div>
+      <section class="admin-panel admin-user-panel">
+        <div class="admin-user-panel-head">
+          <div>
+            <span>Account</span>
+            <h2>Customer profile</h2>
+          </div>
+          <span :class="badgeClass(customer.is_banned ? 'danger' : 'success')">
+            {{ customer.is_banned ? 'Banned' : 'Active' }}
+          </span>
+        </div>
+
+        <dl class="admin-user-detail-list">
+          <div v-for="[label, value, tone] in accountDetails" :key="label">
+            <dt>{{ label }}</dt>
+            <dd>
+              <span v-if="tone" :class="badgeClass(tone)">{{ value }}</span>
+              <span v-else>{{ value }}</span>
+            </dd>
+          </div>
         </dl>
-        <div class="auth-required-actions" style="margin-top: 20px;">
-          <button type="button" class="auth-required-secondary" @click="sendResetPassword(customer)">Send reset password</button>
-          <button type="button" class="auth-required-secondary" @click="toggleBan(customer)">
+
+        <div class="admin-user-actions">
+          <button type="button" class="admin-action-button admin-action-button--soft" @click="sendResetPassword(customer)">Send reset password</button>
+          <button type="button" class="admin-action-button admin-action-button--warning" @click="toggleBan(customer)">
             {{ customer.is_banned ? 'Unban account' : 'Ban account' }}
           </button>
-          <button type="button" class="auth-required-secondary" @click="deleteUser(customer)">Delete account</button>
+          <button type="button" class="admin-action-button admin-action-button--danger" @click="deleteUser(customer)">Delete account</button>
         </div>
       </section>
 
-      <section class="admin-panel">
-        <h2>Customer eSIMs</h2>
-        <div v-if="esims.length === 0" class="empty-admin">No eSIMs yet.</div>
-        <dl v-else class="admin-dl">
-          <div v-for="esim in esims" :key="esim.id">
-            <dt>{{ esim.iccid }}</dt>
-            <dd>{{ esim.status }} · {{ esim.current_bundle_code || 'No bundle' }}</dd>
+      <section class="admin-panel admin-user-panel">
+        <div class="admin-user-panel-head">
+          <div>
+            <span>Inventory</span>
+            <h2>Customer eSIMs</h2>
           </div>
-        </dl>
+        </div>
+        <div v-if="esims.length === 0" class="empty-admin">No eSIMs yet.</div>
+        <div v-else class="admin-esim-list">
+          <article v-for="esim in esims" :key="esim.id">
+            <span :class="badgeClass('info')">{{ esim.status }}</span>
+            <strong>{{ esim.current_bundle_code || 'No bundle' }}</strong>
+            <small>{{ esim.iccid }}</small>
+          </article>
+        </div>
       </section>
     </div>
 
-    <section class="admin-panel">
-      <h2>Orders</h2>
+    <section class="admin-panel admin-user-panel">
+      <div class="admin-user-panel-head">
+        <div>
+          <span>Activity</span>
+          <h2>Orders</h2>
+        </div>
+      </div>
       <div v-if="orders.length === 0" class="empty-admin">No orders yet.</div>
-      <div v-else class="admin-table">
+      <div v-else class="admin-table admin-user-orders-table">
         <table>
           <thead>
             <tr>
@@ -104,8 +166,8 @@ const deleteUser = (customer) => {
           <tbody>
             <tr v-for="order in orders" :key="order.id">
               <td>#{{ order.id }}</td>
-              <td>{{ order.bundle_code }}</td>
-              <td>{{ order.fulfillment_status }}</td>
+              <td><strong>{{ order.bundle_code }}</strong></td>
+              <td><span :class="badgeClass(order.paid_at ? 'success' : 'warning')">{{ order.fulfillment_status }}</span></td>
               <td>{{ order.currency }} {{ Number(order.total).toFixed(2) }}</td>
               <td>{{ order.paid_at || 'No' }}</td>
             </tr>
