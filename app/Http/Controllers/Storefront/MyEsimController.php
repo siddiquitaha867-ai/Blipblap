@@ -36,7 +36,7 @@ class MyEsimController extends Controller
             ->keyBy('id');
 
         return Inertia::render('Storefront/MyEsims', [
-            'esims' => $esims->map(function (CustomerEsim $esim) use ($plans): array {
+            'esims' => $esims->map(function (CustomerEsim $esim) use ($plans, $client): array {
                 $order = $esim->order;
                 $planId = $order?->request_payload['plan_id'] ?? null;
                 $plan = $planId ? $plans->get($planId) : null;
