@@ -1,5 +1,6 @@
 <script setup>
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
+import SiteFooter from '@/Components/SiteFooter.vue';
 
 defineOptions({ layout: StorefrontLayout });
 
@@ -117,23 +118,6 @@ const priceLabel = (plan) => {
       <a href="/esim-plans">Browse all eSIM plans</a>
     </section>
 
-    <footer id="contact" class="footer">
-      <div>
-        <h2><span class="brand-mark">b</span> Blip Blap</h2>
-        <p>Copyright 2026, Blip Blap</p>
-      </div>
-      <div>
-        <h3>Site Map</h3>
-        <a href="/destinations/united-arab-emirates">eSIM United Arab Emirates</a>
-        <a href="/destinations/europe">eSIM Europe</a>
-        <a href="/destinations/saudi-arabia">eSIM Saudi Arabia</a>
-      </div>
-      <div>
-        <h3>Legal</h3>
-        <a href="#">Terms And Conditions</a>
-        <a href="#">Privacy Policy</a>
-        <a href="/how-blipblap-works">How BlipBlap Works</a>
-      </div>
-    </footer>
+    <SiteFooter />
   </section>
 </template>

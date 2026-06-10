@@ -3,6 +3,7 @@ import { computed, ref, watchEffect } from 'vue';
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
 import { usePage } from '@inertiajs/vue3';
 import AuthRequiredModal from '@/Components/AuthRequiredModal.vue';
+import SiteFooter from '@/Components/SiteFooter.vue';
 
 defineOptions({ layout: StorefrontLayout });
 
@@ -341,26 +342,7 @@ watchEffect(() => {
       <img class="group-photo" src="/images/blipblap/Buddies.gif" alt="" />
     </section>
 
-    <footer id="contact" class="footer plan-footer">
-      <div>
-        <h2><span class="brand-mark">b</span> Blip Blap</h2>
-        <p>Copyright 2026, Blip Blap</p>
-      </div>
-      <div>
-        <h3>Site Map</h3>
-        <a href="/destinations/united-arab-emirates">eSIM United Arab Emirates</a>
-        <a href="/destinations/europe">eSIM Europe</a>
-        <a href="/destinations/saudi-arabia">eSIM Saudi Arabia</a>
-        <a href="/destinations/russia">eSIM Russia</a>
-        <a href="/destinations/united-kingdom">eSIM United Kingdom</a>
-      </div>
-      <div>
-        <h3>Legal</h3>
-        <a href="#">Terms And Conditions</a>
-        <a href="#">Privacy Policy</a>
-        <a href="#contact">Contact Us</a>
-      </div>
-    </footer>
+    <SiteFooter plan />
 
     <Teleport to="body">
       <div
