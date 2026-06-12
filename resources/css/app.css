@@ -3861,9 +3861,21 @@ button:disabled {
 }
 
 .faq-section {
+  overflow: hidden;
   padding: 78px 20px 110px;
   position: relative;
   text-align: center;
+}
+
+.faq-section::before {
+  z-index: 0;
+}
+
+.faq-section h2,
+.faq-section > p,
+.faq-list {
+  position: relative;
+  z-index: 1;
 }
 
 .faq-section p {
