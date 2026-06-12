@@ -7685,7 +7685,6 @@ button:disabled {
     padding-right: var(--bb-mobile-gutter);
   }
 
-  .destination-tabs,
   .duration-tabs,
   .checkout-method-tabs {
     display: flex;
@@ -7695,24 +7694,31 @@ button:disabled {
     scrollbar-width: thin;
   }
 
-  .destination-tabs button,
   .duration-tab,
   .checkout-method-tabs button {
     flex: 0 0 auto;
   }
 
   .destination-tabs {
+    background: #ffffff;
     border-bottom: 0;
+    border-radius: 16px;
+    box-shadow: 0 14px 34px rgba(16, 44, 76, 0.08);
+    display: grid;
+    gap: 8px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     margin-top: 28px;
+    padding: 8px;
   }
 
   .destination-tabs button {
     border: 1px solid #dce7ef;
     border-bottom-width: 1px;
-    border-radius: 999px;
+    border-radius: 12px;
+    font-size: 11px;
     min-height: 42px;
-    padding: 10px 16px;
-    white-space: nowrap;
+    padding: 10px 8px;
+    white-space: normal;
   }
 
   .destination-tabs button.active {
