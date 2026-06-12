@@ -7753,7 +7753,7 @@ button:disabled {
   }
 
   .contact-delivery {
-    position: static;
+    display: none;
   }
 
   .payment-copy {
