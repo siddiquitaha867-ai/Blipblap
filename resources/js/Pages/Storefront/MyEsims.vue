@@ -73,25 +73,25 @@ const closeDetails = () => {
           <div class="my-esim-qr-panel">
             <img v-if="esim.qr_code_url" :src="esim.qr_code_url" alt="eSIM QR code">
             <span v-else>QR</span>
-            <div class="my-esim-install-actions">
-              <button type="button" class="my-esim-action-button my-esim-action-button--secondary" @click="openDetails(esim)">View details</button>
-              <a v-if="esim.can_topup" :href="esim.topup_url" class="my-esim-action-button my-esim-action-button--primary">Top up</a>
-              <a v-if="esim.ios_install_url" :href="esim.ios_install_url" class="my-esim-action-button" target="_blank" rel="noopener">
-                Install on Apple
-              </a>
-              <a v-if="esim.android_install_url" :href="esim.android_install_url" class="my-esim-action-button" target="_blank" rel="noopener">
-                Install on Android
-              </a>
-              <button v-if="esim.activation_code" type="button" class="my-esim-action-button" @click="copyActivationCode(esim)">
-                {{ copiedEsimId === esim.id ? 'Copied' : 'Copy activation code' }}
-              </button>
-              <button type="button" class="my-esim-info-button" aria-label="Install help">
-                i
-                <span role="tooltip">
-                  Open this page on your eSIM phone to use the direct install button. On desktop, scan the QR or copy the activation code and enter it manually.
-                </span>
-              </button>
-            </div>
+          </div>
+          <div class="my-esim-install-actions">
+            <button type="button" class="my-esim-action-button my-esim-action-button--secondary" @click="openDetails(esim)">View details</button>
+            <a v-if="esim.can_topup" :href="esim.topup_url" class="my-esim-action-button my-esim-action-button--primary">Top up</a>
+            <a v-if="esim.ios_install_url" :href="esim.ios_install_url" class="my-esim-action-button" target="_blank" rel="noopener">
+              Install on Apple
+            </a>
+            <a v-if="esim.android_install_url" :href="esim.android_install_url" class="my-esim-action-button" target="_blank" rel="noopener">
+              Install on Android
+            </a>
+            <button v-if="esim.activation_code" type="button" class="my-esim-action-button" @click="copyActivationCode(esim)">
+              {{ copiedEsimId === esim.id ? 'Copied' : 'Copy activation code' }}
+            </button>
+            <button type="button" class="my-esim-info-button" aria-label="Install help">
+              i
+              <span role="tooltip">
+                Open this page on your eSIM phone to use the direct install button. On desktop, scan the QR or copy the activation code and enter it manually.
+              </span>
+            </button>
           </div>
         </div>
       </article>
