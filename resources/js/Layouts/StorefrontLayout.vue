@@ -158,7 +158,7 @@ watch(mobileMenuOpen, (open) => {
             <Link href="/esim-plans" @click="setMobileMenuOpen(false)">ESIM Plans</Link>
             <Link href="/how-blipblap-works" @click="setMobileMenuOpen(false)">How BlipBlap Works</Link>
             <a :href="`${homeHref}#faqs`" @click="setMobileMenuOpen(false)">FAQs</a>
-            <a :href="`${homeHref}#contact`" @click="setMobileMenuOpen(false)">Contact Us</a>
+            <Link href="/contact-us" @click="setMobileMenuOpen(false)">Contact Us</Link>
           </nav>
 
           <div class="air-header-actions air-header-actions--mobile">

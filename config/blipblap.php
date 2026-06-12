@@ -2,6 +2,7 @@
 
 return [
     'currency' => env('BLIPBLAP_CURRENCY', 'USD'),
+    'support_email' => env('BLIPBLAP_SUPPORT_EMAIL', env('MAIL_FROM_ADDRESS', 'support@blipblap.com')),
     'markup_percentage' => (float) env('BLIPBLAP_MARKUP_PERCENTAGE', 20),
     'featured_destinations' => [
         ['name' => 'United Arab Emirates', 'iso' => 'AE', 'flag' => '🇦🇪', 'flag_url' => '/images/blipblap/ARE.svg'],

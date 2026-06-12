@@ -5,6 +5,7 @@ use App\Http\Controllers\Storefront\AccountController;
 use App\Http\Controllers\Storefront\ContentPageController;
 use App\Http\Controllers\Storefront\HomeController;
 use App\Http\Controllers\Storefront\CheckoutController;
+use App\Http\Controllers\Storefront\ContactController;
 use App\Http\Controllers\Storefront\MyEsimController;
 use App\Http\Controllers\Storefront\PlanController;
 use App\Http\Controllers\Storefront\PlansIndexController;
@@ -37,6 +38,8 @@ Route::get('/terms-and-conditions', fn () => Inertia::render('Storefront/LegalPa
 Route::get('/privacy-policy', fn () => Inertia::render('Storefront/LegalPage', [
     'type' => 'privacy',
 ]))->name('legal.privacy');
+Route::get('/contact-us', [ContactController::class, 'show'])->name('contact.show');
+Route::post('/contact-us', [ContactController::class, 'store'])->name('contact.store');
 Route::get('/esim-plans', PlansIndexController::class)->name('plans.index');
 Route::get('/destinations-list', function () {
     $flagMap = [

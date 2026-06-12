@@ -21,7 +21,7 @@
       <h3>Support</h3>
       <a href="/how-blipblap-works">How BlipBlap Works</a>
       <a href="/#faqs">FAQs</a>
-      <a href="/#contact">Contact Us</a>
+      <a href="/contact-us">Contact Us</a>
       <a href="/terms-and-conditions">Terms and Conditions</a>
       <a href="/privacy-policy">Privacy Policy</a>
     </nav>
