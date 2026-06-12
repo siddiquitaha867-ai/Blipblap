@@ -3479,6 +3479,40 @@ button:disabled {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.featured-plans-controls {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  grid-column: 2;
+  justify-content: flex-end;
+  margin-top: -14px;
+}
+
+.featured-plans-controls button {
+  align-items: center;
+  background: var(--bb-blue);
+  border: 0;
+  border-radius: 50%;
+  color: #ffffff;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 28px;
+  font-weight: 700;
+  height: 42px;
+  justify-content: center;
+  line-height: 1;
+  transition: background 180ms ease, box-shadow 180ms ease, transform 180ms ease;
+  width: 42px;
+}
+
+.featured-plans-controls button:hover,
+.featured-plans-controls button:focus-visible {
+  background: #005ee0;
+  box-shadow: 0 12px 26px rgba(14, 80, 237, 0.24);
+  outline: 0;
+  transform: translateY(-1px);
+}
+
 .featured-plan-tile {
   background: #ffffff;
   border: 1px solid #dcebf8;
@@ -7622,6 +7656,17 @@ button:disabled {
 
   .featured-plan-tile:hover {
     transform: translateX(0);
+  }
+
+  .featured-plans-controls {
+    grid-column: 1;
+    justify-content: center;
+    margin-top: 12px;
+  }
+
+  .featured-plans-controls button {
+    height: 40px;
+    width: 40px;
   }
 
   .featured-plans-copy {

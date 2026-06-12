@@ -148,6 +148,29 @@ const featuredPlanState = (index) => {
   };
 };
 
+const advanceFeaturedPlan = (direction = 1) => {
+  const count = props.featuredPlans.length;
+
+  if (count <= 1) {
+    return;
+  }
+
+  activeFeaturedPlanIndex.value = (activeFeaturedPlanIndex.value + direction + count) % count;
+};
+
+const resetFeaturedPlanTimer = () => {
+  window.clearInterval(featuredPlanTimer);
+
+  featuredPlanTimer = window.setInterval(() => {
+    advanceFeaturedPlan(1);
+  }, 5000);
+};
+
+const moveFeaturedPlan = (direction) => {
+  advanceFeaturedPlan(direction);
+  resetFeaturedPlanTimer();
+};
+
 const steps = [
   {
     title: 'Choose Your eSIM Plan',
@@ -178,11 +201,7 @@ onMounted(() => {
   }, 5000);
 
   featuredPlanTimer = window.setInterval(() => {
-    if (!props.featuredPlans.length) {
-      return;
-    }
-
-    activeFeaturedPlanIndex.value = (activeFeaturedPlanIndex.value + 1) % props.featuredPlans.length;
+    advanceFeaturedPlan(1);
   }, 5000);
 });
 
@@ -279,6 +298,11 @@ const faqs = computed(() => {
         <em>{{ plan.currency }} {{ Number(plan.retail_price).toFixed(2) }}</em>
         <span class="featured-plan-tile__name">{{ plan.title }}</span>
       </a>
+    </div>
+
+    <div v-if="featuredPlans.length > 1" class="featured-plans-controls" aria-label="Featured plan carousel controls">
+      <button type="button" aria-label="Previous featured plan" @click="moveFeaturedPlan(-1)">‹</button>
+      <button type="button" aria-label="Next featured plan" @click="moveFeaturedPlan(1)">›</button>
     </div>
   </section>
 
