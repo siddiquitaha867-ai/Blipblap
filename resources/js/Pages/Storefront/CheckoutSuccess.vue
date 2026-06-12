@@ -28,8 +28,27 @@ const installStatus = computed(() => props.esim?.status || props.order?.fulfillm
 const generatedQrCodeUrl = ref('');
 const qrCodeUrl = computed(() => props.esim?.qr_code_url || generatedQrCodeUrl.value);
 const hasInstallDetails = computed(() => Boolean(qrCodeUrl.value || props.esim?.activation_code || props.esim?.smdp_address));
-const appleInstallUrl = computed(() => props.esim?.install_details?.assignment?.iosInstallUrl || props.esim?.install_details?.response?.iosInstallUrl || '');
-const androidInstallUrl = computed(() => props.esim?.install_details?.assignment?.androidInstallUrl || props.esim?.install_details?.response?.androidInstallUrl || '');
+const activationCode = computed(() => {
+  if (props.esim?.activation_code) {
+    return props.esim.activation_code;
+  }
+
+  if (props.esim?.smdp_address && props.esim?.matching_id) {
+    return `LPA:1$${props.esim.smdp_address}$${props.esim.matching_id}`;
+  }
+
+  return '';
+});
+const appleInstallUrl = computed(() => (
+  props.esim?.install_details?.assignment?.iosInstallUrl
+  || props.esim?.install_details?.response?.iosInstallUrl
+  || (activationCode.value ? `https://esimsetup.apple.com/esim_qrcode_provisioning?carddata=${encodeURIComponent(activationCode.value)}` : '')
+));
+const androidInstallUrl = computed(() => (
+  props.esim?.install_details?.assignment?.androidInstallUrl
+  || props.esim?.install_details?.response?.androidInstallUrl
+  || (activationCode.value ? `https://esimsetup.android.com/esim_qrcode_provisioning?carddata=${encodeURIComponent(activationCode.value)}` : '')
+));
 const hasDirectInstallLink = computed(() => Boolean(appleInstallUrl.value || androidInstallUrl.value));
 
 watchEffect(async () => {

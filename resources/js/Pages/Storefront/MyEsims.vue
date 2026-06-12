@@ -46,7 +46,6 @@ defineProps({
 
         <div class="my-esim-actions">
           <a v-if="esim.can_topup" :href="esim.topup_url" class="my-esim-topup-link">Top up</a>
-          <span v-else class="my-esim-topup-muted">Top-up unavailable</span>
         </div>
 
         <div class="my-esim-install">

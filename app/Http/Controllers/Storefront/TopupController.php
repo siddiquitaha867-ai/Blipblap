@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\CustomerEsim;
 use App\Models\EsimOrder;
 use App\Models\EsimPlan;
+use App\Services\EsimGo\EsimGoClient;
 use App\Services\EsimGo\OrderProvisioningService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -35,7 +36,7 @@ class TopupController extends Controller
         ]);
     }
 
-    public function stripe(Request $request, CustomerEsim $esim): RedirectResponse|HttpResponse
+    public function stripe(Request $request, CustomerEsim $esim, EsimGoClient $client): RedirectResponse|HttpResponse
     {
         $this->authorizeOwnedEsim($request, $esim);
 
@@ -53,6 +54,12 @@ class TopupController extends Controller
 
         if (! $plan) {
             return back()->with('status', 'The selected top-up package is not compatible with this eSIM.');
+        }
+
+        try {
+            $client->compatibility((string) $esim->iccid, (string) $plan->supplier_code);
+        } catch (\Throwable) {
+            return back()->with('status', 'This top-up package is not compatible with your eSIM. Please choose another package.');
         }
 
         $secret = (string) config('services.stripe.secret');
@@ -206,7 +213,7 @@ class TopupController extends Controller
 
     private function isTopupEligible(CustomerEsim $esim): bool
     {
-        return (bool) $esim->topup_supported && filled($esim->iccid);
+        return filled($esim->iccid) && $this->topupPackages($esim)->isNotEmpty();
     }
 
     private function sourcePlan(CustomerEsim $esim): ?EsimPlan
@@ -244,6 +251,10 @@ class TopupController extends Controller
         }
 
         return $query
+            ->when(
+                (clone $query)->where('topup_supported', true)->exists(),
+                fn ($builder) => $builder->where('topup_supported', true),
+            )
             ->orderBy('duration_days')
             ->orderBy('data_amount')
             ->get();

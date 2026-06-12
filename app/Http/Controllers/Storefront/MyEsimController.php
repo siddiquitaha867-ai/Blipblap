@@ -65,7 +65,7 @@ class MyEsimController extends Controller
                     'usage_status' => $usage['usage_status'],
                     'ios_install_url' => $install['ios_install_url'],
                     'android_install_url' => $install['android_install_url'],
-                    'can_topup' => (bool) $esim->topup_supported && filled($esim->iccid),
+                    'can_topup' => filled($esim->iccid) && $this->hasTopupPackages($esim, $plan),
                     'topup_url' => route('topup.show', $esim),
                 ];
             })->values(),
@@ -179,9 +179,57 @@ class MyEsimController extends Controller
         }
 
         return [
-            'ios_install_url' => $ios,
-            'android_install_url' => $android,
+            'ios_install_url' => $ios ?: $this->fallbackInstallUrl('apple', $esim),
+            'android_install_url' => $android ?: $this->fallbackInstallUrl('android', $esim),
         ];
+    }
+
+    private function fallbackInstallUrl(string $platform, CustomerEsim $esim): ?string
+    {
+        $activationCode = trim((string) $esim->activation_code);
+
+        if ($activationCode === '' && $esim->smdp_address && $esim->matching_id) {
+            $activationCode = 'LPA:1$' . $esim->smdp_address . '$' . $esim->matching_id;
+        }
+
+        if ($activationCode === '') {
+            return null;
+        }
+
+        $host = $platform === 'android'
+            ? 'https://esimsetup.android.com/esim_qrcode_provisioning'
+            : 'https://esimsetup.apple.com/esim_qrcode_provisioning';
+
+        return $host . '?carddata=' . rawurlencode($activationCode);
+    }
+
+    private function hasTopupPackages(CustomerEsim $esim, ?EsimPlan $plan): bool
+    {
+        if (! $plan && $esim->current_bundle_code) {
+            $plan = EsimPlan::query()->where('supplier_code', $esim->current_bundle_code)->first();
+        }
+
+        if (! $plan) {
+            return false;
+        }
+
+        $query = EsimPlan::query()
+            ->where('is_active', true)
+            ->where(function ($query) use ($plan): void {
+                if ($plan->country_name) {
+                    $query->where('country_name', $plan->country_name);
+                } elseif ($plan->region_name) {
+                    $query->where('region_name', $plan->region_name);
+                } else {
+                    $query->where('coverage_type', $plan->coverage_type);
+                }
+            });
+
+        if ((clone $query)->where('topup_supported', true)->exists()) {
+            $query->where('topup_supported', true);
+        }
+
+        return $query->exists();
     }
 
     private function firstValue(array $source, array $paths): mixed
