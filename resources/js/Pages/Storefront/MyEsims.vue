@@ -71,13 +71,19 @@ const copyActivationCode = async (esim) => {
             <img v-if="esim.qr_code_url" :src="esim.qr_code_url" alt="eSIM QR code">
             <span v-else>QR</span>
             <div v-if="esim.ios_install_url || esim.android_install_url" class="my-esim-install-links">
-              <strong>Install without scanning</strong>
               <a v-if="isAppleDevice && esim.ios_install_url" :href="esim.ios_install_url" target="_blank" rel="noopener">Install on iPhone / iPad</a>
               <a v-if="isAndroidDevice && esim.android_install_url" :href="esim.android_install_url" target="_blank" rel="noopener">Install on Android</a>
-              <small v-if="!isAppleDevice && !isAndroidDevice">Open this page on your eSIM phone, scan the QR, or copy the activation code.</small>
-              <button v-if="esim.activation_code" type="button" @click="copyActivationCode(esim)">
-                {{ copiedEsimId === esim.id ? 'Copied' : 'Copy activation code' }}
-              </button>
+              <div v-if="esim.activation_code" class="my-esim-copy-row">
+                <button type="button" @click="copyActivationCode(esim)">
+                  {{ copiedEsimId === esim.id ? 'Copied' : 'Copy activation code' }}
+                </button>
+                <button type="button" class="my-esim-info-button" aria-label="Install help">
+                  i
+                  <span role="tooltip">
+                    Open this page on your eSIM phone to use the direct install button. On desktop, scan the QR or copy the activation code and enter it manually.
+                  </span>
+                </button>
+              </div>
             </div>
             <small v-else class="my-esim-install-note">Use QR or manual details</small>
           </div>

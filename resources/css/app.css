@@ -6002,6 +6002,14 @@ button:disabled {
   text-align: center;
 }
 
+.my-esim-copy-row {
+  align-items: center;
+  display: grid;
+  gap: 6px;
+  grid-template-columns: minmax(0, 1fr) 28px;
+  position: relative;
+}
+
 .my-esim-install-links button,
 .install-copy-button {
   background: #ffffff;
@@ -6015,6 +6023,49 @@ button:disabled {
   min-height: 34px;
   padding: 8px;
   text-align: center;
+}
+
+.my-esim-info-button {
+  align-items: center;
+  border-radius: 50% !important;
+  display: inline-flex;
+  font-size: 12px !important;
+  height: 28px;
+  justify-content: center;
+  min-height: 28px !important;
+  padding: 0 !important;
+  position: relative;
+  width: 28px;
+}
+
+.my-esim-info-button span {
+  background: #07182f;
+  border-radius: 12px;
+  bottom: calc(100% + 10px);
+  box-shadow: 0 16px 40px rgba(16, 44, 76, 0.24);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  left: 50%;
+  line-height: 1.45;
+  opacity: 0;
+  padding: 10px 12px;
+  pointer-events: none;
+  position: absolute;
+  text-align: left;
+  text-transform: none;
+  transform: translate(-50%, 6px);
+  transition: opacity 160ms ease, transform 160ms ease;
+  visibility: hidden;
+  width: min(230px, 78vw);
+  z-index: 4;
+}
+
+.my-esim-info-button:hover span,
+.my-esim-info-button:focus-visible span {
+  opacity: 1;
+  transform: translate(-50%, 0);
+  visibility: visible;
 }
 
 .my-esim-install-links small {
