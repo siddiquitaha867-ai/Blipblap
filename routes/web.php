@@ -9,6 +9,7 @@ use App\Http\Controllers\Storefront\MyEsimController;
 use App\Http\Controllers\Storefront\PlanController;
 use App\Http\Controllers\Storefront\PlansIndexController;
 use App\Http\Controllers\Storefront\SupportChatController;
+use App\Http\Controllers\Storefront\TopupController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
@@ -101,6 +102,9 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/my-account', [AccountController::class, 'show'])->name('my-account');
     Route::patch('/my-account', [AccountController::class, 'update'])->name('my-account.update');
     Route::get('/my-esims', MyEsimController::class)->name('my-esims');
+    Route::get('/my-esims/{esim}/top-up', [TopupController::class, 'show'])->name('topup.show');
+    Route::post('/my-esims/{esim}/top-up/stripe', [TopupController::class, 'stripe'])->name('topup.stripe');
+    Route::get('/my-esims/{esim}/top-up/success', [TopupController::class, 'success'])->name('topup.success');
     Route::get('/email/verify', [EmailVerificationController::class, 'notice'])->name('verification.notice');
     Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])
         ->middleware(['signed', 'throttle:6,1'])

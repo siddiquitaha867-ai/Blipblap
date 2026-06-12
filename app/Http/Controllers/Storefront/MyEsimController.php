@@ -65,6 +65,8 @@ class MyEsimController extends Controller
                     'usage_status' => $usage['usage_status'],
                     'ios_install_url' => $install['ios_install_url'],
                     'android_install_url' => $install['android_install_url'],
+                    'can_topup' => (bool) $esim->topup_supported && filled($esim->iccid),
+                    'topup_url' => route('topup.show', $esim),
                 ];
             })->values(),
         ]);

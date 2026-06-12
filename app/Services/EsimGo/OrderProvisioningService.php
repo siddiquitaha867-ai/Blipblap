@@ -3,6 +3,7 @@
 namespace App\Services\EsimGo;
 
 use App\Mail\EsimReadyMail;
+use App\Mail\TopupAppliedMail;
 use App\Models\CustomerEsim;
 use App\Models\EsimEvent;
 use App\Models\EsimOrder;
@@ -124,6 +125,88 @@ class OrderProvisioningService
         ]);
 
         $this->sendReadyEmail($esim, $order, $plan);
+
+        return $esim;
+    }
+
+    public function applyTopup(EsimOrder $order, ?EsimPlan $plan = null): ?CustomerEsim
+    {
+        if ($order->order_type !== 'topup') {
+            return null;
+        }
+
+        $esim = CustomerEsim::query()
+            ->where('iccid', $order->iccid)
+            ->first();
+
+        if (! $esim || ! $esim->topup_supported) {
+            $order->update([
+                'status' => 'topup_failed',
+                'fulfillment_status' => 'topup_not_available',
+                'response_payload' => $this->appendResponse($order, [
+                    'topup_error' => 'The selected eSIM is not available for top-up.',
+                ]),
+            ]);
+
+            return null;
+        }
+
+        if ($order->status === 'topup_applied' || $order->fulfillment_status === 'topup_applied') {
+            return $esim;
+        }
+
+        if (! in_array($order->status, ['paid', 'provisioning'], true)) {
+            return null;
+        }
+
+        $order->update([
+            'status' => 'provisioning',
+            'fulfillment_status' => 'topup_processing',
+        ]);
+
+        $response = $this->client->applyBundle([
+            'iccid' => $order->iccid,
+            'name' => $order->bundle_code,
+            'allowReassign' => false,
+        ]);
+
+        $appliedIccid = $this->value($response, ['iccid', 'esims.0.iccid']) ?: $order->iccid;
+        $applyReference = $this->value($response, ['applyReference', 'apply_reference', 'esims.0.applyReference', 'esims.0.apply_reference']);
+        $providerStatus = strtolower((string) ($this->value($response, ['status', 'esims.0.status']) ?: 'topup_applied'));
+        $esimStatus = str_contains($providerStatus, 'process') || str_contains($providerStatus, 'pending')
+            ? 'topup_processing'
+            : 'topup_applied';
+
+        $esim->update([
+            'current_bundle_code' => $order->bundle_code,
+            'status' => $esimStatus,
+            'last_status' => $response,
+            'topup_supported' => (bool) ($plan?->topup_supported ?? $esim->topup_supported),
+            'last_synced_at' => now(),
+        ]);
+
+        $order->update([
+            'iccid' => $appliedIccid,
+            'apply_reference' => $applyReference,
+            'status' => $esimStatus,
+            'fulfillment_status' => $esimStatus,
+            'response_payload' => $this->appendResponse($order, ['topup_apply' => $response]),
+        ]);
+
+        EsimEvent::query()->create([
+            'customer_esim_id' => $esim->id,
+            'esim_order_id' => $order->id,
+            'event_type' => $esimStatus,
+            'event_payload' => [
+                'iccid' => $appliedIccid,
+                'bundle_code' => $order->bundle_code,
+                'apply_reference' => $applyReference,
+            ],
+        ]);
+
+        if ($esimStatus === 'topup_applied') {
+            $this->sendTopupEmail($esim->refresh(), $order->refresh(), $plan);
+        }
 
         return $esim;
     }
@@ -432,6 +515,42 @@ class OrderProvisioningService
                 'customer_esim_id' => $esim->id,
                 'esim_order_id' => $order->id,
                 'event_type' => 'ready_email_failed',
+                'event_payload' => [
+                    'to' => $order->customer_email,
+                    'error' => $exception->getMessage(),
+                ],
+            ]);
+        }
+    }
+
+    private function sendTopupEmail(CustomerEsim $esim, EsimOrder $order, ?EsimPlan $plan): void
+    {
+        $alreadySent = EsimEvent::query()
+            ->where('customer_esim_id', $esim->id)
+            ->where('esim_order_id', $order->id)
+            ->where('event_type', 'topup_email_sent')
+            ->exists();
+
+        if ($alreadySent) {
+            return;
+        }
+
+        try {
+            Mail::to($order->customer_email)->send(new TopupAppliedMail($esim, $order, $plan));
+
+            EsimEvent::query()->create([
+                'customer_esim_id' => $esim->id,
+                'esim_order_id' => $order->id,
+                'event_type' => 'topup_email_sent',
+                'event_payload' => [
+                    'to' => $order->customer_email,
+                ],
+            ]);
+        } catch (\Throwable $exception) {
+            EsimEvent::query()->create([
+                'customer_esim_id' => $esim->id,
+                'esim_order_id' => $order->id,
+                'event_type' => 'topup_email_failed',
                 'event_payload' => [
                     'to' => $order->customer_email,
                     'error' => $exception->getMessage(),

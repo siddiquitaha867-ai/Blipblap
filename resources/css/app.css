@@ -5913,6 +5913,36 @@ button:disabled {
   margin: 0 0 20px;
 }
 
+.my-esim-actions {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  margin: -4px 0 18px;
+}
+
+.my-esim-topup-link {
+  background: var(--bb-blue);
+  border-radius: 999px;
+  color: #ffffff;
+  display: inline-flex;
+  font-size: 13px;
+  font-weight: 800;
+  justify-content: center;
+  min-height: 40px;
+  padding: 11px 18px;
+}
+
+.my-esim-topup-muted {
+  background: #eef2f6;
+  border-radius: 999px;
+  color: #748091;
+  display: inline-flex;
+  font-size: 12px;
+  font-weight: 800;
+  min-height: 36px;
+  padding: 10px 14px;
+}
+
 .my-esim-install {
   align-items: start;
   display: grid;
@@ -5957,6 +5987,176 @@ button:disabled {
 
 .my-esim-code {
   line-break: anywhere;
+}
+
+.topup-page {
+  align-items: start;
+  display: grid;
+  gap: clamp(28px, 5vw, 64px);
+  grid-template-columns: minmax(0, 1fr) 460px;
+  margin: 0 auto;
+  max-width: 1120px;
+  padding: 52px 24px 96px;
+}
+
+.topup-copy {
+  display: grid;
+  gap: 18px;
+  padding-top: 8px;
+}
+
+.topup-copy h1 {
+  color: var(--bb-ink);
+  font-size: clamp(46px, 5.6vw, 68px);
+  font-weight: 400;
+  line-height: 0.98;
+  margin: 0 0 16px;
+  max-width: 640px;
+}
+
+.topup-copy > p {
+  color: var(--bb-muted);
+  line-height: 1.7;
+  max-width: 560px;
+}
+
+.topup-current {
+  background: #ffffff;
+  border: 1px solid #dce7ef;
+  border-radius: 18px;
+  box-shadow: 0 18px 44px rgba(16, 44, 76, 0.07);
+  display: grid;
+  gap: 8px;
+  max-width: 520px;
+  padding: 20px;
+}
+
+.topup-current span,
+.topup-panel .payment-card-top span {
+  color: var(--bb-blue);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.topup-current strong {
+  color: #07182f;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.topup-current small {
+  color: var(--bb-muted);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.topup-panel {
+  background: #ffffff;
+  border: 1px solid rgba(216, 229, 239, 0.9);
+  border-radius: 22px;
+  box-shadow: 0 24px 70px rgba(16, 44, 76, 0.12);
+  display: grid;
+  gap: 18px;
+  padding: 24px;
+  position: sticky;
+  top: 22px;
+}
+
+.topup-options {
+  display: grid;
+  gap: 10px;
+}
+
+.topup-option {
+  align-items: center;
+  background: #f8fbfd;
+  border: 1px solid #dce7ef;
+  border-radius: 16px;
+  color: #07182f;
+  cursor: pointer;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  min-height: 62px;
+  padding: 14px;
+  text-align: left;
+  transition: background 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.topup-option:hover,
+.topup-option.active {
+  background: #eef6ff;
+  border-color: rgba(14, 80, 237, 0.4);
+  box-shadow: 0 12px 26px rgba(16, 44, 76, 0.1);
+  transform: translateY(-1px);
+}
+
+.topup-option span {
+  color: var(--bb-blue);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.topup-option strong {
+  color: #3f4a5a;
+  font-size: 13px;
+}
+
+.topup-option em {
+  color: #07182f;
+  font-style: normal;
+  font-weight: 900;
+  white-space: nowrap;
+}
+
+.topup-empty {
+  background: #fff7df;
+  border: 1px solid #f3d57e;
+  border-radius: 16px;
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+}
+
+.topup-empty strong {
+  color: #594719;
+}
+
+.topup-empty p {
+  color: #6b571e;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.topup-summary {
+  background: #f9fbfd;
+  border: 1px solid #dce7ef;
+  border-radius: 16px;
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 16px;
+}
+
+.topup-summary div {
+  align-items: start;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.topup-summary dt {
+  color: var(--bb-muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.topup-summary dd {
+  color: #07182f;
+  font-weight: 700;
+  margin: 0;
+  text-align: right;
 }
 
 .my-account-page {
@@ -6627,6 +6827,7 @@ button:disabled {
   .checkout-form,
   .checkout-page,
   .payment-page,
+  .topup-page,
   .payment-method-preview div,
   .install-preview,
   .payment-card dl,
@@ -6729,6 +6930,10 @@ button:disabled {
   }
 
   .payment-card {
+    position: static;
+  }
+
+  .topup-panel {
     position: static;
   }
 
@@ -6950,6 +7155,7 @@ button:disabled {
   .checkout-form,
   .stripe-test-box,
   .checkout-summary,
+  .topup-panel,
   .payment-card,
   .comment-section,
   .support-band article,
@@ -7008,6 +7214,7 @@ button:disabled {
   .plans-index-hero h1,
   .detail-hero h1,
   .checkout-page h1,
+  .topup-copy h1,
   .payment-page h1,
   .my-esims-hero h1,
   .my-account-hero h1 {
@@ -7017,6 +7224,7 @@ button:disabled {
   .hero-text,
   .detail-hero p,
   .checkout-page > div > p,
+  .topup-copy > p,
   .payment-page > div > p,
   .my-esims-hero p,
   .my-account-hero p,
@@ -7032,6 +7240,7 @@ button:disabled {
   .checkout-form,
   .stripe-test-box,
   .checkout-summary,
+  .topup-panel,
   .payment-card,
   .support-band article,
   .comment-section,
@@ -7043,6 +7252,23 @@ button:disabled {
   .content-page-card,
   .auth-modal {
     padding: 18px;
+  }
+
+  .topup-option {
+    grid-template-columns: 1fr;
+  }
+
+  .topup-option em {
+    white-space: normal;
+  }
+
+  .topup-summary div {
+    display: grid;
+    gap: 5px;
+  }
+
+  .topup-summary dd {
+    text-align: left;
   }
 
   .legal-body {

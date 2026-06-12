@@ -35,14 +35,19 @@ defineProps({
         <h2>{{ esim.plan_title }}</h2>
         <p>
           {{ esim.data || 'Data package' }}
-          <template v-if="esim.duration_days"> · {{ esim.duration_days }} days</template>
+          <template v-if="esim.duration_days"> - {{ esim.duration_days }} days</template>
         </p>
 
         <p v-if="esim.remaining_data || esim.days_remaining" class="checkout-note">
           <template v-if="esim.remaining_data">Remaining data: {{ esim.remaining_data }}</template>
           <template v-if="esim.total_data"> / {{ esim.total_data }}</template>
-          <template v-if="esim.days_remaining !== null && esim.days_remaining !== undefined"> · {{ esim.days_remaining }} days left</template>
+          <template v-if="esim.days_remaining !== null && esim.days_remaining !== undefined"> - {{ esim.days_remaining }} days left</template>
         </p>
+
+        <div class="my-esim-actions">
+          <a v-if="esim.can_topup" :href="esim.topup_url" class="my-esim-topup-link">Top up</a>
+          <span v-else class="my-esim-topup-muted">Top-up unavailable</span>
+        </div>
 
         <div class="my-esim-install">
           <img v-if="esim.qr_code_url" :src="esim.qr_code_url" alt="eSIM QR code">

@@ -275,7 +275,12 @@ class CheckoutController extends Controller
 
                     try {
                         $plan = EsimPlan::query()->where('supplier_code', $order->bundle_code)->first();
-                        $provisioning->provision($order->refresh(), $plan);
+
+                        if ($order->order_type === 'topup') {
+                            $provisioning->applyTopup($order->refresh(), $plan);
+                        } else {
+                            $provisioning->provision($order->refresh(), $plan);
+                        }
                     } catch (\Throwable $exception) {
                         $order->update([
                             'status' => 'provisioning_failed',
