@@ -7320,6 +7320,33 @@ button:disabled {
     font-size: 10px;
   }
 
+  .plans-index-section .plans-index-grid {
+    gap: 12px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .plans-index-section .plans-index-card {
+    align-items: flex-start;
+    gap: 10px;
+    grid-template-columns: 1fr;
+    min-height: 132px;
+    padding: 14px;
+  }
+
+  .plans-index-section .plans-index-icon {
+    height: 44px;
+    width: 44px;
+  }
+
+  .plans-index-section .plans-index-card strong {
+    font-size: 13px;
+  }
+
+  .plans-index-section .plans-index-card small {
+    font-size: 10px;
+    line-height: 1.35;
+  }
+
   .plans-index-page,
   .how-page {
     overflow-x: clip;
@@ -7772,6 +7799,11 @@ button:disabled {
     font-size: clamp(30px, 8vw, 36px);
   }
 
+  .plans-index-page .plans-index-hero h1,
+  .plans-index-page .plans-index-heading h2 {
+    font-size: clamp(27px, 7vw, 34px);
+  }
+
   .trust-panel h2,
   .destinations-section h2,
   .steps-section h2,
@@ -8000,6 +8032,11 @@ button:disabled {
 
   .my-esims-hero h1 {
     font-size: clamp(28px, 8.8vw, 34px);
+  }
+
+  .plans-index-page .plans-index-hero h1,
+  .plans-index-page .plans-index-heading h2 {
+    font-size: clamp(24px, 7.4vw, 30px);
   }
 
   .trust-panel h2,
