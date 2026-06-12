@@ -7221,9 +7221,31 @@ button:disabled {
 
   .destination-search-menu {
     left: 0;
+    margin-top: 10px;
+    max-height: none;
+    padding: 10px;
+    position: static;
     right: 0;
     transform: none;
     width: 100%;
+  }
+
+  .destination-search-list {
+    gap: 6px;
+    max-height: min(250px, 34svh);
+    padding-right: 2px;
+  }
+
+  .destination-search-item {
+    border-radius: 14px;
+    grid-template-columns: 34px minmax(0, 1fr);
+    min-height: 48px;
+    padding: 7px 9px;
+  }
+
+  .destination-search-flag {
+    height: 34px;
+    width: 34px;
   }
 
   .pill,

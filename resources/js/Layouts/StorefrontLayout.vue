@@ -104,6 +104,15 @@ watch(mobileMenuOpen, (open) => {
     searchOpen.value = false;
   }
 });
+
+watch(searchQuery, (value) => {
+  if (value.trim()) {
+    loadDestinations();
+    return;
+  }
+
+  searchOpen.value = false;
+});
 </script>
 
 <template>
