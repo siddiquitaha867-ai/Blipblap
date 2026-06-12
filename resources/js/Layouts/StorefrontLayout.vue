@@ -38,8 +38,12 @@ const loadDestinations = async () => {
 const filteredDestinations = computed(() => {
   const query = searchQuery.value.trim().toLowerCase();
 
+  if (!query) {
+    return [];
+  }
+
   return destinations.value
-    .filter((destination) => !query || destination.name.toLowerCase().includes(query));
+    .filter((destination) => destination.name.toLowerCase().startsWith(query));
 });
 
 const destinationMeta = (destination) => {
@@ -188,18 +192,7 @@ watch(mobileMenuOpen, (open) => {
                 <button type="button" @click="loadDestinations">Locations</button>
               </form>
 
-              <div v-show="searchOpen" class="destination-search-menu">
-                <label>
-                  <span>Search country</span>
-                  <input
-                    v-model="searchQuery"
-                    type="search"
-                    placeholder="Type country name..."
-                    autocomplete="off"
-                    @focus="searchOpen = true"
-                  />
-                </label>
-
+              <div v-show="searchOpen && searchQuery.trim()" class="destination-search-menu">
                 <div class="destination-search-list">
                   <p v-if="searchLoading" class="destination-search-state">Loading destinations...</p>
                   <p v-else-if="!filteredDestinations.length" class="destination-search-state">No countries found.</p>

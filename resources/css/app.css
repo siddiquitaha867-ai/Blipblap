@@ -335,35 +335,6 @@ button:disabled {
   z-index: 80;
 }
 
-.destination-search-menu label {
-  display: grid;
-  gap: 8px;
-  margin-bottom: 14px;
-}
-
-.destination-search-menu label span {
-  color: var(--bb-muted);
-  font-size: 11px;
-  font-weight: 800;
-  padding-left: 6px;
-  text-transform: uppercase;
-}
-
-.destination-search-menu label input {
-  background: #f3f7fa;
-  border: 1px solid #dce7ef;
-  border-radius: 999px;
-  color: #07182f;
-  height: 42px;
-  outline: 0;
-  padding: 0 18px;
-}
-
-.destination-search-menu label input:focus {
-  border-color: var(--bb-blue);
-  box-shadow: 0 0 0 4px rgba(14, 80, 237, 0.1);
-}
-
 .destination-search-list {
   display: grid;
   gap: 4px;
