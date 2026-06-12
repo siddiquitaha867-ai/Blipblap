@@ -57,15 +57,23 @@ class OrderProvisioningService
 
         if (! $iccid) {
             $order->update([
+                'apply_reference' => $reference ?: $order->apply_reference,
                 'status' => 'provisioning_pending',
                 'fulfillment_status' => 'pending_install_details',
-                'response_payload' => $this->appendResponse($order, ['esim_go_order' => $response]),
+                'response_payload' => $this->appendResponse($order, [
+                    'esim_go_order' => $response,
+                    'esim_go_lookup_reference' => $reference ?: $order->order_reference,
+                ]),
             ]);
 
             EsimEvent::query()->create([
                 'esim_order_id' => $order->id,
                 'event_type' => 'provisioning_pending',
-                'event_payload' => ['response' => $response],
+                'event_payload' => [
+                    'blipblap_reference' => $order->order_reference,
+                    'esim_go_reference' => $reference ?: $order->order_reference,
+                    'response' => $response,
+                ],
             ]);
 
             return null;
@@ -109,9 +117,13 @@ class OrderProvisioningService
 
         $order->update([
             'iccid' => $iccid,
+            'apply_reference' => $reference ?: $order->apply_reference,
             'status' => 'provisioned',
             'fulfillment_status' => 'ready_to_install',
-            'response_payload' => $this->appendResponse($order, ['esim_go_order' => $response]),
+            'response_payload' => $this->appendResponse($order, [
+                'esim_go_order' => $response,
+                'esim_go_lookup_reference' => $reference ?: $order->order_reference,
+            ]),
         ]);
 
         EsimEvent::query()->create([
@@ -121,6 +133,8 @@ class OrderProvisioningService
             'event_payload' => [
                 'iccid' => $iccid,
                 'bundle_code' => $order->bundle_code,
+                'blipblap_reference' => $order->order_reference,
+                'esim_go_reference' => $reference ?: $order->order_reference,
             ],
         ]);
 
@@ -187,10 +201,13 @@ class OrderProvisioningService
 
         $order->update([
             'iccid' => $appliedIccid,
-            'apply_reference' => $applyReference,
+            'apply_reference' => $applyReference ?: $order->apply_reference,
             'status' => $esimStatus,
             'fulfillment_status' => $esimStatus,
-            'response_payload' => $this->appendResponse($order, ['topup_apply' => $response]),
+            'response_payload' => $this->appendResponse($order, [
+                'topup_apply' => $response,
+                'esim_go_lookup_reference' => $applyReference ?: $order->order_reference,
+            ]),
         ]);
 
         EsimEvent::query()->create([
@@ -200,6 +217,7 @@ class OrderProvisioningService
             'event_payload' => [
                 'iccid' => $appliedIccid,
                 'bundle_code' => $order->bundle_code,
+                'blipblap_reference' => $order->order_reference,
                 'apply_reference' => $applyReference,
             ],
         ]);

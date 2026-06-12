@@ -27,6 +27,9 @@ class OrderController extends Controller
             return [
                 'id' => $order->id,
                 'order_reference' => $order->order_reference,
+                'esim_go_lookup_reference' => $this->esimGoLookupReference($order),
+                'apply_reference' => $this->providerApplyReference($order),
+                'order_type' => $order->order_type,
                 'payment_reference' => $order->payment_reference,
                 'bundle_code' => $order->bundle_code,
                 'status' => $order->status,
@@ -76,6 +79,9 @@ class OrderController extends Controller
             fputcsv($handle, [
                 'Invoice No',
                 'Order ID',
+                'BlipBlap Reference',
+                'eSIM Go Lookup Reference',
+                'Order Type',
                 'Date',
                 'Customer Name',
                 'Customer Email',
@@ -107,6 +113,9 @@ class OrderController extends Controller
                         fputcsv($handle, [
                             $order->order_reference ?: 'BB-' . $order->id,
                             $order->id,
+                            $order->order_reference,
+                            $this->csvText($this->esimGoLookupReference($order)),
+                            $order->order_type,
                             $this->csvText(optional($order->created_at)->format('Y-m-d H:i:s')),
                             data_get($order->request_payload, 'customer_name', ''),
                             $order->customer_email,
@@ -141,6 +150,8 @@ class OrderController extends Controller
                     $inner->where('customer_email', 'like', "%{$search}%")
                         ->orWhere('request_payload->customer_name', 'like', "%{$search}%")
                         ->orWhere('order_reference', 'like', "%{$search}%")
+                        ->orWhere('apply_reference', 'like', "%{$search}%")
+                        ->orWhere('response_payload->esim_go_lookup_reference', 'like', "%{$search}%")
                         ->orWhere('payment_reference', 'like', "%{$search}%")
                         ->orWhere('bundle_code', 'like', "%{$search}%")
                         ->orWhere('iccid', 'like', "%{$search}%")
@@ -183,6 +194,33 @@ class OrderController extends Controller
         }
 
         return data_get($order->response_payload, 'payment_method_collection', 'stripe');
+    }
+
+    private function esimGoLookupReference(EsimOrder $order): string
+    {
+        return (string) (
+            $this->providerApplyReference($order)
+            ?: data_get($order->response_payload, 'esim_go_lookup_reference')
+            ?: data_get($order->response_payload, 'esim_go_order.orderReference')
+            ?: data_get($order->response_payload, 'esim_go_order.order_reference')
+            ?: data_get($order->response_payload, 'esim_go_order.reference')
+            ?: data_get($order->response_payload, 'esim_go_order.id')
+            ?: data_get($order->response_payload, 'topup_apply.applyReference')
+            ?: data_get($order->response_payload, 'topup_apply.apply_reference')
+            ?: data_get($order->response_payload, 'topup_apply.id')
+            ?: $order->order_reference
+        );
+    }
+
+    private function providerApplyReference(EsimOrder $order): string
+    {
+        $reference = trim((string) $order->apply_reference);
+
+        if ($reference === '' || str_starts_with($reference, 'pi_')) {
+            return '';
+        }
+
+        return $reference;
     }
 
     private function csvText(?string $value): string

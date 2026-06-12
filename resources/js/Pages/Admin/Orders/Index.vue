@@ -19,6 +19,7 @@ const props = defineProps({
 const search = ref(props.filters.search || '');
 const range = ref(props.filters.range || 'last_7_days');
 const selectedOrder = ref(null);
+const copiedReference = ref('');
 
 const rangeOptions = computed(() => props.filters.range_options || {
   last_7_days: 'Last 7 days',
@@ -62,6 +63,20 @@ const paymentFor = (order) => [
   order.payment_brand,
   order.payment_last4 ? `**** ${order.payment_last4}` : '',
 ].filter(Boolean).join(' ');
+
+const copyReference = async (value) => {
+  if (!value) {
+    return;
+  }
+
+  await navigator.clipboard.writeText(value);
+  copiedReference.value = value;
+  window.setTimeout(() => {
+    if (copiedReference.value === value) {
+      copiedReference.value = '';
+    }
+  }, 1600);
+};
 </script>
 
 <template>
@@ -74,7 +89,7 @@ const paymentFor = (order) => [
     </div>
 
     <form class="admin-search" @submit.prevent="submit">
-      <input v-model="search" type="search" placeholder="Search customer, email, order, payment, bundle, ICCID" />
+      <input v-model="search" type="search" placeholder="Search customer, email, BlipBlap ref, eSIM Go ref, payment, bundle, ICCID" />
       <button type="submit">Search</button>
       <div class="admin-order-actions">
         <select v-model="range" class="admin-range-select" @change="submit">
@@ -108,7 +123,10 @@ const paymentFor = (order) => [
             >
               <td>
                 <strong>#{{ order.id }}</strong>
-                <small>{{ order.order_reference || order.payment_reference || 'No reference' }}</small>
+                <small>{{ order.order_reference || 'No BlipBlap reference' }}</small>
+                <small v-if="order.esim_go_lookup_reference">
+                  eSIM Go: {{ order.esim_go_lookup_reference }}
+                </small>
               </td>
               <td>
                 <strong>{{ order.customer_name || 'No name' }}</strong>
@@ -167,6 +185,31 @@ const paymentFor = (order) => [
             <article>
               <span>Address</span>
               <strong>{{ addressFor(selectedOrder) || 'No address saved' }}</strong>
+            </article>
+            <article>
+              <span>References</span>
+              <strong>{{ selectedOrder.order_reference || 'No BlipBlap reference' }}</strong>
+              <button
+                v-if="selectedOrder.order_reference"
+                type="button"
+                class="admin-mini-button reference-copy-button"
+                @click="copyReference(selectedOrder.order_reference)"
+              >
+                {{ copiedReference === selectedOrder.order_reference ? 'Copied' : 'Copy BlipBlap ref' }}
+              </button>
+              <p>eSIM Go lookup: {{ selectedOrder.esim_go_lookup_reference || 'Not returned yet' }}</p>
+              <button
+                v-if="selectedOrder.esim_go_lookup_reference"
+                type="button"
+                class="admin-mini-button reference-copy-button"
+                @click="copyReference(selectedOrder.esim_go_lookup_reference)"
+              >
+                {{ copiedReference === selectedOrder.esim_go_lookup_reference ? 'Copied' : 'Copy eSIM Go ref' }}
+              </button>
+              <p v-if="selectedOrder.apply_reference && selectedOrder.apply_reference !== selectedOrder.esim_go_lookup_reference">
+                Apply ref: {{ selectedOrder.apply_reference }}
+              </p>
+              <p>Type: {{ selectedOrder.order_type || 'new_esim' }}</p>
             </article>
             <article>
               <span>Payment</span>

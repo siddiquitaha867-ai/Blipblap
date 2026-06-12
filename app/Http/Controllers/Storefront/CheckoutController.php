@@ -106,7 +106,7 @@ class CheckoutController extends Controller
         $order = EsimOrder::query()->create([
             'user_id' => $request->user()?->id,
             'customer_email' => $data['customer_email'],
-            'order_reference' => 'BB-' . now()->format('YmdHis') . '-' . Str::upper(Str::random(6)),
+            'order_reference' => 'BB-ESIM-' . now()->format('YmdHis') . '-' . Str::upper(Str::random(6)),
             'order_type' => 'new_esim',
             'bundle_code' => $plan->supplier_code,
             'status' => 'pending_payment',
@@ -145,6 +145,7 @@ class CheckoutController extends Controller
                 'cancel_url' => route('checkout.payment', $plan) . '?email=' . urlencode($data['customer_email']),
                 'metadata' => [
                     'order_id' => (string) $order->id,
+                    'order_reference' => (string) $order->order_reference,
                     'plan_id' => (string) $plan->id,
                 ],
                 'line_items' => [
@@ -265,7 +266,6 @@ class CheckoutController extends Controller
                 if ($order) {
                     $order->update([
                         'payment_reference' => $session['id'] ?? null,
-                        'apply_reference' => $session['payment_intent'] ?? null,
                         'status' => 'paid',
                         'validation_status' => 'paid',
                         'fulfillment_status' => 'ready_for_provisioning',
@@ -323,7 +323,6 @@ class CheckoutController extends Controller
         }
 
         $order->update([
-            'apply_reference' => $session['payment_intent'] ?? $order->apply_reference,
             'status' => 'paid',
             'validation_status' => 'paid',
             'fulfillment_status' => 'ready_for_provisioning',
