@@ -10,6 +10,8 @@ const searchLoading = ref(false);
 const searchQuery = ref('');
 const destinations = ref([]);
 const mobileMenuOpen = ref(false);
+const cookieConsentResolved = ref(false);
+const cookieConsentStorageKey = 'blipblap_cookie_consent';
 
 const user = computed(() => page.props.auth.user);
 const isAdminPreview = computed(() => Boolean(user.value?.is_admin));
@@ -87,13 +89,28 @@ const lockPageScroll = (locked) => {
   document.documentElement.style.overflow = locked ? 'hidden' : '';
 };
 
+const syncCookieConsentState = () => {
+  if (typeof window === 'undefined') {
+    return;
+  }
+
+  cookieConsentResolved.value = Boolean(window.localStorage.getItem(cookieConsentStorageKey));
+};
+
+const handleCookieConsent = () => {
+  cookieConsentResolved.value = true;
+};
+
 onMounted(() => {
   syncDesktopState();
+  syncCookieConsentState();
   window.addEventListener('resize', syncDesktopState);
+  window.addEventListener('blipblap:cookie-consent', handleCookieConsent);
 });
 
 onBeforeUnmount(() => {
   window.removeEventListener('resize', syncDesktopState);
+  window.removeEventListener('blipblap:cookie-consent', handleCookieConsent);
   lockPageScroll(false);
 });
 
@@ -237,7 +254,7 @@ watch(searchQuery, (value) => {
       <slot />
     </main>
 
-    <SupportChatWidget :hidden="isAdminPreview || mobileMenuOpen" />
+    <SupportChatWidget :hidden="isAdminPreview || mobileMenuOpen || !cookieConsentResolved" />
     <CookieConsentBanner />
   </div>
 </template>
