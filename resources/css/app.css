@@ -3656,7 +3656,19 @@ button:disabled {
   gap: 54px;
   grid-template-columns: 1fr 1fr;
   min-height: 540px;
+  overflow: hidden;
   padding: 62px 86px;
+  position: relative;
+}
+
+.steps-section::before {
+  z-index: 0;
+}
+
+.steps-illustration,
+.steps-copy {
+  position: relative;
+  z-index: 1;
 }
 
 .steps-illustration {
