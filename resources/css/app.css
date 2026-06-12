@@ -7893,7 +7893,7 @@ button:disabled {
 
   .support-band > div {
     gap: 10px;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: 1fr;
   }
 
   .support-band article {
@@ -8123,7 +8123,7 @@ button:disabled {
   }
 
   .support-band > div {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: 1fr;
   }
 
   .comment-section {
