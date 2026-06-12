@@ -81,7 +81,7 @@ const groups = computed(() => ({
   ...props.destinationGroups,
 }));
 
-const visibleDestinations = computed(() => (groups.value[activeTab.value] || []).slice(0, 9));
+const visibleDestinations = computed(() => (groups.value[activeTab.value] || []).slice(0, 8));
 
 const planDataLabel = (plan) => {
   if (plan.unlimited) {
