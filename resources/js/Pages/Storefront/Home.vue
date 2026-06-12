@@ -65,6 +65,10 @@ const faqIntro = computed(() => homepageContent.value.faq_intro || 'A compilatio
 const activeTab = ref('Top Destinations');
 const activeStep = ref(0);
 const activeFeaturedPlanIndex = ref(0);
+const featuredDragStartX = ref(0);
+const featuredDragDeltaX = ref(0);
+const featuredDragging = ref(false);
+const featuredSwipeHandled = ref(false);
 const page = usePage();
 const authPromptCheckoutUrl = ref('');
 const isLoggedIn = computed(() => Boolean(page.props.auth.user));
@@ -169,6 +173,56 @@ const resetFeaturedPlanTimer = () => {
 const moveFeaturedPlan = (direction) => {
   advanceFeaturedPlan(direction);
   resetFeaturedPlanTimer();
+};
+
+const startFeaturedDrag = (event) => {
+  if (props.featuredPlans.length <= 1) {
+    return;
+  }
+
+  featuredDragging.value = true;
+  featuredSwipeHandled.value = false;
+  featuredDragDeltaX.value = 0;
+  featuredDragStartX.value = event.clientX ?? event.touches?.[0]?.clientX ?? 0;
+};
+
+const updateFeaturedDrag = (event) => {
+  if (!featuredDragging.value) {
+    return;
+  }
+
+  const currentX = event.clientX ?? event.touches?.[0]?.clientX ?? featuredDragStartX.value;
+  featuredDragDeltaX.value = currentX - featuredDragStartX.value;
+};
+
+const finishFeaturedDrag = () => {
+  if (!featuredDragging.value) {
+    return;
+  }
+
+  const threshold = 42;
+  const delta = featuredDragDeltaX.value;
+
+  featuredDragging.value = false;
+
+  if (Math.abs(delta) < threshold) {
+    featuredDragDeltaX.value = 0;
+    return;
+  }
+
+  featuredSwipeHandled.value = true;
+  moveFeaturedPlan(delta < 0 ? 1 : -1);
+  featuredDragDeltaX.value = 0;
+};
+
+const handleFeaturedPlanClick = (event, plan) => {
+  if (featuredSwipeHandled.value) {
+    event.preventDefault();
+    featuredSwipeHandled.value = false;
+    return;
+  }
+
+  requestCheckout(event, plan);
 };
 
 const steps = [
@@ -283,14 +337,24 @@ const faqs = computed(() => {
       </p>
     </div>
 
-    <div class="featured-plans-rail">
+    <div
+      class="featured-plans-rail"
+      :class="{ 'is-dragging': featuredDragging }"
+      :style="{ '--featured-drag-x': `${featuredDragDeltaX}px` }"
+      @pointerdown="startFeaturedDrag"
+      @pointermove="updateFeaturedDrag"
+      @pointerup="finishFeaturedDrag"
+      @pointercancel="finishFeaturedDrag"
+      @pointerleave="finishFeaturedDrag"
+    >
       <a
         v-for="(plan, index) in featuredPlans"
         :key="plan.id"
         class="featured-plan-tile"
         :class="featuredPlanState(index)"
+        :draggable="false"
         :href="`/checkout/${plan.slug}`"
-        @click="requestCheckout($event, plan)"
+        @click="handleFeaturedPlanClick($event, plan)"
       >
         <span class="featured-plan-tile__location">{{ planLocation(plan) }}</span>
         <strong>{{ planDataLabel(plan) }}</strong>
@@ -298,11 +362,6 @@ const faqs = computed(() => {
         <em>{{ plan.currency }} {{ Number(plan.retail_price).toFixed(2) }}</em>
         <span class="featured-plan-tile__name">{{ plan.title }}</span>
       </a>
-    </div>
-
-    <div v-if="featuredPlans.length > 1" class="featured-plans-controls" aria-label="Featured plan carousel controls">
-      <button type="button" aria-label="Previous featured plan" @click="moveFeaturedPlan(-1)">‹</button>
-      <button type="button" aria-label="Next featured plan" @click="moveFeaturedPlan(1)">›</button>
     </div>
   </section>
 
