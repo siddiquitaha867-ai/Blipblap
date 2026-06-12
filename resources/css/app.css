@@ -7296,18 +7296,37 @@ button:disabled {
     opacity: 0;
     pointer-events: none;
     position: absolute;
-    transform: translateX(28px);
+    transform: translateX(28px) scale(0.96);
     transition: opacity 260ms ease, transform 320ms ease;
     visibility: hidden;
-    width: 100%;
+    width: 82%;
   }
 
   .featured-plan-tile.is-active {
+    margin: 0 auto;
     opacity: 1;
     pointer-events: auto;
     position: relative;
     transform: translateX(0);
     visibility: visible;
+  }
+
+  .featured-plan-tile.is-previous,
+  .featured-plan-tile.is-next {
+    opacity: 0.42;
+    visibility: visible;
+  }
+
+  .featured-plan-tile.is-previous {
+    left: -68%;
+    right: auto;
+    transform: translateX(0) scale(0.94);
+  }
+
+  .featured-plan-tile.is-next {
+    left: auto;
+    right: -68%;
+    transform: translateX(0) scale(0.94);
   }
 
   .featured-plan-tile:hover {

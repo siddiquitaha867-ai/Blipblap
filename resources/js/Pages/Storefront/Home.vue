@@ -129,6 +129,25 @@ const requestCheckout = (event, plan) => {
   authPromptCheckoutUrl.value = `/checkout/${plan.slug}`;
 };
 
+const featuredPlanState = (index) => {
+  const count = props.featuredPlans.length;
+
+  if (count <= 1) {
+    return {
+      'is-active': index === activeFeaturedPlanIndex.value,
+    };
+  }
+
+  const previousIndex = (activeFeaturedPlanIndex.value - 1 + count) % count;
+  const nextIndex = (activeFeaturedPlanIndex.value + 1) % count;
+
+  return {
+    'is-active': index === activeFeaturedPlanIndex.value,
+    'is-previous': index === previousIndex,
+    'is-next': index === nextIndex,
+  };
+};
+
 const steps = [
   {
     title: 'Choose Your eSIM Plan',
@@ -250,7 +269,7 @@ const faqs = computed(() => {
         v-for="(plan, index) in featuredPlans"
         :key="plan.id"
         class="featured-plan-tile"
-        :class="{ 'is-active': index === activeFeaturedPlanIndex }"
+        :class="featuredPlanState(index)"
         :href="`/checkout/${plan.slug}`"
         @click="requestCheckout($event, plan)"
       >
