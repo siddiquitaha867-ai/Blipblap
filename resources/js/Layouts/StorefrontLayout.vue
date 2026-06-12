@@ -1,4 +1,5 @@
 <script setup>
+import CookieConsentBanner from '@/Components/CookieConsentBanner.vue';
 import SupportChatWidget from '@/Components/SupportChatWidget.vue';
 import { Link, usePage } from '@inertiajs/vue3';
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
@@ -235,5 +236,6 @@ watch(mobileMenuOpen, (open) => {
     </main>
 
     <SupportChatWidget :hidden="isAdminPreview || mobileMenuOpen" />
+    <CookieConsentBanner />
   </div>
 </template>

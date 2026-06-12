@@ -1,6 +1,6 @@
 <script setup>
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
-import { router, usePage } from '@inertiajs/vue3';
+import { Link, router, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 
 defineOptions({ layout: StorefrontLayout });
@@ -22,6 +22,7 @@ const city = ref('');
 const state = ref('');
 const postalCode = ref('');
 const country = ref('');
+const legalAccepted = ref(false);
 const taxAmount = computed(() => Number(props.plan.tax_amount || 0));
 const totalAmount = computed(() => Number(props.plan.retail_price || 0) + taxAmount.value);
 
@@ -36,6 +37,7 @@ const goToPayment = () => {
     state: state.value,
     postal_code: postalCode.value,
     country: country.value,
+    terms_accepted: legalAccepted.value ? '1' : '0',
   });
 };
 </script>
@@ -48,6 +50,9 @@ const goToPayment = () => {
       <p>
         Confirm your plan, add your delivery email, then continue to checkout.
         Your install details will be prepared after payment.
+      </p>
+      <p v-if="page.props.flash.status" class="checkout-status-note">
+        {{ page.props.flash.status }}
       </p>
 
       <form class="checkout-form" @submit.prevent="goToPayment">
@@ -104,8 +109,17 @@ const goToPayment = () => {
             </button>
           </div>
         </fieldset>
+        <label class="checkout-legal-check checkout-wide">
+          <input v-model="legalAccepted" type="checkbox" required>
+          <span>
+            I agree to the
+            <Link href="/terms-and-conditions">Terms and Conditions</Link>
+            and
+            <Link href="/privacy-policy">Privacy Policy</Link>.
+          </span>
+        </label>
         <div class="checkout-form-footer">
-          <button type="submit" class="checkout-inline-submit">Continue to payment</button>
+          <button type="submit" class="checkout-inline-submit" :disabled="!legalAccepted">Continue to payment</button>
           <p>Secure payment opens on the next step.</p>
         </div>
       </form>

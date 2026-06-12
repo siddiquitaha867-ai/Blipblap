@@ -46,6 +46,12 @@ class CheckoutController extends Controller
                 ->with('status', 'Checkout is disabled in admin storefront preview.');
         }
 
+        if (! $request->boolean('terms_accepted')) {
+            return redirect()
+                ->route('checkout.show', $plan)
+                ->with('status', 'Please agree to the Terms and Conditions and Privacy Policy before payment.');
+        }
+
         return Inertia::render('Storefront/Payment', [
             'plan' => $plan,
             'customerName' => (string) $request->query('name', ''),
@@ -84,6 +90,7 @@ class CheckoutController extends Controller
             'state' => ['nullable', 'string', 'max:120'],
             'postal_code' => ['nullable', 'string', 'max:40'],
             'country' => ['nullable', 'string', 'max:120'],
+            'terms_accepted' => ['accepted'],
         ]);
 
         $secret = (string) config('services.stripe.secret');
@@ -120,6 +127,8 @@ class CheckoutController extends Controller
                 'state' => $data['state'] ?? null,
                 'postal_code' => $data['postal_code'] ?? null,
                 'country' => $data['country'] ?? null,
+                'terms_accepted' => true,
+                'terms_accepted_at' => now()->toIso8601String(),
             ],
         ]);
 

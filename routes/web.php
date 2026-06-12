@@ -30,6 +30,12 @@ use Illuminate\Support\Str;
 
 Route::get('/', HomeController::class)->name('home');
 Route::get('/how-blipblap-works', fn () => Inertia::render('Storefront/HowItWorks'))->name('how-it-works');
+Route::get('/terms-and-conditions', fn () => Inertia::render('Storefront/LegalPage', [
+    'type' => 'terms',
+]))->name('legal.terms');
+Route::get('/privacy-policy', fn () => Inertia::render('Storefront/LegalPage', [
+    'type' => 'privacy',
+]))->name('legal.privacy');
 Route::get('/esim-plans', PlansIndexController::class)->name('plans.index');
 Route::get('/destinations-list', function () {
     $flagMap = [

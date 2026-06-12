@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\EsimPlan;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -69,17 +70,22 @@ class PlanController extends Controller
 
     public function update(Request $request, EsimPlan $plan): RedirectResponse
     {
-        $data = $request->validate([
+        $rules = [
             'title' => ['required', 'string', 'max:255'],
             'retail_price' => ['required', 'numeric', 'min:0'],
-            'tax_amount' => ['required', 'numeric', 'min:0'],
             'duration_days' => ['required', 'integer', 'min:1'],
             'unlimited' => ['required', 'boolean'],
             'data_amount' => ['nullable', 'numeric', 'min:0'],
             'data_unit' => ['nullable', 'string', 'max:20'],
             'is_active' => ['required', 'boolean'],
             'is_featured' => ['required', 'boolean'],
-        ]);
+        ];
+
+        if (Schema::hasColumn('esim_plans', 'tax_amount')) {
+            $rules['tax_amount'] = ['required', 'numeric', 'min:0'];
+        }
+
+        $data = $request->validate($rules);
 
         if (! (bool) $data['unlimited'] && ($data['data_amount'] === null || $data['data_unit'] === null || $data['data_unit'] === '')) {
             throw ValidationException::withMessages([
@@ -90,6 +96,10 @@ class PlanController extends Controller
         if ((bool) $data['unlimited']) {
             $data['data_amount'] = null;
             $data['data_unit'] = null;
+        }
+
+        if (! Schema::hasColumn('esim_plans', 'tax_amount')) {
+            unset($data['tax_amount']);
         }
 
         $plan->update($data);

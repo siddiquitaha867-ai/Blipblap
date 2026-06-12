@@ -22,8 +22,8 @@
       <a href="/how-blipblap-works">How BlipBlap Works</a>
       <a href="/#faqs">FAQs</a>
       <a href="/#contact">Contact Us</a>
-      <a href="#">Terms and Conditions</a>
-      <a href="#">Privacy Policy</a>
+      <a href="/terms-and-conditions">Terms and Conditions</a>
+      <a href="/privacy-policy">Privacy Policy</a>
     </nav>
   </footer>
 </template>

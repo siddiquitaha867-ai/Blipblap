@@ -97,6 +97,7 @@ const totalAmount = computed(() => Number(props.plan.retail_price || 0) + taxAmo
       <input type="hidden" name="state" :value="state">
       <input type="hidden" name="postal_code" :value="postalCode">
       <input type="hidden" name="country" :value="country">
+      <input type="hidden" name="terms_accepted" value="1">
 
       <div class="payment-card-top">
         <span>Order summary</span>
@@ -168,7 +169,10 @@ const totalAmount = computed(() => Number(props.plan.retail_price || 0) + taxAmo
       <button type="submit" class="payment-submit">
         Continue to secure payment
       </button>
-      <p class="payment-secure-note">You will be redirected to Stripe Checkout to complete payment securely.</p>
+      <p class="payment-secure-note">
+        You will be redirected to Stripe Checkout to complete payment securely.
+        By continuing, you confirm your agreement to the Terms and Conditions and Privacy Policy.
+      </p>
     </form>
   </section>
 </template>
