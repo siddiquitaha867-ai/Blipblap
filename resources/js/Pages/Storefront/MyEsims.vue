@@ -1,5 +1,6 @@
 <script setup>
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
+import { ref } from 'vue';
 
 defineOptions({ layout: StorefrontLayout });
 
@@ -9,6 +10,23 @@ defineProps({
     default: () => [],
   },
 });
+
+const copiedEsimId = ref(null);
+const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+const isAppleDevice = /iPhone|iPad|iPod/i.test(userAgent);
+const isAndroidDevice = /Android/i.test(userAgent);
+
+const copyActivationCode = async (esim) => {
+  if (!esim.activation_code || typeof navigator === 'undefined' || !navigator.clipboard) {
+    return;
+  }
+
+  await navigator.clipboard.writeText(esim.activation_code);
+  copiedEsimId.value = esim.id;
+  window.setTimeout(() => {
+    copiedEsimId.value = null;
+  }, 1800);
+};
 </script>
 
 <template>
@@ -54,8 +72,12 @@ defineProps({
             <span v-else>QR</span>
             <div v-if="esim.ios_install_url || esim.android_install_url" class="my-esim-install-links">
               <strong>Install without scanning</strong>
-              <a v-if="esim.ios_install_url" :href="esim.ios_install_url" target="_blank" rel="noopener">Install on iPhone / iPad</a>
-              <a v-if="esim.android_install_url" :href="esim.android_install_url" target="_blank" rel="noopener">Install on Android</a>
+              <a v-if="isAppleDevice && esim.ios_install_url" :href="esim.ios_install_url" target="_blank" rel="noopener">Install on iPhone / iPad</a>
+              <a v-if="isAndroidDevice && esim.android_install_url" :href="esim.android_install_url" target="_blank" rel="noopener">Install on Android</a>
+              <small v-if="!isAppleDevice && !isAndroidDevice">Open this page on your eSIM phone, scan the QR, or copy the activation code.</small>
+              <button v-if="esim.activation_code" type="button" @click="copyActivationCode(esim)">
+                {{ copiedEsimId === esim.id ? 'Copied' : 'Copy activation code' }}
+              </button>
             </div>
             <small v-else class="my-esim-install-note">Use QR or manual details</small>
           </div>

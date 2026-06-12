@@ -24,10 +24,14 @@ const props = defineProps({
   },
 });
 
+const copied = ref(false);
 const installStatus = computed(() => props.esim?.status || props.order?.fulfillment_status || props.order?.status || 'Waiting for payment');
 const generatedQrCodeUrl = ref('');
 const qrCodeUrl = computed(() => props.esim?.qr_code_url || generatedQrCodeUrl.value);
 const hasInstallDetails = computed(() => Boolean(qrCodeUrl.value || props.esim?.activation_code || props.esim?.smdp_address));
+const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+const isAppleDevice = /iPhone|iPad|iPod/i.test(userAgent);
+const isAndroidDevice = /Android/i.test(userAgent);
 const activationCode = computed(() => {
   if (props.esim?.activation_code) {
     return props.esim.activation_code;
@@ -50,6 +54,21 @@ const androidInstallUrl = computed(() => (
   || (activationCode.value ? `https://esimsetup.android.com/esim_qrcode_provisioning?carddata=${encodeURIComponent(activationCode.value)}` : '')
 ));
 const hasDirectInstallLink = computed(() => Boolean(appleInstallUrl.value || androidInstallUrl.value));
+const canShowAppleInstall = computed(() => isAppleDevice && Boolean(appleInstallUrl.value));
+const canShowAndroidInstall = computed(() => isAndroidDevice && Boolean(androidInstallUrl.value));
+const canShowDirectInstall = computed(() => canShowAppleInstall.value || canShowAndroidInstall.value);
+
+const copyActivationCode = async () => {
+  if (!activationCode.value || typeof navigator === 'undefined' || !navigator.clipboard) {
+    return;
+  }
+
+  await navigator.clipboard.writeText(activationCode.value);
+  copied.value = true;
+  window.setTimeout(() => {
+    copied.value = false;
+  }, 1800);
+};
 
 watchEffect(async () => {
   if (props.esim?.qr_code_url || !props.esim?.activation_code) {
@@ -99,12 +118,15 @@ watchEffect(async () => {
         </div>
         <div v-if="hasInstallDetails" class="install-link-panel">
           <strong>Install without scanning</strong>
-          <p v-if="hasDirectInstallLink">Tap the right install link on the phone that will use this eSIM.</p>
-          <p v-else>Direct install links are not available for this eSIM. Use the QR code or manual details.</p>
-          <div v-if="hasDirectInstallLink" class="install-link-actions">
-            <a v-if="appleInstallUrl" :href="appleInstallUrl" target="_blank" rel="noopener">Install on iPhone / iPad</a>
-            <a v-if="androidInstallUrl" :href="androidInstallUrl" target="_blank" rel="noopener">Install on Android</a>
+          <p v-if="canShowDirectInstall">Tap this on the phone that will use this eSIM.</p>
+          <p v-else>Direct install links only work on compatible phones. On this device, scan the QR code or copy the activation code.</p>
+          <div v-if="canShowDirectInstall" class="install-link-actions">
+            <a v-if="canShowAppleInstall" :href="appleInstallUrl" target="_blank" rel="noopener">Install on iPhone / iPad</a>
+            <a v-if="canShowAndroidInstall" :href="androidInstallUrl" target="_blank" rel="noopener">Install on Android</a>
           </div>
+          <button v-if="activationCode" type="button" class="install-copy-button" @click="copyActivationCode">
+            {{ copied ? 'Copied' : 'Copy activation code' }}
+          </button>
         </div>
       </div>
       <dl>
