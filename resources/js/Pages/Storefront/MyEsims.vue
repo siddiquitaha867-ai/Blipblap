@@ -50,8 +50,16 @@ defineProps({
         </div>
 
         <div class="my-esim-install">
-          <img v-if="esim.qr_code_url" :src="esim.qr_code_url" alt="eSIM QR code">
-          <span v-else>QR</span>
+          <div class="my-esim-qr-panel">
+            <img v-if="esim.qr_code_url" :src="esim.qr_code_url" alt="eSIM QR code">
+            <span v-else>QR</span>
+            <div v-if="esim.ios_install_url || esim.android_install_url" class="my-esim-install-links">
+              <strong>Install without scanning</strong>
+              <a v-if="esim.ios_install_url" :href="esim.ios_install_url" target="_blank" rel="noopener">Install on iPhone / iPad</a>
+              <a v-if="esim.android_install_url" :href="esim.android_install_url" target="_blank" rel="noopener">Install on Android</a>
+            </div>
+            <small v-else class="my-esim-install-note">Use QR or manual details</small>
+          </div>
           <dl>
             <div>
               <dt>ICCID</dt>

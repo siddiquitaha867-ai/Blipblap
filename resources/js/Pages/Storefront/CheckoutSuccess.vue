@@ -28,6 +28,9 @@ const installStatus = computed(() => props.esim?.status || props.order?.fulfillm
 const generatedQrCodeUrl = ref('');
 const qrCodeUrl = computed(() => props.esim?.qr_code_url || generatedQrCodeUrl.value);
 const hasInstallDetails = computed(() => Boolean(qrCodeUrl.value || props.esim?.activation_code || props.esim?.smdp_address));
+const appleInstallUrl = computed(() => props.esim?.install_details?.assignment?.iosInstallUrl || props.esim?.install_details?.response?.iosInstallUrl || '');
+const androidInstallUrl = computed(() => props.esim?.install_details?.assignment?.androidInstallUrl || props.esim?.install_details?.response?.androidInstallUrl || '');
+const hasDirectInstallLink = computed(() => Boolean(appleInstallUrl.value || androidInstallUrl.value));
 
 watchEffect(async () => {
   if (props.esim?.qr_code_url || !props.esim?.activation_code) {
@@ -70,9 +73,20 @@ watchEffect(async () => {
     </div>
 
     <div class="install-preview" :class="{ 'install-preview--ready': hasInstallDetails }">
-      <div class="install-qr">
-        <img v-if="qrCodeUrl" :src="qrCodeUrl" alt="eSIM installation QR code">
-        <span v-else>QR</span>
+      <div class="install-qr-panel">
+        <div class="install-qr">
+          <img v-if="qrCodeUrl" :src="qrCodeUrl" alt="eSIM installation QR code">
+          <span v-else>QR</span>
+        </div>
+        <div v-if="hasInstallDetails" class="install-link-panel">
+          <strong>Install without scanning</strong>
+          <p v-if="hasDirectInstallLink">Tap the right install link on the phone that will use this eSIM.</p>
+          <p v-else>Direct install links are not available for this eSIM. Use the QR code or manual details.</p>
+          <div v-if="hasDirectInstallLink" class="install-link-actions">
+            <a v-if="appleInstallUrl" :href="appleInstallUrl" target="_blank" rel="noopener">Install on iPhone / iPad</a>
+            <a v-if="androidInstallUrl" :href="androidInstallUrl" target="_blank" rel="noopener">Install on Android</a>
+          </div>
+        </div>
       </div>
       <dl>
         <div>
@@ -95,18 +109,18 @@ watchEffect(async () => {
           <dt>Activation code</dt>
           <dd class="install-code">{{ esim.activation_code }}</dd>
         </div>
-        <div v-if="esim?.install_details?.assignment?.iosInstallUrl || esim?.install_details?.response?.iosInstallUrl">
+        <div v-if="appleInstallUrl">
           <dt>Apple install URL</dt>
           <dd>
-            <a :href="esim.install_details.assignment?.iosInstallUrl || esim.install_details.response?.iosInstallUrl" target="_blank" rel="noopener">
+            <a :href="appleInstallUrl" target="_blank" rel="noopener">
               Open iPhone / iPad install link
             </a>
           </dd>
         </div>
-        <div v-if="esim?.install_details?.assignment?.androidInstallUrl || esim?.install_details?.response?.androidInstallUrl">
+        <div v-if="androidInstallUrl">
           <dt>Android install URL</dt>
           <dd>
-            <a :href="esim.install_details.assignment?.androidInstallUrl || esim.install_details.response?.androidInstallUrl" target="_blank" rel="noopener">
+            <a :href="androidInstallUrl" target="_blank" rel="noopener">
               Open Android install link
             </a>
           </dd>
