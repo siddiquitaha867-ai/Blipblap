@@ -18,6 +18,7 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\DiagnosticsController as AdminDiagnosticsController;
 use App\Http\Controllers\Admin\ContentController as AdminContentController;
+use App\Http\Controllers\Admin\ContactRequestController as AdminContactRequestController;
 use App\Http\Controllers\Admin\LogController as AdminLogController;
 use App\Http\Controllers\Admin\OrderController as AdminOrderController;
 use App\Http\Controllers\Admin\PlanController as AdminPlanController;
@@ -131,6 +132,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/orders/export', [AdminOrderController::class, 'export'])->name('orders.export');
     Route::get('/reports', [AdminReportController::class, 'index'])->name('reports.index');
     Route::get('/logs', [AdminLogController::class, 'index'])->name('logs.index');
+    Route::get('/support', [AdminContactRequestController::class, 'index'])->name('support.index');
+    Route::patch('/support/{contactRequest}', [AdminContactRequestController::class, 'update'])->name('support.update');
     Route::get('/promotions', [AdminPromotionController::class, 'index'])->name('promotions.index');
     Route::post('/promotions', [AdminPromotionController::class, 'store'])->name('promotions.store');
     Route::patch('/promotions/{promotion}', [AdminPromotionController::class, 'update'])->name('promotions.update');

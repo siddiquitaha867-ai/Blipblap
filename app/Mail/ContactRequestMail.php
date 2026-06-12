@@ -2,6 +2,7 @@
 
 namespace App\Mail;
 
+use App\Models\ContactRequest;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Address;
@@ -14,16 +15,16 @@ class ContactRequestMail extends Mailable
     use Queueable;
     use SerializesModels;
 
-    public function __construct(public readonly array $data)
+    public function __construct(public readonly ContactRequest $contactRequest)
     {
     }
 
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'New BlipBlap contact request: ' . $this->data['topic'],
+            subject: 'New BlipBlap contact request: ' . $this->contactRequest->topic,
             replyTo: [
-                new Address($this->data['email'], $this->data['name']),
+                new Address($this->contactRequest->email, $this->contactRequest->name),
             ],
         );
     }

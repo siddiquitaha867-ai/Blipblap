@@ -15,11 +15,12 @@ const isActive = (href) => currentPath.value === href || currentPath.value.start
         <img src="/images/blipblap/logo-inc.png" alt="BlipBlap" />
       </Link>
       <nav>
-        <Link href="/admin" :class="{ active: isActive('/admin') && !currentPath.startsWith('/admin/plans') && !currentPath.startsWith('/admin/orders') && !currentPath.startsWith('/admin/reports') && !currentPath.startsWith('/admin/logs') && !currentPath.startsWith('/admin/diagnostics') && !currentPath.startsWith('/admin/promotions') && !currentPath.startsWith('/admin/content') && !currentPath.startsWith('/admin/users') && !currentPath.startsWith('/admin/storefront') }">Dashboard</Link>
+        <Link href="/admin" :class="{ active: isActive('/admin') && !currentPath.startsWith('/admin/plans') && !currentPath.startsWith('/admin/orders') && !currentPath.startsWith('/admin/reports') && !currentPath.startsWith('/admin/logs') && !currentPath.startsWith('/admin/diagnostics') && !currentPath.startsWith('/admin/promotions') && !currentPath.startsWith('/admin/content') && !currentPath.startsWith('/admin/users') && !currentPath.startsWith('/admin/support') && !currentPath.startsWith('/admin/storefront') }">Dashboard</Link>
         <Link href="/admin/plans" :class="{ active: isActive('/admin/plans') }">Plans</Link>
         <Link href="/admin/orders" :class="{ active: isActive('/admin/orders') }">Orders</Link>
         <Link href="/admin/reports" :class="{ active: isActive('/admin/reports') }">Reports</Link>
         <Link href="/admin/logs" :class="{ active: isActive('/admin/logs') }">Logs</Link>
+        <Link href="/admin/support" :class="{ active: isActive('/admin/support') }">Support</Link>
         <Link href="/admin/diagnostics" :class="{ active: isActive('/admin/diagnostics') }">Diagnostics</Link>
         <Link href="/admin/promotions" :class="{ active: isActive('/admin/promotions') }">Promotions</Link>
         <Link href="/admin/content" :class="{ active: isActive('/admin/content') }">Content</Link>

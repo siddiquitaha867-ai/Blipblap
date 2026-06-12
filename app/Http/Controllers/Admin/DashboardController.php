@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\ContactRequest;
 use App\Models\EsimOrder;
 use App\Models\EsimPlan;
 use App\Models\PromotionRule;
@@ -21,7 +22,20 @@ class DashboardController extends Controller
                 'plans' => EsimPlan::query()->count(),
                 'orders' => EsimOrder::query()->count(),
                 'promotions' => PromotionRule::query()->count(),
+                'support_open' => ContactRequest::query()->whereIn('status', ['new', 'in_progress'])->count(),
             ],
+            'recentRequests' => ContactRequest::query()
+                ->latest()
+                ->limit(6)
+                ->get()
+                ->map(fn (ContactRequest $request): array => [
+                    'id' => $request->id,
+                    'name' => $request->name,
+                    'email' => $request->email,
+                    'topic' => $request->topic,
+                    'order_reference' => $request->order_reference,
+                    'status' => $request->status,
+                ]),
             'recentUsers' => User::query()
                 ->latest()
                 ->limit(8)

@@ -13,16 +13,17 @@
                     <tr>
                         <td style="background:#0e50ed;padding:28px 30px;">
                             <p style="color:#bfe2ff;font-size:12px;font-weight:800;letter-spacing:.08em;margin:0 0 8px;text-transform:uppercase;">Contact request</p>
-                            <h1 style="color:#ffffff;font-size:30px;line-height:1.12;margin:0;">{{ $data['topic'] }}</h1>
+                            <h1 style="color:#ffffff;font-size:30px;line-height:1.12;margin:0;">{{ $contactRequest->topic }}</h1>
                         </td>
                     </tr>
                     <tr>
                         <td style="padding:28px 30px;">
-                            <p><strong>Name:</strong> {{ $data['name'] }}</p>
-                            <p><strong>Email:</strong> {{ $data['email'] }}</p>
-                            <p><strong>Order reference:</strong> {{ $data['order_reference'] ?: 'Not provided' }}</p>
+                            <p><strong>Name:</strong> {{ $contactRequest->name }}</p>
+                            <p><strong>Email:</strong> {{ $contactRequest->email }}</p>
+                            <p><strong>Order reference:</strong> {{ $contactRequest->order_reference ?: 'Not provided' }}</p>
+                            <p><strong>Admin inbox:</strong> <a href="{{ url('/admin/support') }}" style="color:#0e50ed;font-weight:700;">Open support requests</a></p>
                             <p style="margin-top:24px;"><strong>Message</strong></p>
-                            <p style="white-space:pre-line;line-height:1.6;">{{ $data['message'] }}</p>
+                            <p style="white-space:pre-line;line-height:1.6;">{{ $contactRequest->message }}</p>
                         </td>
                     </tr>
                 </table>

@@ -6,21 +6,6 @@ import { computed } from 'vue';
 
 defineOptions({ layout: StorefrontLayout });
 
-const props = defineProps({
-  supportEmail: {
-    type: String,
-    default: 'support@blipblap.com',
-  },
-  mailFrom: {
-    type: String,
-    default: '',
-  },
-  mailDriver: {
-    type: String,
-    default: 'smtp',
-  },
-});
-
 const page = usePage();
 const form = useForm({
   name: page.props.auth.user?.name || '',
@@ -29,8 +14,6 @@ const form = useForm({
   order_reference: '',
   message: '',
 });
-
-const deliveryStatus = computed(() => props.mailDriver === 'log' ? 'SMTP pending' : 'SMTP enabled');
 
 const submit = () => {
   form.post('/contact-us', {
@@ -103,21 +86,21 @@ const submit = () => {
 
       <aside class="contact-delivery">
         <div class="contact-delivery-panel">
-          <span>Email delivery</span>
-          <h2>{{ deliveryStatus }}</h2>
-          <p>Messages route to the support inbox configured for BlipBlap.</p>
+          <span>Support response</span>
+          <h2>We route your message to the right team</h2>
+          <p>Your request is saved in our support inbox so the admin team can track, reply, and resolve it.</p>
           <dl>
             <div>
-              <dt>Support inbox</dt>
-              <dd>{{ supportEmail }}</dd>
+              <dt>Best for</dt>
+              <dd>Orders, QR codes, top-ups, refunds, and install help</dd>
             </div>
             <div>
-              <dt>Sender</dt>
-              <dd>{{ mailFrom || supportEmail }}</dd>
+              <dt>Include</dt>
+              <dd>Order reference, device model, destination, and ICCID if available</dd>
             </div>
             <div>
-              <dt>Delivery method</dt>
-              <dd>{{ mailDriver.toUpperCase() }}</dd>
+              <dt>Reply path</dt>
+              <dd>We reply to the email address you enter in this form</dd>
             </div>
           </dl>
         </div>
@@ -128,8 +111,8 @@ const submit = () => {
             <p>Share the BB order reference so we can find payment, provisioning, and email logs faster.</p>
           </article>
           <article>
-            <strong>SMTP delivery</strong>
-            <p>Checkout, ready-to-install, top-up, and contact messages use the configured Laravel mail transport.</p>
+            <strong>Installation help</strong>
+            <p>Tell us whether you are scanning the QR, using manual details, or opening the page on your phone.</p>
           </article>
           <article>
             <strong>Useful details</strong>

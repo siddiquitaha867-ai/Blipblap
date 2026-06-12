@@ -13,6 +13,10 @@ defineProps({
     type: Array,
     default: () => [],
   },
+  recentRequests: {
+    type: Array,
+    default: () => [],
+  },
 });
 </script>
 
@@ -47,7 +51,44 @@ defineProps({
         <span>Promotions</span>
         <strong>{{ stats.promotions }}</strong>
       </article>
+      <article>
+        <span>Open support</span>
+        <strong>{{ stats.support_open }}</strong>
+      </article>
     </div>
+
+    <section class="admin-panel">
+      <div class="admin-user-panel-head">
+        <h2>Recent support requests</h2>
+        <Link href="/admin/support">Open inbox</Link>
+      </div>
+      <div class="admin-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Topic</th>
+              <th>Customer</th>
+              <th>Status</th>
+              <th>Order</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="request in recentRequests" :key="request.id">
+              <td>{{ request.topic }}</td>
+              <td>
+                <strong>{{ request.name }}</strong>
+                <small>{{ request.email }}</small>
+              </td>
+              <td>{{ request.status }}</td>
+              <td>{{ request.order_reference || '-' }}</td>
+            </tr>
+            <tr v-if="!recentRequests.length">
+              <td colspan="4">No contact requests yet.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
 
     <section class="admin-panel">
       <h2>Recent users</h2>

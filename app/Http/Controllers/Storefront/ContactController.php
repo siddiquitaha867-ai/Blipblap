@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Storefront;
 
 use App\Http\Controllers\Controller;
 use App\Mail\ContactRequestMail;
+use App\Models\ContactRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -14,11 +15,7 @@ class ContactController extends Controller
 {
     public function show(): Response
     {
-        return Inertia::render('Storefront/Contact', [
-            'supportEmail' => config('blipblap.support_email'),
-            'mailFrom' => config('mail.from.address'),
-            'mailDriver' => config('mail.default'),
-        ]);
+        return Inertia::render('Storefront/Contact');
     }
 
     public function store(Request $request): RedirectResponse
@@ -31,8 +28,18 @@ class ContactController extends Controller
             'message' => ['required', 'string', 'min:10', 'max:3000'],
         ]);
 
+        $contactRequest = ContactRequest::query()->create([
+            ...$data,
+            'status' => 'new',
+            'metadata' => [
+                'ip' => $request->ip(),
+                'user_agent' => $request->userAgent(),
+                'user_id' => $request->user()?->id,
+            ],
+        ]);
+
         Mail::to((string) config('blipblap.support_email'))
-            ->send(new ContactRequestMail($data));
+            ->send(new ContactRequestMail($contactRequest));
 
         return back()->with('status', 'Thanks. Your message has been sent to BlipBlap support.');
     }
