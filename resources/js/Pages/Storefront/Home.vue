@@ -4,7 +4,7 @@ import DestinationTabs from '@/Components/DestinationTabs.vue';
 import AuthRequiredModal from '@/Components/AuthRequiredModal.vue';
 import SiteFooter from '@/Components/SiteFooter.vue';
 import { usePage } from '@inertiajs/vue3';
-import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 
 defineOptions({ layout: StorefrontLayout });
 
@@ -64,6 +64,7 @@ const faqIntro = computed(() => homepageContent.value.faq_intro || 'A compilatio
 
 const activeTab = ref('Top Destinations');
 const activeStep = ref(0);
+const activeFeaturedPlanIndex = ref(0);
 const page = usePage();
 const authPromptCheckoutUrl = ref('');
 const isLoggedIn = computed(() => Boolean(page.props.auth.user));
@@ -150,16 +151,35 @@ const steps = [
 ];
 
 let stepTimer;
+let featuredPlanTimer;
 
 onMounted(() => {
   stepTimer = window.setInterval(() => {
     activeStep.value = (activeStep.value + 1) % steps.length;
   }, 5000);
+
+  featuredPlanTimer = window.setInterval(() => {
+    if (!props.featuredPlans.length) {
+      return;
+    }
+
+    activeFeaturedPlanIndex.value = (activeFeaturedPlanIndex.value + 1) % props.featuredPlans.length;
+  }, 5000);
 });
 
 onBeforeUnmount(() => {
   window.clearInterval(stepTimer);
+  window.clearInterval(featuredPlanTimer);
 });
+
+watch(
+  () => props.featuredPlans.length,
+  (count) => {
+    if (activeFeaturedPlanIndex.value >= count) {
+      activeFeaturedPlanIndex.value = 0;
+    }
+  },
+);
 
 const faqs = computed(() => {
   if (homepageContent.value.faqs?.length) {
@@ -227,9 +247,10 @@ const faqs = computed(() => {
 
     <div class="featured-plans-rail">
       <a
-        v-for="plan in featuredPlans"
+        v-for="(plan, index) in featuredPlans"
         :key="plan.id"
         class="featured-plan-tile"
+        :class="{ 'is-active': index === activeFeaturedPlanIndex }"
         :href="`/checkout/${plan.slug}`"
         @click="requestCheckout($event, plan)"
       >

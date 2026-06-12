@@ -7283,6 +7283,37 @@ button:disabled {
     padding: 0 18px;
   }
 
+  .featured-plans-rail {
+    align-items: stretch;
+    display: block;
+    min-height: 190px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .featured-plan-tile {
+    inset: 0;
+    opacity: 0;
+    pointer-events: none;
+    position: absolute;
+    transform: translateX(28px);
+    transition: opacity 260ms ease, transform 320ms ease;
+    visibility: hidden;
+    width: 100%;
+  }
+
+  .featured-plan-tile.is-active {
+    opacity: 1;
+    pointer-events: auto;
+    position: relative;
+    transform: translateX(0);
+    visibility: visible;
+  }
+
+  .featured-plan-tile:hover {
+    transform: translateX(0);
+  }
+
   .featured-plans-copy {
     text-align: center;
   }
