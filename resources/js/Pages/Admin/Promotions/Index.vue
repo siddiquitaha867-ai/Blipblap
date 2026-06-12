@@ -1,5 +1,6 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
+import { formatDateTime } from '@/utils/dateTime';
 import { Link, router, useForm } from '@inertiajs/vue3';
 
 defineOptions({ layout: AdminLayout });
@@ -99,8 +100,8 @@ const togglePromotion = (promotion) => {
               <td>{{ promotion.title }}</td>
               <td>{{ promotion.rule_type }}</td>
               <td><span class="admin-badge">{{ promotion.is_active ? 'Active' : 'Paused' }}</span></td>
-              <td>{{ promotion.starts_at || '-' }}</td>
-              <td>{{ promotion.ends_at || '-' }}</td>
+              <td>{{ formatDateTime(promotion.starts_at) }}</td>
+              <td>{{ formatDateTime(promotion.ends_at) }}</td>
               <td>
                 <button type="button" class="admin-mini-button" @click="togglePromotion(promotion)">
                   {{ promotion.is_active ? 'Pause' : 'Activate' }}
@@ -141,7 +142,7 @@ const togglePromotion = (promotion) => {
               <td>{{ event.event_status }}</td>
               <td>{{ event.customer_email || '-' }}</td>
               <td>{{ event.esim_order_id ? `#${event.esim_order_id}` : '-' }}</td>
-              <td>{{ event.created_at }}</td>
+              <td>{{ formatDateTime(event.created_at) }}</td>
             </tr>
           </tbody>
         </table>

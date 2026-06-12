@@ -1,5 +1,6 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
+import { formatDateTime } from '@/utils/dateTime';
 import { Link } from '@inertiajs/vue3';
 
 defineOptions({ layout: AdminLayout });
@@ -108,7 +109,7 @@ defineProps({
               <td>{{ user.name }}</td>
               <td>{{ user.email }}</td>
               <td>{{ user.email_verified_at ? 'Yes' : 'No' }}</td>
-              <td>{{ user.last_login_at || 'Never' }}</td>
+              <td>{{ user.last_login_at ? formatDateTime(user.last_login_at) : 'Never' }}</td>
               <td><Link :href="`/admin/users/${user.id}`">Open</Link></td>
             </tr>
           </tbody>

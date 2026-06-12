@@ -1,5 +1,6 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
+import { formatDate } from '@/utils/dateTime';
 import { Link, router } from '@inertiajs/vue3';
 import { ref } from 'vue';
 
@@ -60,7 +61,7 @@ const submit = () => {
               <td>{{ user.is_admin ? 'Yes' : 'No' }}</td>
               <td>{{ user.is_banned ? 'Banned' : 'Active' }}</td>
               <td>{{ user.email_verified_at ? 'Yes' : 'No' }}</td>
-              <td>{{ user.created_at }}</td>
+              <td>{{ formatDate(user.created_at) }}</td>
               <td><Link :href="`/admin/users/${user.id}`">Details</Link></td>
             </tr>
           </tbody>

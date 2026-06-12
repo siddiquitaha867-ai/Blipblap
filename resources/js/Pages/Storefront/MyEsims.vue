@@ -1,5 +1,6 @@
 <script setup>
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
+import { formatDate } from '@/utils/dateTime';
 import { ref } from 'vue';
 
 defineOptions({ layout: StorefrontLayout });
@@ -115,6 +116,14 @@ const copyActivationCode = async (esim) => {
             <div v-if="esim.order_reference">
               <dt>Order</dt>
               <dd>{{ esim.order_reference }}</dd>
+            </div>
+            <div v-if="esim.created_at">
+              <dt>Purchased</dt>
+              <dd>{{ formatDate(esim.created_at) }}</dd>
+            </div>
+            <div v-if="esim.expires_at">
+              <dt>Expires</dt>
+              <dd>{{ formatDate(esim.expires_at) }}</dd>
             </div>
             <div v-if="esim.usage_status">
               <dt>Usage status</dt>

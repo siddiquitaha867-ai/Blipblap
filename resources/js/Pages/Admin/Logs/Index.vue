@@ -1,5 +1,6 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
+import { formatDateTime } from '@/utils/dateTime';
 import { Link, router } from '@inertiajs/vue3';
 
 defineOptions({ layout: AdminLayout });
@@ -56,7 +57,7 @@ const eventStatus = (log) => log.event_status || (log.esim_order_id ? `Order #${
               <td>{{ eventStatus(log) }}</td>
               <td>{{ log.customer_email || '-' }}</td>
               <td>{{ log.esim_order_id ? `#${log.esim_order_id}` : '-' }}</td>
-              <td>{{ log.created_at }}</td>
+              <td>{{ formatDateTime(log.created_at) }}</td>
             </tr>
           </tbody>
         </table>

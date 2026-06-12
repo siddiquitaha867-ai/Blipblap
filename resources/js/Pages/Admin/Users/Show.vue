@@ -1,5 +1,6 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
+import { formatDate, formatDateTime } from '@/utils/dateTime';
 import { Link, router } from '@inertiajs/vue3';
 import { computed } from 'vue';
 
@@ -37,8 +38,8 @@ const accountDetails = computed(() => [
   ['Status', props.customer.is_banned ? 'Banned' : 'Active', props.customer.is_banned ? 'danger' : 'success'],
   ['Marketing', props.customer.marketing_opt_in ? 'Opted in' : 'No', props.customer.marketing_opt_in ? 'info' : 'neutral'],
   ['Referral', props.customer.referral_code || '-'],
-  ['Last login', props.customer.last_login_at || 'Never'],
-  ['Joined', props.customer.created_at],
+  ['Last login', props.customer.last_login_at ? formatDateTime(props.customer.last_login_at) : 'Never'],
+  ['Joined', formatDate(props.customer.created_at)],
 ]);
 
 const paidOrdersCount = computed(() => props.orders.filter((order) => order.paid_at).length);
@@ -169,7 +170,7 @@ const badgeClass = (tone) => `admin-user-badge admin-user-badge--${tone || 'neut
               <td><strong>{{ order.bundle_code }}</strong></td>
               <td><span :class="badgeClass(order.paid_at ? 'success' : 'warning')">{{ order.fulfillment_status }}</span></td>
               <td>{{ order.currency }} {{ Number(order.total).toFixed(2) }}</td>
-              <td>{{ order.paid_at || 'No' }}</td>
+              <td>{{ order.paid_at ? formatDateTime(order.paid_at) : 'No' }}</td>
             </tr>
           </tbody>
         </table>

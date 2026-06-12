@@ -1,5 +1,6 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
+import { formatDateTime } from '@/utils/dateTime';
 import { Link, router } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 
@@ -215,7 +216,7 @@ const copyReference = async (value) => {
               <span>Payment</span>
               <strong>{{ paymentFor(selectedOrder) }}</strong>
               <p>{{ selectedOrder.payment_reference || 'No payment reference' }}</p>
-              <p>{{ selectedOrder.paid_at || 'Pending payment' }}</p>
+              <p>{{ selectedOrder.paid_at ? formatDateTime(selectedOrder.paid_at) : 'Pending payment' }}</p>
             </article>
             <article>
               <span>Plan</span>
@@ -235,7 +236,7 @@ const copyReference = async (value) => {
             </article>
             <article>
               <span>Created</span>
-              <strong>{{ selectedOrder.created_at }}</strong>
+              <strong>{{ formatDateTime(selectedOrder.created_at) }}</strong>
             </article>
           </div>
         </section>

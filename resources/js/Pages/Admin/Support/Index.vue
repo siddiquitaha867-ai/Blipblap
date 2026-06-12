@@ -1,5 +1,6 @@
 <script setup>
 import AdminLayout from '@/Layouts/AdminLayout.vue';
+import { formatDateTime, formatRelativeTime } from '@/utils/dateTime';
 import { Link, router, usePage } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 
@@ -97,7 +98,7 @@ const statusLabel = computed(() => ({
           >
             <span>{{ request.topic }}</span>
             <strong>{{ request.name }}</strong>
-            <small>{{ request.email }} · {{ request.created_at }}</small>
+            <small>{{ request.email }} · {{ formatRelativeTime(request.created_at) }}</small>
             <em>{{ statusLabel[request.status] || request.status }}</em>
           </button>
           <p v-if="!requests.data.length" class="admin-empty-note">No support requests found.</p>
@@ -139,7 +140,7 @@ const statusLabel = computed(() => ({
             </div>
             <div>
               <dt>Submitted</dt>
-              <dd>{{ selectedRequest.created_at }}</dd>
+              <dd>{{ formatDateTime(selectedRequest.created_at) }}</dd>
             </div>
           </dl>
 
