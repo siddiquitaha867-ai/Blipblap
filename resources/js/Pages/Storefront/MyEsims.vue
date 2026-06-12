@@ -13,9 +13,7 @@ defineProps({
 });
 
 const copiedEsimId = ref(null);
-const userAgent = typeof navigator !== 'undefined' ? navigator.userAgent : '';
-const isAppleDevice = /iPhone|iPad|iPod/i.test(userAgent);
-const isAndroidDevice = /Android/i.test(userAgent);
+const selectedEsim = ref(null);
 
 const copyActivationCode = async (esim) => {
   if (!esim.activation_code || typeof navigator === 'undefined' || !navigator.clipboard) {
@@ -27,6 +25,14 @@ const copyActivationCode = async (esim) => {
   window.setTimeout(() => {
     copiedEsimId.value = null;
   }, 1800);
+};
+
+const openDetails = (esim) => {
+  selectedEsim.value = esim;
+};
+
+const closeDetails = () => {
+  selectedEsim.value = null;
 };
 </script>
 
@@ -63,75 +69,93 @@ const copyActivationCode = async (esim) => {
           <template v-if="esim.days_remaining !== null && esim.days_remaining !== undefined"> - {{ esim.days_remaining }} days left</template>
         </p>
 
-        <div class="my-esim-actions">
-          <a v-if="esim.can_topup" :href="esim.topup_url" class="my-esim-topup-link">Top up</a>
-        </div>
-
         <div class="my-esim-install">
           <div class="my-esim-qr-panel">
             <img v-if="esim.qr_code_url" :src="esim.qr_code_url" alt="eSIM QR code">
             <span v-else>QR</span>
-            <div v-if="esim.ios_install_url || esim.android_install_url" class="my-esim-install-links">
-              <a v-if="isAppleDevice && esim.ios_install_url" :href="esim.ios_install_url" target="_blank" rel="noopener">Install on iPhone / iPad</a>
-              <a v-if="isAndroidDevice && esim.android_install_url" :href="esim.android_install_url" target="_blank" rel="noopener">Install on Android</a>
-              <div v-if="esim.activation_code" class="my-esim-copy-row">
-                <button type="button" @click="copyActivationCode(esim)">
-                  {{ copiedEsimId === esim.id ? 'Copied' : 'Copy activation code' }}
-                </button>
-                <button type="button" class="my-esim-info-button" aria-label="Install help">
-                  i
-                  <span role="tooltip">
-                    Open this page on your eSIM phone to use the direct install button. On desktop, scan the QR or copy the activation code and enter it manually.
-                  </span>
-                </button>
-              </div>
+            <div class="my-esim-install-actions">
+              <button type="button" class="my-esim-action-button my-esim-action-button--secondary" @click="openDetails(esim)">View details</button>
+              <a v-if="esim.can_topup" :href="esim.topup_url" class="my-esim-action-button my-esim-action-button--primary">Top up</a>
+              <a v-if="esim.ios_install_url" :href="esim.ios_install_url" class="my-esim-action-button" target="_blank" rel="noopener">
+                Install on Apple
+              </a>
+              <a v-if="esim.android_install_url" :href="esim.android_install_url" class="my-esim-action-button" target="_blank" rel="noopener">
+                Install on Android
+              </a>
+              <button v-if="esim.activation_code" type="button" class="my-esim-action-button" @click="copyActivationCode(esim)">
+                {{ copiedEsimId === esim.id ? 'Copied' : 'Copy activation code' }}
+              </button>
+              <button type="button" class="my-esim-info-button" aria-label="Install help">
+                i
+                <span role="tooltip">
+                  Open this page on your eSIM phone to use the direct install button. On desktop, scan the QR or copy the activation code and enter it manually.
+                </span>
+              </button>
             </div>
-            <small v-else class="my-esim-install-note">Use QR or manual details</small>
           </div>
-          <dl>
-            <div>
-              <dt>ICCID</dt>
-              <dd>{{ esim.iccid || 'Pending' }}</dd>
-            </div>
-            <div v-if="esim.smdp_address">
-              <dt>SM-DP+</dt>
-              <dd>{{ esim.smdp_address }}</dd>
-            </div>
-            <div v-if="esim.matching_id">
-              <dt>Matching ID</dt>
-              <dd>{{ esim.matching_id }}</dd>
-            </div>
-            <div v-if="esim.activation_code">
-              <dt>Activation code</dt>
-              <dd class="my-esim-code">{{ esim.activation_code }}</dd>
-            </div>
-            <div v-if="esim.ios_install_url">
-              <dt>Apple install</dt>
-              <dd><a :href="esim.ios_install_url" target="_blank" rel="noopener">Open iPhone / iPad install link</a></dd>
-            </div>
-            <div v-if="esim.android_install_url">
-              <dt>Android install</dt>
-              <dd><a :href="esim.android_install_url" target="_blank" rel="noopener">Open Android install link</a></dd>
-            </div>
-            <div v-if="esim.order_reference">
-              <dt>Order</dt>
-              <dd>{{ esim.order_reference }}</dd>
-            </div>
-            <div v-if="esim.created_at">
-              <dt>Purchased</dt>
-              <dd>{{ formatDate(esim.created_at) }}</dd>
-            </div>
-            <div v-if="esim.expires_at">
-              <dt>Expires</dt>
-              <dd>{{ formatDate(esim.expires_at) }}</dd>
-            </div>
-            <div v-if="esim.usage_status">
-              <dt>Usage status</dt>
-              <dd>{{ esim.usage_status }}</dd>
-            </div>
-          </dl>
         </div>
       </article>
     </div>
+
+    <Teleport to="body">
+      <div
+        v-if="selectedEsim"
+        class="my-esim-detail-modal-backdrop"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="my-esim-detail-title"
+        @click.self="closeDetails"
+      >
+        <section class="my-esim-detail-modal">
+          <button type="button" class="my-esim-detail-close" aria-label="Close eSIM details" @click="closeDetails">x</button>
+          <span>{{ selectedEsim.location }}</span>
+          <h2 id="my-esim-detail-title">eSIM details</h2>
+          <p>{{ selectedEsim.plan_title }}</p>
+
+          <dl>
+            <div>
+              <dt>ICCID</dt>
+              <dd>{{ selectedEsim.iccid || 'Pending' }}</dd>
+            </div>
+            <div v-if="selectedEsim.smdp_address">
+              <dt>SM-DP+</dt>
+              <dd>{{ selectedEsim.smdp_address }}</dd>
+            </div>
+            <div v-if="selectedEsim.matching_id">
+              <dt>Matching ID</dt>
+              <dd>{{ selectedEsim.matching_id }}</dd>
+            </div>
+            <div v-if="selectedEsim.activation_code">
+              <dt>Activation code</dt>
+              <dd class="my-esim-code">{{ selectedEsim.activation_code }}</dd>
+            </div>
+            <div v-if="selectedEsim.ios_install_url">
+              <dt>Apple install</dt>
+              <dd><a :href="selectedEsim.ios_install_url" target="_blank" rel="noopener">Open iPhone / iPad install link</a></dd>
+            </div>
+            <div v-if="selectedEsim.android_install_url">
+              <dt>Android install</dt>
+              <dd><a :href="selectedEsim.android_install_url" target="_blank" rel="noopener">Open Android install link</a></dd>
+            </div>
+            <div v-if="selectedEsim.order_reference">
+              <dt>Order</dt>
+              <dd>{{ selectedEsim.order_reference }}</dd>
+            </div>
+            <div v-if="selectedEsim.created_at">
+              <dt>Purchased</dt>
+              <dd>{{ formatDate(selectedEsim.created_at) }}</dd>
+            </div>
+            <div v-if="selectedEsim.expires_at">
+              <dt>Expires</dt>
+              <dd>{{ formatDate(selectedEsim.expires_at) }}</dd>
+            </div>
+            <div v-if="selectedEsim.usage_status">
+              <dt>Usage status</dt>
+              <dd>{{ selectedEsim.usage_status }}</dd>
+            </div>
+          </dl>
+        </section>
+      </div>
+    </Teleport>
   </section>
 </template>

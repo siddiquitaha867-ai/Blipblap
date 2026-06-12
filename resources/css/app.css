@@ -6296,7 +6296,7 @@ button:disabled {
   align-items: start;
   display: grid;
   gap: 18px;
-  grid-template-columns: 118px 1fr;
+  grid-template-columns: minmax(180px, 220px) 1fr;
 }
 
 .my-esim-qr-panel {
@@ -6313,20 +6313,21 @@ button:disabled {
   color: var(--bb-muted);
   display: flex;
   font-weight: 800;
-  height: 118px;
+  height: 180px;
   justify-content: center;
   object-fit: contain;
   padding: 8px;
-  width: 118px;
+  width: 180px;
 }
 
-.my-esim-install-links {
+.my-esim-install-actions {
   display: grid;
   gap: 8px;
-  width: 118px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  position: relative;
+  width: 100%;
 }
 
-.my-esim-install-links strong,
 .my-esim-install-note {
   color: var(--bb-muted);
   display: block;
@@ -6336,19 +6337,34 @@ button:disabled {
   text-transform: uppercase;
 }
 
-.my-esim-install-links a {
+.my-esim-action-button {
+  align-items: center;
   background: #eef6ff;
   border: 1px solid #d8e7ff;
   border-radius: 12px;
   color: var(--bb-blue);
+  cursor: pointer;
   display: inline-flex;
   font-size: 11px;
   font-weight: 800;
   justify-content: center;
   line-height: 1.3;
-  min-height: 36px;
+  min-height: 40px;
   padding: 8px;
   text-align: center;
+  text-decoration: none;
+}
+
+.my-esim-action-button--primary {
+  background: var(--bb-blue);
+  border-color: var(--bb-blue);
+  color: #ffffff;
+}
+
+.my-esim-action-button--secondary {
+  background: #ffffff;
+  border-color: #cbd7e3;
+  color: #3f4a5a;
 }
 
 .my-esim-copy-row {
@@ -6359,7 +6375,7 @@ button:disabled {
   position: relative;
 }
 
-.my-esim-install-links button,
+.my-esim-install-actions button,
 .install-copy-button {
   background: #ffffff;
   border: 1px solid #cbd7e3;
@@ -6417,7 +6433,7 @@ button:disabled {
   visibility: visible;
 }
 
-.my-esim-install-links small {
+.my-esim-install-actions small {
   color: #5d6877;
   display: block;
   font-size: 11px;
@@ -6430,20 +6446,20 @@ button:disabled {
   width: 118px;
 }
 
-.my-esim-install dl {
+.my-esim-detail-modal dl {
   display: grid;
   gap: 11px;
   margin: 0;
 }
 
-.my-esim-install dt {
+.my-esim-detail-modal dt {
   color: var(--bb-muted);
   font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
 }
 
-.my-esim-install dd {
+.my-esim-detail-modal dd {
   color: #07182f;
   line-height: 1.35;
   margin: 3px 0 0;
@@ -6451,6 +6467,77 @@ button:disabled {
 
 .my-esim-code {
   line-break: anywhere;
+}
+
+.my-esim-detail-modal-backdrop {
+  align-items: center;
+  background: rgba(7, 24, 47, 0.56);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  padding: 18px;
+  position: fixed;
+  z-index: 250;
+}
+
+.my-esim-detail-modal {
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 30px 90px rgba(7, 24, 47, 0.32);
+  max-height: min(82vh, 720px);
+  max-width: 560px;
+  overflow-y: auto;
+  padding: 24px;
+  position: relative;
+  width: 100%;
+}
+
+.my-esim-detail-close {
+  align-items: center;
+  background: #eef6ff;
+  border: 1px solid #d8e7ff;
+  border-radius: 50%;
+  color: var(--bb-blue);
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 14px;
+  font-weight: 900;
+  height: 32px;
+  justify-content: center;
+  position: absolute;
+  right: 16px;
+  top: 16px;
+  width: 32px;
+}
+
+.my-esim-detail-modal > span {
+  color: var(--bb-blue);
+  display: block;
+  font-size: 12px;
+  font-weight: 800;
+  margin-bottom: 8px;
+  padding-right: 42px;
+  text-transform: uppercase;
+}
+
+.my-esim-detail-modal h2 {
+  color: var(--bb-ink);
+  font-size: 30px;
+  font-weight: 500;
+  line-height: 1.08;
+  margin: 0 42px 8px 0;
+}
+
+.my-esim-detail-modal p {
+  color: var(--bb-muted);
+  line-height: 1.5;
+  margin: 0 0 20px;
+}
+
+.my-esim-detail-modal dl > div {
+  border-top: 1px solid #e8edf1;
+  min-width: 0;
+  padding-top: 12px;
 }
 
 .topup-page {
@@ -7605,6 +7692,11 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 
+  .my-esim-qr-panel {
+    justify-items: start;
+    max-width: 360px;
+  }
+
   .auth-screen {
     align-items: flex-start;
     height: auto;
@@ -7674,6 +7766,10 @@ button:disabled {
   .my-account-hero h1 {
     font-size: clamp(34px, 9vw, 42px);
     line-height: 1.02;
+  }
+
+  .my-esims-hero h1 {
+    font-size: clamp(30px, 8vw, 36px);
   }
 
   .trust-panel h2,
@@ -7902,6 +7998,10 @@ button:disabled {
     font-size: clamp(30px, 9.5vw, 38px);
   }
 
+  .my-esims-hero h1 {
+    font-size: clamp(28px, 8.8vw, 34px);
+  }
+
   .trust-panel h2,
   .destinations-section h2,
   .steps-section h2,
@@ -8065,5 +8165,25 @@ button:disabled {
   .my-esim-qr-panel > span {
     height: min(72vw, 180px);
     width: min(72vw, 180px);
+  }
+
+  .my-esim-install-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .my-esim-detail-modal-backdrop {
+    align-items: flex-end;
+    padding: 12px;
+  }
+
+  .my-esim-detail-modal {
+    border-radius: 18px 18px 14px 14px;
+    max-height: 84vh;
+    padding: 20px;
+  }
+
+  .my-esim-detail-modal h2 {
+    font-size: 26px;
   }
 }
