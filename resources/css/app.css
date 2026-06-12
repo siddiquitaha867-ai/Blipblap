@@ -7354,7 +7354,43 @@ button:disabled {
 
   .how-hero {
     min-height: auto;
-    padding: 54px 22px 64px;
+    padding: 34px 22px 42px;
+  }
+
+  .how-page .how-hero h1 {
+    font-size: clamp(28px, 7.2vw, 36px);
+    line-height: 1.04;
+  }
+
+  .how-hero p {
+    font-size: 14px;
+    line-height: 1.55;
+    margin: 16px 0 18px;
+  }
+
+  .how-hero a,
+  .how-final a {
+    min-height: 42px;
+    padding: 12px 18px;
+  }
+
+  .how-hero__visual {
+    justify-content: flex-start;
+  }
+
+  .how-hero__visual img {
+    border-radius: 18px;
+    max-height: 260px;
+    max-width: min(320px, 82vw);
+    object-fit: cover;
+  }
+
+  .how-page .how-intro h2,
+  .how-page .how-story h2,
+  .how-page .how-connect h2,
+  .how-page .how-final h2 {
+    font-size: clamp(25px, 6.8vw, 32px);
+    line-height: 1.07;
   }
 
   .how-intro,
@@ -7362,17 +7398,38 @@ button:disabled {
   .how-connect,
   .how-final {
     gap: 28px;
-    padding: 54px 22px;
+    padding: 42px 22px;
+  }
+
+  .how-intro > p,
+  .how-connect__copy > p {
+    font-size: 14px;
+    line-height: 1.65;
   }
 
   .how-highlights {
-    padding: 0 22px 44px;
+    gap: 12px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    padding: 0 22px 36px;
   }
 
   .how-highlights article,
   .how-highlights article:first-child,
   .how-highlights article:last-child {
     border-radius: 18px;
+    min-height: 0;
+    padding: 20px;
+  }
+
+  .how-highlights strong,
+  .how-step-list strong {
+    font-size: 15px;
+  }
+
+  .how-highlights p,
+  .how-step-list p {
+    font-size: 13px;
+    line-height: 1.5;
   }
 
   .how-story__media {
@@ -7389,9 +7446,39 @@ button:disabled {
   }
 
   .how-demo {
-    min-height: 360px;
+    min-height: 300px;
     justify-self: center;
     width: 100%;
+  }
+
+  .how-demo__phone {
+    border-width: 8px;
+    border-radius: 34px;
+    height: 320px;
+    width: 190px;
+  }
+
+  .how-demo__frame {
+    padding: 62px 18px 0;
+  }
+
+  .how-demo__frame strong {
+    font-size: 22px;
+  }
+
+  .how-demo__signal {
+    display: none;
+  }
+
+  .how-final {
+    padding-bottom: 56px;
+  }
+
+  .how-final img {
+    border-radius: 20px;
+    max-height: 260px;
+    max-width: min(320px, 82vw);
+    object-fit: cover;
   }
 
   .plans-index-hero,
@@ -7922,7 +8009,24 @@ button:disabled {
   }
 
   .how-highlights {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .how-page .how-hero {
+    padding-bottom: 34px;
+    padding-top: 28px;
+  }
+
+  .how-page .how-hero h1 {
+    font-size: clamp(27px, 8vw, 34px);
+  }
+
+  .how-page .how-intro,
+  .how-page .how-story,
+  .how-page .how-connect,
+  .how-page .how-final {
+    padding-bottom: 38px;
+    padding-top: 38px;
   }
 
   .hero-art {
@@ -8184,6 +8288,27 @@ button:disabled {
   .plans-index-hero span,
   .plans-index-heading span {
     letter-spacing: 0.12em;
+  }
+
+  .how-page .how-hero h1 {
+    font-size: clamp(25px, 8.4vw, 31px);
+  }
+
+  .how-page .how-intro h2,
+  .how-page .how-story h2,
+  .how-page .how-connect h2,
+  .how-page .how-final h2 {
+    font-size: clamp(23px, 7.2vw, 28px);
+  }
+
+  .how-hero__visual img,
+  .how-final img {
+    max-height: 220px;
+    max-width: min(300px, 82vw);
+  }
+
+  .how-highlights article {
+    padding: 16px;
   }
 
   .auth-options {

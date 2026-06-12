@@ -1,5 +1,6 @@
 <script setup>
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
+import SiteFooter from '@/Components/SiteFooter.vue';
 
 defineOptions({ layout: StorefrontLayout });
 
@@ -109,5 +110,7 @@ const phoneFrames = [
         <a href="/esim-plans">Explore all plans</a>
       </div>
     </section>
+
+    <SiteFooter />
   </section>
 </template>
