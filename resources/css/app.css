@@ -7184,12 +7184,17 @@ button:disabled {
     min-height: 420px;
   }
 
-  .trust-grid,
   .how-highlights,
   .plans-index-grid,
   .featured-plans-rail,
   .destination-grid {
     grid-template-columns: 1fr;
+  }
+
+  .trust-grid {
+    gap: 30px 18px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 36px;
   }
 
   .plans-index-page,
@@ -7256,6 +7261,21 @@ button:disabled {
     justify-self: center;
     max-width: 140px;
     width: min(34vw, 140px);
+  }
+
+  .trust-icon-img {
+    height: 68px;
+    margin-bottom: 14px;
+    width: 68px;
+  }
+
+  .trust-grid h3 {
+    font-size: 11px;
+    line-height: 1.25;
+  }
+
+  .trust-grid p {
+    max-width: 140px;
   }
 
   .featured-plans-section {
@@ -7849,6 +7869,25 @@ button:disabled {
   .plans-index-strip img,
   .plans-index-strip img:last-child {
     width: min(42vw, 120px);
+  }
+
+  .trust-grid {
+    gap: 26px 14px;
+  }
+
+  .trust-icon-img {
+    height: 62px;
+    width: 62px;
+  }
+
+  .trust-grid h3 {
+    font-size: 10px;
+  }
+
+  .trust-grid p {
+    font-size: 10px;
+    line-height: 1.45;
+    max-width: 126px;
   }
 
   .how-hero__copy span,
