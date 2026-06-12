@@ -7794,15 +7794,143 @@ button:disabled {
   .package-picker__header {
     align-items: start;
     display: grid;
+    gap: 8px;
+    margin-bottom: 16px;
   }
 
   .package-picker__header p {
+    font-size: 12px;
     text-align: left;
   }
 
+  .package-picker {
+    padding: 24px;
+  }
+
+  .package-picker h2 {
+    font-size: 28px;
+    line-height: 1.06;
+  }
+
+  .duration-tabs {
+    display: grid;
+    gap: 6px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-bottom: 16px;
+    overflow: visible;
+    padding: 6px;
+  }
+
   .duration-tab {
-    flex-basis: 72px;
-    padding: 9px 8px;
+    flex: initial;
+    min-height: 44px;
+    padding: 7px 6px;
+  }
+
+  .duration-tab strong {
+    font-size: 12px;
+  }
+
+  .duration-tab span {
+    font-size: 9px;
+  }
+
+  .package-grid {
+    gap: 10px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .package-card {
+    gap: 7px;
+    min-height: 104px;
+    padding: 14px;
+  }
+
+  .package-card span {
+    font-size: 11px;
+    line-height: 1.25;
+  }
+
+  .package-card strong {
+    font-size: 20px;
+    line-height: 1.08;
+  }
+
+  .package-card em {
+    font-size: 12px;
+  }
+
+  .support-band {
+    padding-bottom: 30px;
+    padding-top: 28px;
+  }
+
+  .support-band h2 {
+    margin-bottom: 14px;
+  }
+
+  .support-band > div {
+    gap: 10px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .support-band article {
+    padding: 16px;
+  }
+
+  .support-band strong {
+    font-size: 14px;
+    line-height: 1.22;
+    margin-bottom: 6px;
+  }
+
+  .support-band p {
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .comment-section {
+    gap: 20px;
+    grid-template-columns: 0.9fr 1.1fr;
+    margin-top: 30px;
+    padding: 26px;
+  }
+
+  .comment-section::before {
+    height: 170px;
+    right: -72px;
+    top: -86px;
+    width: 170px;
+  }
+
+  .comment-copy span {
+    margin-bottom: 8px;
+  }
+
+  .comment-copy h2 {
+    margin-bottom: 10px;
+  }
+
+  .comment-copy p {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .comment-form {
+    gap: 10px;
+  }
+
+  .comment-form input,
+  .comment-form textarea {
+    padding: 10px 12px;
+  }
+
+  .comment-form textarea {
+    min-height: 96px;
+  }
+
+  .comment-form button {
+    padding: 11px 18px;
   }
 
   .my-esim-install {
@@ -7952,6 +8080,36 @@ button:disabled {
   .duration-tab,
   .checkout-method-tabs button {
     flex: 0 0 auto;
+  }
+
+  .duration-tabs {
+    display: grid;
+    gap: 6px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-bottom: 16px;
+    overflow: visible;
+    padding: 6px;
+  }
+
+  .duration-tab {
+    flex: initial;
+    white-space: normal;
+  }
+
+  .package-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .support-band > div {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .comment-section {
+    grid-template-columns: 1fr;
+  }
+
+  .comment-form {
+    grid-template-columns: 1fr;
   }
 
   .destination-tabs {

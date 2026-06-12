@@ -265,7 +265,7 @@ watchEffect(() => {
             class="package-card"
             @click="requestCheckout($event, item)"
           >
-            <span>{{ item.duration_days }} days</span>
+            <span>Valid for {{ item.duration_days }} days</span>
             <strong>{{ planDataLabel(item) }}</strong>
             <em>{{ item.currency }} {{ Number(item.retail_price).toFixed(2) }}</em>
           </a>
@@ -278,7 +278,7 @@ watchEffect(() => {
             class="package-card package-card--disabled"
             disabled
           >
-            <span>{{ item.duration_days }} days</span>
+            <span>Valid for {{ item.duration_days }} days</span>
             <strong>{{ planDataLabel(item) }}</strong>
             <em>{{ item.currency }} {{ Number(item.retail_price).toFixed(2) }}</em>
           </button>
@@ -328,18 +328,6 @@ watchEffect(() => {
         </label>
         <button type="button">Submit comment</button>
       </form>
-    </section>
-
-    <section class="app-cta plan-app-cta">
-      <div>
-        <h2>Download the App<br />and manage your<br />eSIMs easily.</h2>
-        <p>The quick & easy way to manage your eSIMs</p>
-        <div class="store-buttons">
-          <a href="#"><img src="/images/blipblap/pngwing.com_-e1764851044946-300x99.png" alt="Get it on Google Play" /></a>
-          <a href="#"><img src="/images/blipblap/pngwing.com-1-300x116.png" alt="Download on the App Store" /></a>
-        </div>
-      </div>
-      <img class="group-photo" src="/images/blipblap/Buddies.gif" alt="" />
     </section>
 
     <SiteFooter plan />
