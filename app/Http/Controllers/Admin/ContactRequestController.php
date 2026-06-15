@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\ContactRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -13,6 +14,25 @@ class ContactRequestController extends Controller
 {
     public function index(Request $request): Response
     {
+        if (! Schema::hasTable((new ContactRequest())->getTable())) {
+            return Inertia::render('Admin/Support/Index', [
+                'requests' => [
+                    'data' => [],
+                    'links' => [],
+                ],
+                'filters' => [
+                    'status' => (string) $request->query('status', 'open'),
+                    'search' => trim((string) $request->query('search', '')),
+                ],
+                'stats' => [
+                    'new' => 0,
+                    'in_progress' => 0,
+                    'resolved' => 0,
+                ],
+                'databaseIssue' => 'Support requests table is missing. Run pending migrations, then refresh this page.',
+            ]);
+        }
+
         $status = (string) $request->query('status', 'open');
         $search = trim((string) $request->query('search', ''));
 

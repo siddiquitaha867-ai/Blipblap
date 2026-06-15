@@ -8,6 +8,7 @@ use App\Models\ContactRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -20,6 +21,10 @@ class ContactController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        if (! Schema::hasTable((new ContactRequest())->getTable())) {
+            return back()->with('status', 'Support form is temporarily unavailable while the database is being updated.');
+        }
+
         $data = $request->validate([
             'name' => ['required', 'string', 'max:120'],
             'email' => ['required', 'email', 'max:255'],

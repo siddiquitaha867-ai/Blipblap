@@ -10,7 +10,9 @@ use App\Services\EsimGo\EsimGoClient;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 use Inertia\Response;
 use Throwable;
@@ -63,6 +65,7 @@ class DiagnosticsController extends Controller
                 'scheme' => $request->getScheme(),
                 'user_agent' => $request->userAgent(),
             ],
+            'database' => $this->databaseHealth(),
         ]);
     }
 
@@ -219,5 +222,96 @@ class DiagnosticsController extends Controller
         } catch (\Throwable) {
             return null;
         }
+    }
+
+    private function databaseHealth(): array
+    {
+        $requiredTables = [
+            'users',
+            'password_reset_tokens',
+            'sessions',
+            'esim_plans',
+            'esim_orders',
+            'customer_esims',
+            'api_logs',
+            'esim_events',
+            'loyalty_events',
+            'loyalty_balances',
+            'campaign_events',
+            'promotion_rules',
+            'site_contents',
+            'content_pages',
+            'contact_requests',
+        ];
+
+        $requiredColumns = [
+            'users' => ['id', 'name', 'email', 'password', 'is_admin', 'is_banned', 'email_verified_at', 'last_login_at', 'phone', 'country'],
+            'esim_plans' => ['id', 'supplier_code', 'country_name', 'retail_price', 'currency', 'tax_amount', 'is_active'],
+            'contact_requests' => ['id', 'name', 'email', 'topic', 'order_reference', 'status', 'message', 'metadata', 'resolved_at'],
+        ];
+
+        try {
+            DB::connection()->getPdo();
+
+            $missingTables = array_values(array_filter(
+                $requiredTables,
+                fn (string $table): bool => ! Schema::hasTable($table)
+            ));
+
+            $columnIssues = [];
+            foreach ($requiredColumns as $table => $columns) {
+                if (! Schema::hasTable($table)) {
+                    continue;
+                }
+
+                $existingColumns = Schema::getColumnListing($table);
+                $missingColumns = array_values(array_diff($columns, $existingColumns));
+
+                if ($missingColumns !== []) {
+                    $columnIssues[] = [
+                        'table' => $table,
+                        'missing_columns' => $missingColumns,
+                    ];
+                }
+            }
+
+            $pendingMigrations = $this->pendingMigrations();
+
+            return [
+                'ok' => $missingTables === [] && $columnIssues === [] && $pendingMigrations === [],
+                'connection' => (string) config('database.default'),
+                'database' => DB::connection()->getDatabaseName(),
+                'missing_tables' => $missingTables,
+                'column_issues' => $columnIssues,
+                'pending_migrations' => $pendingMigrations,
+            ];
+        } catch (Throwable $exception) {
+            return [
+                'ok' => false,
+                'connection' => (string) config('database.default'),
+                'database' => null,
+                'missing_tables' => $requiredTables,
+                'column_issues' => [],
+                'pending_migrations' => [],
+                'error' => $exception->getMessage(),
+            ];
+        }
+    }
+
+    private function pendingMigrations(): array
+    {
+        $migrationFiles = glob(database_path('migrations/*.php')) ?: [];
+        $available = array_map(
+            fn (string $path): string => pathinfo($path, PATHINFO_FILENAME),
+            $migrationFiles
+        );
+
+        if (! Schema::hasTable('migrations')) {
+            return array_values($available);
+        }
+
+        $ran = DB::table('migrations')->pluck('migration')->all();
+
+        return array_values(array_diff($available, $ran));
     }
 }

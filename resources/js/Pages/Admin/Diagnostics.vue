@@ -21,6 +21,10 @@ defineProps({
     type: Object,
     required: true,
   },
+  database: {
+    type: Object,
+    required: true,
+  },
 });
 
 const formatValue = (value) => {
@@ -157,9 +161,66 @@ const syncCatalogue = async () => {
         <span>API request IP</span>
         <strong>{{ network.public_outbound_ip || 'Unavailable' }}</strong>
       </article>
+      <article :class="{ ok: database.ok, warn: !database.ok }">
+        <span>Database</span>
+        <strong>{{ database.ok ? 'Healthy' : 'Needs attention' }}</strong>
+      </article>
     </div>
 
     <div class="diagnostic-grid">
+      <section class="admin-panel diagnostic-panel">
+        <h2>Database & migrations</h2>
+        <dl class="admin-dl">
+          <div>
+            <dt>Connection</dt>
+            <dd>{{ formatValue(database.connection) }}</dd>
+          </div>
+          <div>
+            <dt>Database</dt>
+            <dd>{{ formatValue(database.database) }}</dd>
+          </div>
+          <div>
+            <dt>Pending migrations</dt>
+            <dd>
+              <template v-if="database.pending_migrations?.length">
+                <ul class="diagnostic-list">
+                  <li v-for="migration in database.pending_migrations" :key="migration">{{ migration }}</li>
+                </ul>
+              </template>
+              <template v-else>None</template>
+            </dd>
+          </div>
+          <div>
+            <dt>Missing tables</dt>
+            <dd>
+              <template v-if="database.missing_tables?.length">
+                <ul class="diagnostic-list">
+                  <li v-for="table in database.missing_tables" :key="table">{{ table }}</li>
+                </ul>
+              </template>
+              <template v-else>None</template>
+            </dd>
+          </div>
+          <div>
+            <dt>Missing columns</dt>
+            <dd>
+              <template v-if="database.column_issues?.length">
+                <ul class="diagnostic-list">
+                  <li v-for="issue in database.column_issues" :key="issue.table">
+                    {{ issue.table }}: {{ issue.missing_columns.join(', ') }}
+                  </li>
+                </ul>
+              </template>
+              <template v-else>None</template>
+            </dd>
+          </div>
+          <div v-if="database.error">
+            <dt>Error</dt>
+            <dd>{{ database.error }}</dd>
+          </div>
+        </dl>
+      </section>
+
       <section class="admin-panel diagnostic-panel">
         <h2>eSIM Go API</h2>
         <dl class="admin-dl">

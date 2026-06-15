@@ -2720,6 +2720,15 @@ button:disabled {
   padding: 6px 8px;
 }
 
+.diagnostic-list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.diagnostic-list li + li {
+  margin-top: 4px;
+}
+
 .empty-admin {
   color: var(--bb-muted);
 }

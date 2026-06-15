@@ -8,6 +8,7 @@ use App\Models\EsimOrder;
 use App\Models\EsimPlan;
 use App\Models\PromotionRule;
 use App\Models\User;
+use Illuminate\Support\Facades\Schema;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -15,6 +16,8 @@ class DashboardController extends Controller
 {
     public function __invoke(): Response
     {
+        $supportTableExists = Schema::hasTable((new ContactRequest())->getTable());
+
         return Inertia::render('Admin/Dashboard', [
             'stats' => [
                 'users' => User::query()->count(),
@@ -22,9 +25,11 @@ class DashboardController extends Controller
                 'plans' => EsimPlan::query()->count(),
                 'orders' => EsimOrder::query()->count(),
                 'promotions' => PromotionRule::query()->count(),
-                'support_open' => ContactRequest::query()->whereIn('status', ['new', 'in_progress'])->count(),
+                'support_open' => $supportTableExists
+                    ? ContactRequest::query()->whereIn('status', ['new', 'in_progress'])->count()
+                    : 0,
             ],
-            'recentRequests' => ContactRequest::query()
+            'recentRequests' => $supportTableExists ? ContactRequest::query()
                 ->latest()
                 ->limit(6)
                 ->get()
@@ -35,7 +40,7 @@ class DashboardController extends Controller
                     'topic' => $request->topic,
                     'order_reference' => $request->order_reference,
                     'status' => $request->status,
-                ]),
+                ]) : [],
             'recentUsers' => User::query()
                 ->latest()
                 ->limit(8)
