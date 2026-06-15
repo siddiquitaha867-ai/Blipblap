@@ -34,6 +34,13 @@ const openDetails = (esim) => {
 const closeDetails = () => {
   selectedEsim.value = null;
 };
+
+const hasUsageData = (esim) => (
+  esim.usage_percent !== null
+  && esim.usage_percent !== undefined
+);
+
+const usageWidth = (esim) => `${hasUsageData(esim) ? esim.usage_percent : 0}%`;
 </script>
 
 <template>
@@ -63,11 +70,24 @@ const closeDetails = () => {
           <template v-if="esim.duration_days"> - {{ esim.duration_days }} days</template>
         </p>
 
-        <p v-if="esim.remaining_data || esim.days_remaining" class="checkout-note">
-          <template v-if="esim.remaining_data">Remaining data: {{ esim.remaining_data }}</template>
-          <template v-if="esim.total_data"> / {{ esim.total_data }}</template>
-          <template v-if="esim.days_remaining !== null && esim.days_remaining !== undefined"> - {{ esim.days_remaining }} days left</template>
-        </p>
+        <div class="esim-usage-meter">
+          <div class="esim-usage-meter__head">
+            <span>Data usage</span>
+            <strong v-if="hasUsageData(esim)">{{ esim.usage_percent }}% used</strong>
+            <strong v-else>Updating</strong>
+          </div>
+          <div class="esim-usage-meter__track" :class="{ 'is-empty': !hasUsageData(esim) }">
+            <span :style="{ width: usageWidth(esim) }"></span>
+          </div>
+          <div class="esim-usage-meter__meta">
+            <span>Used {{ esim.used_data || '0 MB' }}</span>
+            <span>Remaining {{ esim.remaining_data || 'Checking' }}</span>
+          </div>
+          <small v-if="esim.total_data || esim.days_remaining !== null && esim.days_remaining !== undefined">
+            <template v-if="esim.total_data">Total {{ esim.total_data }}</template>
+            <template v-if="esim.days_remaining !== null && esim.days_remaining !== undefined"> · {{ esim.days_remaining }} days left</template>
+          </small>
+        </div>
 
         <div class="my-esim-install">
           <div class="my-esim-qr-panel">
@@ -152,6 +172,14 @@ const closeDetails = () => {
             <div v-if="selectedEsim.usage_status">
               <dt>Usage status</dt>
               <dd>{{ selectedEsim.usage_status }}</dd>
+            </div>
+            <div v-if="hasUsageData(selectedEsim)">
+              <dt>Data used</dt>
+              <dd>{{ selectedEsim.used_data || '0 MB' }} of {{ selectedEsim.total_data || 'total data' }}</dd>
+            </div>
+            <div v-if="selectedEsim.remaining_data">
+              <dt>Data left</dt>
+              <dd>{{ selectedEsim.remaining_data }}</dd>
             </div>
           </dl>
         </section>

@@ -65,6 +65,13 @@ const deleteUser = (customer) => {
 };
 
 const badgeClass = (tone) => `admin-user-badge admin-user-badge--${tone || 'neutral'}`;
+
+const hasUsageData = (esim) => (
+  esim.usage_percent !== null
+  && esim.usage_percent !== undefined
+);
+
+const usageWidth = (esim) => `${hasUsageData(esim) ? esim.usage_percent : 0}%`;
 </script>
 
 <template>
@@ -138,8 +145,22 @@ const badgeClass = (tone) => `admin-user-badge admin-user-badge--${tone || 'neut
         <div v-else class="admin-esim-list">
           <article v-for="esim in esims" :key="esim.id">
             <span :class="badgeClass('info')">{{ esim.status }}</span>
-            <strong>{{ esim.current_bundle_code || 'No bundle' }}</strong>
+            <strong>{{ esim.plan_title || esim.current_bundle_code || 'No bundle' }}</strong>
             <small>{{ esim.iccid }}</small>
+            <div class="admin-esim-usage">
+              <div>
+                <span>Data usage</span>
+                <strong v-if="hasUsageData(esim)">{{ esim.usage_percent }}% used</strong>
+                <strong v-else>Updating</strong>
+              </div>
+              <div class="admin-esim-usage__track" :class="{ 'is-empty': !hasUsageData(esim) }">
+                <span :style="{ width: usageWidth(esim) }"></span>
+              </div>
+              <small>
+                Used {{ esim.used_data || '0 MB' }} · Remaining {{ esim.remaining_data || 'Checking' }}
+                <template v-if="esim.total_data"> · Total {{ esim.total_data }}</template>
+              </small>
+            </div>
           </article>
         </div>
       </section>

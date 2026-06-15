@@ -291,7 +291,7 @@ watchEffect(() => {
       <div>
         <article>
           <strong>Check device compatibility</strong>
-          <p>Most recent iPhone and Android devices support eSIM. Keep your physical SIM active alongside BlipBlap.</p>
+          <p>Make sure your phone is unlocked and eSIM-ready before you choose a package.</p>
         </article>
         <article>
           <strong>Install in minutes</strong>

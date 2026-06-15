@@ -5,7 +5,10 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\CustomerEsim;
 use App\Models\EsimOrder;
+use App\Models\EsimPlan;
 use App\Models\User;
+use App\Services\EsimGo\EsimGoClient;
+use App\Services\EsimUsageService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
@@ -40,7 +43,7 @@ class UserController extends Controller
         ]);
     }
 
-    public function show(User $user): Response
+    public function show(User $user, EsimGoClient $client, EsimUsageService $usageService): Response
     {
         $orders = EsimOrder::query()
             ->where(function ($query) use ($user): void {
@@ -52,6 +55,7 @@ class UserController extends Controller
             ->get();
 
         $esims = CustomerEsim::query()
+            ->with('order')
             ->where(function ($query) use ($user): void {
                 $query->where('user_id', $user->id)
                     ->orWhere('customer_email', $user->email);
@@ -59,6 +63,17 @@ class UserController extends Controller
             ->latest()
             ->limit(25)
             ->get();
+
+        $planIds = $esims
+            ->pluck('order.request_payload.plan_id')
+            ->filter()
+            ->unique()
+            ->values();
+
+        $plans = EsimPlan::query()
+            ->whereIn('id', $planIds)
+            ->get()
+            ->keyBy('id');
 
         return Inertia::render('Admin/Users/Show', [
             'customer' => $user,
@@ -79,13 +94,27 @@ class UserController extends Controller
                     data_get($order->request_payload, 'country'),
                 ])),
             ])->values(),
-            'esims' => $esims->map(fn (CustomerEsim $esim): array => [
-                'id' => $esim->id,
-                'iccid' => $esim->iccid,
-                'status' => $esim->status,
-                'current_bundle_code' => $esim->current_bundle_code,
-                'customer_email' => $esim->customer_email,
-            ])->values(),
+            'esims' => $esims->map(function (CustomerEsim $esim) use ($plans, $client, $usageService): array {
+                $planId = $esim->order?->request_payload['plan_id'] ?? null;
+                $plan = $planId ? $plans->get($planId) : null;
+                $usage = $usageService->summary($usageService->providerEsimData($client, $esim), $plan);
+
+                return [
+                    'id' => $esim->id,
+                    'iccid' => $esim->iccid,
+                    'status' => $esim->status,
+                    'current_bundle_code' => $esim->current_bundle_code,
+                    'customer_email' => $esim->customer_email,
+                    'plan_title' => $plan?->title ?: $esim->nickname ?: $esim->order?->bundle_code ?: 'BlipBlap eSIM',
+                    'used_data' => $usage['used_data'],
+                    'remaining_data' => $usage['remaining_data'],
+                    'total_data' => $usage['total_data'],
+                    'usage_percent' => $usage['usage_percent'],
+                    'remaining_percent' => $usage['remaining_percent'],
+                    'usage_status' => $usage['usage_status'],
+                    'days_remaining' => $usage['days_remaining'],
+                ];
+            })->values(),
         ]);
     }
 

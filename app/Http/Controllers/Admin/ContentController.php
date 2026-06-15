@@ -151,7 +151,7 @@ class ContentController extends Controller
             'faqs' => [
                 ['question' => 'How do I activate my eSIM?', 'answer' => 'Scan the QR and install instantly from your BlipBlap account.'],
                 ['question' => 'Which devices are supported?', 'answer' => 'Most modern iPhone and Android devices with eSIM support will work.'],
-                ['question' => 'Can I keep my physical SIM?', 'answer' => 'Yes, you can use your eSIM alongside your original physical SIM.'],
+                ['question' => 'When should I install my eSIM?', 'answer' => 'Install it before your trip, then turn on data when you reach your destination.'],
                 ['question' => 'How do loyalty rewards work?', 'answer' => 'Earn points on eligible purchases and referrals, then redeem them for rewards.'],
             ],
         ];

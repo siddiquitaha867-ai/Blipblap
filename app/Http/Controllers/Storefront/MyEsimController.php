@@ -5,15 +5,15 @@ namespace App\Http\Controllers\Storefront;
 use App\Http\Controllers\Controller;
 use App\Models\CustomerEsim;
 use App\Models\EsimPlan;
+use App\Services\EsimUsageService;
 use App\Services\EsimGo\EsimGoClient;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class MyEsimController extends Controller
 {
-    public function __invoke(Request $request, EsimGoClient $client): Response
+    public function __invoke(Request $request, EsimGoClient $client, EsimUsageService $usageService): Response
     {
         $esims = CustomerEsim::query()
             ->with('order')
@@ -36,12 +36,12 @@ class MyEsimController extends Controller
             ->keyBy('id');
 
         return Inertia::render('Storefront/MyEsims', [
-            'esims' => $esims->map(function (CustomerEsim $esim) use ($plans, $client): array {
+            'esims' => $esims->map(function (CustomerEsim $esim) use ($plans, $client, $usageService): array {
                 $order = $esim->order;
                 $planId = $order?->request_payload['plan_id'] ?? null;
                 $plan = $planId ? $plans->get($planId) : null;
-                $providerData = $this->providerEsimData($client, $esim);
-                $usage = $this->usageSummary($providerData, $plan);
+                $providerData = $usageService->providerEsimData($client, $esim);
+                $usage = $usageService->summary($providerData, $plan);
                 $install = $this->installLinks($providerData, $esim);
 
                 return [
@@ -60,8 +60,11 @@ class MyEsimController extends Controller
                     'created_at' => $esim->created_at?->toFormattedDateString(),
                     'expires_at' => $esim->expires_at?->toFormattedDateString(),
                     'days_remaining' => $usage['days_remaining'],
+                    'used_data' => $usage['used_data'],
                     'remaining_data' => $usage['remaining_data'],
                     'total_data' => $usage['total_data'],
+                    'usage_percent' => $usage['usage_percent'],
+                    'remaining_percent' => $usage['remaining_percent'],
                     'usage_status' => $usage['usage_status'],
                     'ios_install_url' => $install['ios_install_url'],
                     'android_install_url' => $install['android_install_url'],
@@ -70,80 +73,6 @@ class MyEsimController extends Controller
                 ];
             })->values(),
         ]);
-    }
-
-    private function providerEsimData(EsimGoClient $client, CustomerEsim $esim): array
-    {
-        $data = [
-            'esim' => [],
-            'bundles' => [],
-            'bundle_status' => [],
-        ];
-
-        if (! $esim->iccid) {
-            return $data;
-        }
-
-        try {
-            $data['esim'] = $client->refreshEsim($esim->iccid);
-        } catch (\Throwable) {
-            $data['esim'] = [];
-        }
-
-        try {
-            $data['bundles'] = $client->appliedBundles($esim->iccid);
-        } catch (\Throwable) {
-            $data['bundles'] = [];
-        }
-
-        if ($esim->current_bundle_code) {
-            try {
-                $data['bundle_status'] = $client->appliedBundleStatus($esim->iccid, $esim->current_bundle_code);
-            } catch (\Throwable) {
-                $data['bundle_status'] = [];
-            }
-        }
-
-        return $data;
-    }
-
-    private function usageSummary(array $providerData, ?EsimPlan $plan): array
-    {
-        $remainingData = $this->firstValue($providerData, [
-            'bundle_status.remainingData',
-            'bundle_status.remaining_data',
-            'bundle_status.data.remaining',
-            'bundle_status.allowance.remaining',
-            'esim.remainingData',
-            'esim.remaining_data',
-            'esim.data.remaining',
-        ]);
-        $totalData = $this->firstValue($providerData, [
-            'bundle_status.totalData',
-            'bundle_status.total_data',
-            'bundle_status.data.total',
-            'bundle_status.allowance.total',
-            'esim.totalData',
-            'esim.total_data',
-        ]);
-        $remainingDays = $this->daysRemaining($this->firstValue($providerData, [
-            'bundle_status.expiryDate',
-            'bundle_status.expiry_date',
-            'bundle_status.expiresAt',
-            'bundle_status.expires_at',
-            'esim.expiryDate',
-            'esim.expiresAt',
-        ]), $plan?->duration_days);
-
-        return [
-            'days_remaining' => $remainingDays,
-            'remaining_data' => $this->normalizeDataLabel($remainingData, $plan),
-            'total_data' => $this->normalizeDataLabel($totalData, $plan),
-            'usage_status' => $this->firstValue($providerData, [
-                'bundle_status.status',
-                'esim.status',
-            ]) ?: 'Unknown',
-        ];
     }
 
     private function installLinks(array $providerData, CustomerEsim $esim): array
@@ -245,35 +174,4 @@ class MyEsimController extends Controller
         return null;
     }
 
-    private function normalizeDataLabel(mixed $value, ?EsimPlan $plan): ?string
-    {
-        if ($value === null || $value === '') {
-            return $plan?->unlimited ? 'Unlimited' : null;
-        }
-
-        if (is_numeric($value)) {
-            $numeric = (float) $value;
-
-            if ($numeric >= 1024) {
-                return round($numeric / 1024, 2) . ' GB';
-            }
-
-            return round($numeric, 2) . ' MB';
-        }
-
-        return (string) $value;
-    }
-
-    private function daysRemaining(mixed $dateValue, ?int $fallbackDuration): ?int
-    {
-        if (is_string($dateValue) && trim($dateValue) !== '') {
-            try {
-                return max(0, Carbon::parse($dateValue)->diffInDays(now(), false) * -1);
-            } catch (\Throwable) {
-                return $fallbackDuration;
-            }
-        }
-
-        return $fallbackDuration;
-    }
 }

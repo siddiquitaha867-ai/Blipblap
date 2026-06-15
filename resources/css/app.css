@@ -1625,6 +1625,52 @@ button:disabled {
   font-size: 12px;
 }
 
+.admin-esim-usage {
+  display: grid;
+  gap: 7px;
+  margin-top: 4px;
+}
+
+.admin-esim-usage > div:first-child {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-esim-usage > div:first-child span,
+.admin-esim-usage > div:first-child strong {
+  color: var(--bb-muted);
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.admin-esim-usage > div:first-child strong {
+  color: var(--bb-blue);
+  text-align: right;
+}
+
+.admin-esim-usage__track {
+  background: #e8eef6;
+  border-radius: 999px;
+  height: 9px;
+  overflow: hidden;
+}
+
+.admin-esim-usage__track > span {
+  background: linear-gradient(90deg, #0e50ed, #00a4b8);
+  border-radius: inherit;
+  display: block;
+  height: 100%;
+  min-width: 0;
+}
+
+.admin-esim-usage__track.is-empty > span {
+  background: #b7c3d3;
+  width: 18% !important;
+}
+
 .admin-user-orders-table td strong {
   color: var(--bb-ink);
 }
@@ -6305,6 +6351,68 @@ button:disabled {
 .my-esim-card p {
   color: var(--bb-muted);
   margin: 0 0 20px;
+}
+
+.esim-usage-meter {
+  background: #f7fafc;
+  border: 1px solid #e1eaf3;
+  border-radius: 12px;
+  display: grid;
+  gap: 9px;
+  margin: 0 0 18px;
+  padding: 13px;
+}
+
+.esim-usage-meter__head,
+.esim-usage-meter__meta {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.esim-usage-meter__head span,
+.esim-usage-meter__head strong {
+  color: #334155;
+  font-size: 12px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.esim-usage-meter__head strong {
+  color: var(--bb-blue);
+  text-align: right;
+}
+
+.esim-usage-meter__track {
+  background: #dfe7f0;
+  border-radius: 999px;
+  height: 12px;
+  overflow: hidden;
+}
+
+.esim-usage-meter__track > span {
+  background: linear-gradient(90deg, #0e50ed, #00a4b8);
+  border-radius: inherit;
+  display: block;
+  height: 100%;
+  min-width: 0;
+}
+
+.esim-usage-meter__track.is-empty > span {
+  background: #aeb9c7;
+  width: 18% !important;
+}
+
+.esim-usage-meter__meta span,
+.esim-usage-meter small {
+  color: var(--bb-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.esim-usage-meter__meta span:last-child {
+  text-align: right;
 }
 
 .my-esim-actions {
