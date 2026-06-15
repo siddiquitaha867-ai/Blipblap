@@ -6316,7 +6316,7 @@ button:disabled {
   background: #ffffff;
   border-radius: 18px;
   box-shadow: 0 18px 42px rgba(16, 44, 76, 0.06);
-  padding: 24px;
+  padding: 24px 24px 18px;
 }
 
 .my-esim-card__top {
@@ -6448,7 +6448,7 @@ button:disabled {
 .my-esim-install {
   align-items: start;
   display: grid;
-  gap: 12px;
+  gap: 10px;
   grid-template-columns: minmax(142px, 180px) minmax(0, 1fr);
 }
 
@@ -6476,7 +6476,7 @@ button:disabled {
 .my-esim-install-actions {
   display: grid;
   align-content: start;
-  gap: 8px;
+  gap: 7px;
   grid-template-columns: 1fr;
   position: relative;
   width: 100%;

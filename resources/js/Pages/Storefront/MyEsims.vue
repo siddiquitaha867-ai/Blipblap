@@ -106,12 +106,6 @@ const usageWidth = (esim) => `${hasUsageData(esim) ? esim.usage_percent : 0}%`;
             <button v-if="esim.activation_code" type="button" class="my-esim-action-button" @click="copyActivationCode(esim)">
               {{ copiedEsimId === esim.id ? 'Copied' : 'Copy activation code' }}
             </button>
-            <button type="button" class="my-esim-info-button" aria-label="Install help">
-              i
-              <span role="tooltip">
-                Open this page on your eSIM phone to use the direct install button. On desktop, scan the QR or copy the activation code and enter it manually.
-              </span>
-            </button>
           </div>
         </div>
       </article>
