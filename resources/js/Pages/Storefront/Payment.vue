@@ -46,6 +46,18 @@ const props = defineProps({
     type: String,
     default: '',
   },
+  promotionCode: {
+    type: String,
+    default: '',
+  },
+  promotionDiscount: {
+    type: Object,
+    default: null,
+  },
+  pricing: {
+    type: Object,
+    default: null,
+  },
   csrfToken: {
     type: String,
     required: true,
@@ -54,8 +66,10 @@ const props = defineProps({
 
 const page = usePage();
 const stripeAction = `/checkout/${props.plan.slug}/stripe`;
-const taxAmount = computed(() => Number(props.plan.tax_amount || 0));
-const totalAmount = computed(() => Number(props.plan.retail_price || 0) + taxAmount.value);
+const subtotalAmount = computed(() => Number(props.pricing?.subtotal ?? props.plan.retail_price ?? 0));
+const discountAmount = computed(() => Number(props.pricing?.discount_amount || 0));
+const taxAmount = computed(() => Number(props.pricing?.tax_amount ?? props.plan.tax_amount ?? 0));
+const totalAmount = computed(() => Number(props.pricing?.total ?? (subtotalAmount.value + taxAmount.value)));
 const billingAddressLines = computed(() => [
   props.addressLine1,
   props.addressLine2,
@@ -96,6 +110,7 @@ const billingAddressLines = computed(() => [
       <input type="hidden" name="state" :value="props.state">
       <input type="hidden" name="postal_code" :value="props.postalCode">
       <input type="hidden" name="country" :value="props.country">
+      <input type="hidden" name="promotion_code" :value="props.promotionCode">
       <input type="hidden" name="terms_accepted" value="1">
 
       <div class="payment-card-top">
@@ -114,7 +129,11 @@ const billingAddressLines = computed(() => [
         </div>
         <div>
           <dt>Plan price</dt>
-          <dd>{{ plan.currency }} {{ Number(plan.retail_price).toFixed(2) }}</dd>
+          <dd>{{ plan.currency }} {{ subtotalAmount.toFixed(2) }}</dd>
+        </div>
+        <div v-if="discountAmount > 0">
+          <dt>Promo discount</dt>
+          <dd>-{{ plan.currency }} {{ discountAmount.toFixed(2) }}</dd>
         </div>
         <div>
           <dt>Tax</dt>
@@ -125,6 +144,12 @@ const billingAddressLines = computed(() => [
           <dd>{{ plan.currency }} {{ totalAmount.toFixed(2) }}</dd>
         </div>
       </dl>
+      <p v-if="promotionDiscount" class="payment-promo-note">
+        Promo code {{ promotionDiscount.code }} applied.
+      </p>
+      <p v-if="page.props.errors?.promotion_code" class="payment-error-note">
+        {{ page.props.errors.promotion_code }}
+      </p>
 
       <div class="payment-method-preview">
         <div>

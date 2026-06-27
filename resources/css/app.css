@@ -5902,6 +5902,18 @@ button:disabled {
   padding: 12px 14px;
 }
 
+.payment-promo-note {
+  background: #eefbf4;
+  border: 1px solid #b8ebcb;
+  border-radius: 14px;
+  color: #116034;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.5;
+  margin: -4px 0 16px;
+  padding: 11px 13px;
+}
+
 .checkout-wide {
   grid-column: 1 / -1;
 }

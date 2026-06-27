@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Models\CustomerEsim;
 use App\Models\EsimOrder;
 use App\Models\EsimPlan;
+use App\Models\PromotionRule;
 use App\Services\EsimGo\OrderProvisioningService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 use Inertia\Response;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
@@ -62,7 +64,11 @@ class CheckoutController extends Controller
             'state' => ['required', 'string', 'max:120'],
             'postal_code' => ['required', 'string', 'max:40'],
             'country' => ['required', 'string', 'max:120'],
+            'promotion_code' => ['nullable', 'string', 'max:40'],
         ]);
+
+        $promotion = $this->validatedPromotion((string) ($billing['promotion_code'] ?? ''), $plan);
+        $pricing = $this->pricing($plan, $promotion);
 
         return Inertia::render('Storefront/Payment', [
             'plan' => $plan,
@@ -75,6 +81,9 @@ class CheckoutController extends Controller
             'state' => (string) $billing['state'],
             'postalCode' => (string) $billing['postal_code'],
             'country' => (string) $billing['country'],
+            'promotionCode' => $promotion['code'] ?? '',
+            'promotionDiscount' => $promotion,
+            'pricing' => $pricing,
             'csrfToken' => csrf_token(),
             'stripePublishableKey' => config('services.stripe.key'),
         ]);
@@ -102,6 +111,7 @@ class CheckoutController extends Controller
             'state' => ['required', 'string', 'max:120'],
             'postal_code' => ['required', 'string', 'max:40'],
             'country' => ['required', 'string', 'max:120'],
+            'promotion_code' => ['nullable', 'string', 'max:40'],
             'terms_accepted' => ['accepted'],
         ]);
 
@@ -111,9 +121,12 @@ class CheckoutController extends Controller
             return back()->with('status', 'Stripe secret key is missing. Add STRIPE_SECRET to .env.');
         }
 
-        $subtotal = (float) $plan->retail_price;
-        $taxAmount = (float) ($plan->tax_amount ?? 0);
-        $total = round($subtotal + $taxAmount, 2);
+        $promotion = $this->validatedPromotion((string) ($data['promotion_code'] ?? ''), $plan);
+        $pricing = $this->pricing($plan, $promotion);
+        $subtotal = $pricing['subtotal'];
+        $taxAmount = $pricing['tax_amount'];
+        $discountAmount = $pricing['discount_amount'];
+        $total = $pricing['total'];
 
         $order = EsimOrder::query()->create([
             'user_id' => $request->user()?->id,
@@ -131,6 +144,8 @@ class CheckoutController extends Controller
                 'plan_id' => $plan->id,
                 'plan_slug' => $plan->slug,
                 'tax_amount' => $taxAmount,
+                'discount_amount' => $discountAmount,
+                'promotion' => $promotion,
                 'customer_name' => $data['customer_name'] ?? null,
                 'customer_phone' => $data['customer_phone'] ?? null,
                 'address_line1' => $data['address_line1'] ?? null,
@@ -159,6 +174,8 @@ class CheckoutController extends Controller
                     'order_id' => (string) $order->id,
                     'order_reference' => (string) $order->order_reference,
                     'plan_id' => (string) $plan->id,
+                    'promotion_code' => (string) ($promotion['code'] ?? ''),
+                    'discount_amount' => (string) $discountAmount,
                 ],
                 'line_items' => [
                     [
@@ -167,7 +184,7 @@ class CheckoutController extends Controller
                             'currency' => $currency,
                             'unit_amount' => $amount,
                             'product_data' => [
-                                'name' => $plan->title,
+                                'name' => $promotion ? $plan->title . ' (' . $promotion['code'] . ' applied)' : $plan->title,
                                 'description' => ($plan->country_name ?: $plan->region_name ?: $plan->coverage_type) . ' eSIM',
                             ],
                         ],
@@ -350,6 +367,97 @@ class CheckoutController extends Controller
         return redirect()
             ->route('auth.login', ['redirect' => $intendedUrl])
             ->with('status', 'Please log in or create an account before checkout.');
+    }
+
+    private function validatedPromotion(string $code, EsimPlan $plan): ?array
+    {
+        $normalizedCode = $this->normalizePromotionCode($code);
+
+        if ($normalizedCode === '') {
+            return null;
+        }
+
+        $promotion = PromotionRule::query()
+            ->where('is_active', true)
+            ->where('conditions->code', $normalizedCode)
+            ->first();
+
+        if (! $promotion) {
+            throw ValidationException::withMessages(['promotion_code' => 'This promotion code is not valid.']);
+        }
+
+        if ($promotion->starts_at && $promotion->starts_at->isFuture()) {
+            throw ValidationException::withMessages(['promotion_code' => 'This promotion code is not active yet.']);
+        }
+
+        if ($promotion->ends_at && $promotion->ends_at->isPast()) {
+            throw ValidationException::withMessages(['promotion_code' => 'This promotion code has expired.']);
+        }
+
+        $conditions = $promotion->conditions ?? [];
+        $actions = $promotion->actions ?? [];
+        $appliesTo = (string) ($conditions['applies_to'] ?? 'all');
+        $planIds = collect($conditions['plan_ids'] ?? [])->map(fn ($id): int => (int) $id)->all();
+
+        if ($appliesTo === 'plans' && ! in_array((int) $plan->id, $planIds, true)) {
+            throw ValidationException::withMessages(['promotion_code' => 'This promotion code is not available for the selected plan.']);
+        }
+
+        $usageLimit = $conditions['usage_limit'] ?? null;
+
+        if ($usageLimit && $this->promotionUsageCount($normalizedCode) >= (int) $usageLimit) {
+            throw ValidationException::withMessages(['promotion_code' => 'This promotion code has reached its usage limit.']);
+        }
+
+        $discountType = (string) ($actions['discount_type'] ?? '');
+        $discountValue = (float) ($actions['discount_value'] ?? 0);
+
+        if (! in_array($discountType, ['percent', 'fixed'], true) || $discountValue <= 0) {
+            throw ValidationException::withMessages(['promotion_code' => 'This promotion code is not configured correctly.']);
+        }
+
+        return [
+            'id' => $promotion->id,
+            'title' => $promotion->title,
+            'code' => $normalizedCode,
+            'discount_type' => $discountType,
+            'discount_value' => $discountValue,
+            'applies_to' => $appliesTo,
+        ];
+    }
+
+    private function pricing(EsimPlan $plan, ?array $promotion): array
+    {
+        $subtotal = round((float) $plan->retail_price, 2);
+        $taxAmount = round((float) ($plan->tax_amount ?? 0), 2);
+        $discountAmount = 0.0;
+
+        if ($promotion) {
+            $discountAmount = $promotion['discount_type'] === 'fixed'
+                ? (float) $promotion['discount_value']
+                : $subtotal * ((float) $promotion['discount_value'] / 100);
+            $discountAmount = round(min($subtotal, max(0, $discountAmount)), 2);
+        }
+
+        return [
+            'subtotal' => $subtotal,
+            'discount_amount' => $discountAmount,
+            'tax_amount' => $taxAmount,
+            'total' => round(max(0, $subtotal - $discountAmount) + $taxAmount, 2),
+        ];
+    }
+
+    private function normalizePromotionCode(string $code): string
+    {
+        return Str::upper(preg_replace('/[^A-Z0-9_-]/i', '', trim($code)) ?? '');
+    }
+
+    private function promotionUsageCount(string $code): int
+    {
+        return EsimOrder::query()
+            ->whereIn('status', ['paid', 'provisioning', 'provisioned'])
+            ->where('request_payload->promotion->code', $code)
+            ->count();
     }
 
     private function isValidStripeSignature(string $payload, string $signature, string $secret): bool

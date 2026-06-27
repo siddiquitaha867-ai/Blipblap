@@ -22,6 +22,7 @@ const city = ref('');
 const state = ref('');
 const postalCode = ref('');
 const country = ref('');
+const promotionCode = ref('');
 const legalAccepted = ref(false);
 const taxAmount = computed(() => Number(props.plan.tax_amount || 0));
 const totalAmount = computed(() => Number(props.plan.retail_price || 0) + taxAmount.value);
@@ -37,6 +38,7 @@ const goToPayment = () => {
     state: state.value,
     postal_code: postalCode.value,
     country: country.value,
+    promotion_code: promotionCode.value,
     terms_accepted: legalAccepted.value ? '1' : '0',
   });
 };
@@ -116,6 +118,11 @@ const goToPayment = () => {
             </button>
           </div>
         </fieldset>
+        <label class="checkout-wide">
+          <span>Promotion code</span>
+          <input v-model="promotionCode" type="text" placeholder="Enter promo code (optional)" autocomplete="off">
+          <small v-if="page.props.errors?.promotion_code">{{ page.props.errors.promotion_code }}</small>
+        </label>
         <label class="checkout-legal-check checkout-wide">
           <input v-model="legalAccepted" type="checkbox" required>
           <span>
