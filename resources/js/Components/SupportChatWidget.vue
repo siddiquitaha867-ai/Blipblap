@@ -68,8 +68,16 @@ const sendMessage = async (preset = '') => {
 
 <template>
   <div v-if="visible" class="support-chat">
-    <button v-if="!open" type="button" class="support-chat-toggle" @click="open = true">
-      <span>Ask AI</span>
+    <button v-if="!open" type="button" class="support-chat-toggle" aria-label="Contact support" @click="open = true">
+      <span class="support-chat-toggle__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false">
+          <path d="M4.5 12.5a7.5 7.5 0 0 1 15 0v4.25a2.25 2.25 0 0 1-2.25 2.25H15" />
+          <path d="M7 13h-.5A2.5 2.5 0 0 0 4 15.5v.5A2.5 2.5 0 0 0 6.5 18H7v-5Z" />
+          <path d="M17 13h.5a2.5 2.5 0 0 1 2.5 2.5v.5a2.5 2.5 0 0 1-2.5 2.5H17v-5Z" />
+          <path d="M9.5 19h5" />
+        </svg>
+      </span>
+      <span>Support</span>
     </button>
 
     <section v-if="open" class="support-chat-panel">
