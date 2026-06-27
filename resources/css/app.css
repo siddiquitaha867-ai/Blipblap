@@ -6208,7 +6208,7 @@ button:disabled {
   border-radius: 16px;
   display: grid;
   gap: 12px;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   margin-bottom: 20px;
   padding: 16px;
 }

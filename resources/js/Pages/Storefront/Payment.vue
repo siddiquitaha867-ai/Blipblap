@@ -128,7 +128,7 @@ const billingAddressLines = computed(() => [
 
       <div class="payment-method-preview">
         <div>
-          <span>Customer</span>
+          <span>Customer Details</span>
           <strong>{{ props.customerName }}</strong>
           <small>{{ props.customerEmail }}</small>
           <small>{{ props.customerPhone }}</small>
