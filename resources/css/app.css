@@ -2019,6 +2019,25 @@ button:disabled {
   grid-template-columns: 1.4fr 1fr 1fr 1fr auto auto;
 }
 
+.admin-promotion-grid {
+  align-items: end;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.admin-promotion-grid > button[type="submit"],
+.admin-promotion-grid .admin-check-row {
+  align-self: center;
+}
+
+.admin-promotion-plan-picker {
+  grid-column: 1 / -1;
+}
+
+.admin-promotion-plan-picker select {
+  min-height: 180px;
+  padding: 10px 12px;
+}
+
 .admin-bulk-grid {
   align-items: end;
   gap: 10px 12px;

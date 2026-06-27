@@ -10,6 +10,10 @@ defineProps({
     type: Object,
     required: true,
   },
+  plans: {
+    type: Array,
+    default: () => [],
+  },
   recentEvents: {
     type: Array,
     default: () => [],
@@ -19,15 +23,52 @@ defineProps({
 const form = useForm({
   title: '',
   rule_type: 'discount',
+  code: '',
+  discount_type: 'percent',
+  discount_value: '',
+  usage_limit: '',
+  applies_to: 'all',
+  plan_ids: [],
   is_active: true,
   starts_at: '',
   ends_at: '',
 });
 
+const generateCode = () => {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let suffix = '';
+
+  for (let index = 0; index < 6; index += 1) {
+    suffix += chars[Math.floor(Math.random() * chars.length)];
+  }
+
+  form.code = `BLIP${suffix}`;
+};
+
+const discountLabel = (promotion) => {
+  const type = promotion.actions?.discount_type;
+  const value = Number(promotion.actions?.discount_value || 0);
+
+  if (!value) {
+    return '-';
+  }
+
+  return type === 'fixed' ? `${value.toFixed(2)} off` : `${value}% off`;
+};
+
+const scopeLabel = (promotion) => {
+  if (promotion.conditions?.applies_to !== 'plans') {
+    return 'Whole site';
+  }
+
+  const count = promotion.conditions?.plan_ids?.length || 0;
+  return `${count} selected ${count === 1 ? 'plan' : 'plans'}`;
+};
+
 const submit = () => {
   form.post('/admin/promotions', {
     preserveScroll: true,
-    onSuccess: () => form.reset('title', 'starts_at', 'ends_at'),
+    onSuccess: () => form.reset('title', 'code', 'discount_value', 'usage_limit', 'plan_ids', 'starts_at', 'ends_at'),
   });
 };
 
@@ -49,7 +90,7 @@ const togglePromotion = (promotion) => {
 
     <section class="admin-panel admin-form-panel">
       <h2>Create promotion</h2>
-      <form class="admin-create-grid" @submit.prevent="submit">
+      <form class="admin-create-grid admin-promotion-grid" @submit.prevent="submit">
         <label>
           <span>Title</span>
           <input v-model="form.title" type="text" placeholder="Summer discount" />
@@ -63,6 +104,44 @@ const togglePromotion = (promotion) => {
             <option value="bundle_offer">Bundle offer</option>
             <option value="campaign">Campaign</option>
           </select>
+        </label>
+        <label>
+          <span>Promotion code</span>
+          <input v-model="form.code" type="text" placeholder="BLIPSAVE20" />
+          <button type="button" class="admin-mini-button" @click="generateCode">Generate code</button>
+          <small v-if="form.errors.code">{{ form.errors.code }}</small>
+        </label>
+        <label>
+          <span>Discount type</span>
+          <select v-model="form.discount_type">
+            <option value="percent">Percentage</option>
+            <option value="fixed">Fixed amount</option>
+          </select>
+        </label>
+        <label>
+          <span>Discount value</span>
+          <input v-model="form.discount_value" type="number" min="0.01" step="0.01" :placeholder="form.discount_type === 'percent' ? '20' : '5.00'" />
+          <small v-if="form.errors.discount_value">{{ form.errors.discount_value }}</small>
+        </label>
+        <label>
+          <span>Usage limit</span>
+          <input v-model="form.usage_limit" type="number" min="1" step="1" placeholder="Optional" />
+        </label>
+        <label>
+          <span>Applies to</span>
+          <select v-model="form.applies_to">
+            <option value="all">Whole site</option>
+            <option value="plans">Selected plans only</option>
+          </select>
+        </label>
+        <label v-if="form.applies_to === 'plans'" class="admin-promotion-plan-picker checkout-wide">
+          <span>Selected plans</span>
+          <select v-model="form.plan_ids" multiple>
+            <option v-for="plan in plans" :key="plan.id" :value="plan.id">
+              {{ plan.location }} - {{ plan.title }} ({{ plan.currency }} {{ Number(plan.price).toFixed(2) }})
+            </option>
+          </select>
+          <small v-if="form.errors.plan_ids">{{ form.errors.plan_ids }}</small>
         </label>
         <label>
           <span>Starts</span>
@@ -88,7 +167,10 @@ const togglePromotion = (promotion) => {
           <thead>
             <tr>
               <th>Title</th>
+              <th>Code</th>
               <th>Type</th>
+              <th>Discount</th>
+              <th>Scope</th>
               <th>Status</th>
               <th>Starts</th>
               <th>Ends</th>
@@ -98,7 +180,10 @@ const togglePromotion = (promotion) => {
           <tbody>
             <tr v-for="promotion in promotions.data" :key="promotion.id">
               <td>{{ promotion.title }}</td>
+              <td><strong>{{ promotion.conditions?.code || '-' }}</strong></td>
               <td>{{ promotion.rule_type }}</td>
+              <td>{{ discountLabel(promotion) }}</td>
+              <td>{{ scopeLabel(promotion) }}</td>
               <td><span class="admin-badge">{{ promotion.is_active ? 'Active' : 'Paused' }}</span></td>
               <td>{{ formatDateTime(promotion.starts_at) }}</td>
               <td>{{ formatDateTime(promotion.ends_at) }}</td>
