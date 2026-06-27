@@ -6372,16 +6372,28 @@ button:disabled {
 }
 
 .esim-usage-meter__head span,
-.esim-usage-meter__head strong {
+.esim-usage-meter__head strong,
+.esim-usage-meter__head button {
   color: #334155;
   font-size: 12px;
   font-weight: 900;
   text-transform: uppercase;
 }
 
-.esim-usage-meter__head strong {
+.esim-usage-meter__head strong,
+.esim-usage-meter__head button {
+  background: transparent;
+  border: 0;
   color: var(--bb-blue);
+  cursor: pointer;
+  font-family: inherit;
+  padding: 0;
   text-align: right;
+}
+
+.esim-usage-meter__head button:disabled {
+  cursor: wait;
+  opacity: 0.7;
 }
 
 .esim-usage-meter__track {

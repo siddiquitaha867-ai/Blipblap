@@ -106,6 +106,7 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/my-account', [AccountController::class, 'show'])->name('my-account');
     Route::patch('/my-account', [AccountController::class, 'update'])->name('my-account.update');
     Route::get('/my-esims', MyEsimController::class)->name('my-esims');
+    Route::get('/my-esims/{esim}/usage', [MyEsimController::class, 'usage'])->name('my-esims.usage');
     Route::get('/my-esims/{esim}/top-up', [TopupController::class, 'show'])->name('topup.show');
     Route::post('/my-esims/{esim}/top-up/stripe', [TopupController::class, 'stripe'])->name('topup.stripe');
     Route::get('/my-esims/{esim}/top-up/success', [TopupController::class, 'success'])->name('topup.success');

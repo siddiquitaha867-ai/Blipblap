@@ -1,11 +1,11 @@
 <script setup>
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
 import { formatDate } from '@/utils/dateTime';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
 defineOptions({ layout: StorefrontLayout });
 
-defineProps({
+const props = defineProps({
   esims: {
     type: Array,
     default: () => [],
@@ -14,6 +14,12 @@ defineProps({
 
 const copiedEsimId = ref(null);
 const selectedEsim = ref(null);
+const localEsims = ref([...props.esims]);
+const refreshingUsageIds = ref(new Set());
+
+watch(() => props.esims, (esims) => {
+  localEsims.value = [...esims];
+}, { deep: true });
 
 const copyActivationCode = async (esim) => {
   if (!esim.activation_code || typeof navigator === 'undefined' || !navigator.clipboard) {
@@ -35,6 +41,49 @@ const closeDetails = () => {
   selectedEsim.value = null;
 };
 
+const isRefreshingUsage = (esim) => refreshingUsageIds.value.has(esim.id);
+
+const setUsageRefreshing = (esim, refreshing) => {
+  const next = new Set(refreshingUsageIds.value);
+
+  if (refreshing) {
+    next.add(esim.id);
+  } else {
+    next.delete(esim.id);
+  }
+
+  refreshingUsageIds.value = next;
+};
+
+const refreshUsage = async (esim) => {
+  if (!esim.id || isRefreshingUsage(esim)) {
+    return;
+  }
+
+  setUsageRefreshing(esim, true);
+
+  try {
+    const response = await fetch(`/my-esims/${esim.id}/usage`, {
+      headers: { Accept: 'application/json' },
+    });
+
+    if (!response.ok) {
+      return;
+    }
+
+    const usage = await response.json();
+    const updated = { ...esim, ...usage };
+
+    localEsims.value = localEsims.value.map((item) => (item.id === esim.id ? updated : item));
+
+    if (selectedEsim.value?.id === esim.id) {
+      selectedEsim.value = updated;
+    }
+  } finally {
+    setUsageRefreshing(esim, false);
+  }
+};
+
 const hasUsageData = (esim) => (
   esim.usage_percent !== null
   && esim.usage_percent !== undefined
@@ -51,14 +100,14 @@ const usageWidth = (esim) => `${hasUsageData(esim) ? esim.usage_percent : 0}%`;
       <p>Open your active and recent BlipBlap eSIMs, then copy the install details whenever you need them.</p>
     </div>
 
-    <div v-if="!esims.length" class="my-esims-empty">
+    <div v-if="!localEsims.length" class="my-esims-empty">
       <h2>No eSIMs yet</h2>
       <p>Purchased eSIMs will appear here after checkout.</p>
       <a href="/esim-plans">Browse eSIM plans</a>
     </div>
 
     <div v-else class="my-esims-grid">
-      <article v-for="esim in esims" :key="esim.id" class="my-esim-card">
+      <article v-for="esim in localEsims" :key="esim.id" class="my-esim-card">
         <div class="my-esim-card__top">
           <span>{{ esim.location }}</span>
           <strong>{{ esim.status }}</strong>
@@ -73,8 +122,9 @@ const usageWidth = (esim) => `${hasUsageData(esim) ? esim.usage_percent : 0}%`;
         <div class="esim-usage-meter">
           <div class="esim-usage-meter__head">
             <span>Data usage</span>
-            <strong v-if="hasUsageData(esim)">{{ esim.usage_percent }}% used</strong>
-            <strong v-else>Updating</strong>
+            <button type="button" @click="refreshUsage(esim)" :disabled="isRefreshingUsage(esim)">
+              {{ isRefreshingUsage(esim) ? 'Updating' : (hasUsageData(esim) ? `${esim.usage_percent}% used` : 'Refresh') }}
+            </button>
           </div>
           <div class="esim-usage-meter__track" :class="{ 'is-empty': !hasUsageData(esim) }">
             <span :style="{ width: usageWidth(esim) }"></span>
@@ -86,6 +136,9 @@ const usageWidth = (esim) => `${hasUsageData(esim) ? esim.usage_percent : 0}%`;
           <small v-if="esim.total_data || esim.days_remaining !== null && esim.days_remaining !== undefined">
             <template v-if="esim.total_data">Total {{ esim.total_data }}</template>
             <template v-if="esim.days_remaining !== null && esim.days_remaining !== undefined"> · {{ esim.days_remaining }} days left</template>
+          </small>
+          <small v-if="esim.last_synced_at">
+            Updated {{ formatDate(esim.last_synced_at) }}
           </small>
         </div>
 
@@ -166,6 +219,10 @@ const usageWidth = (esim) => `${hasUsageData(esim) ? esim.usage_percent : 0}%`;
             <div v-if="selectedEsim.usage_status">
               <dt>Usage status</dt>
               <dd>{{ selectedEsim.usage_status }}</dd>
+            </div>
+            <div v-if="selectedEsim.last_synced_at">
+              <dt>Usage updated</dt>
+              <dd>{{ formatDate(selectedEsim.last_synced_at) }}</dd>
             </div>
             <div v-if="hasUsageData(selectedEsim)">
               <dt>Data used</dt>

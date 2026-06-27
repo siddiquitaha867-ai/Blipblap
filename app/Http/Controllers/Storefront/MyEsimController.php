@@ -7,7 +7,9 @@ use App\Models\CustomerEsim;
 use App\Models\EsimPlan;
 use App\Services\EsimUsageService;
 use App\Services\EsimGo\EsimGoClient;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -37,42 +39,95 @@ class MyEsimController extends Controller
 
         return Inertia::render('Storefront/MyEsims', [
             'esims' => $esims->map(function (CustomerEsim $esim) use ($plans, $client, $usageService): array {
-                $order = $esim->order;
-                $planId = $order?->request_payload['plan_id'] ?? null;
-                $plan = $planId ? $plans->get($planId) : null;
-                $providerData = $usageService->providerEsimData($client, $esim);
-                $usage = $usageService->summary($providerData, $plan);
-                $install = $this->installLinks($providerData, $esim);
-
-                return [
-                    'id' => $esim->id,
-                    'plan_title' => $plan?->title ?: $esim->nickname ?: $order?->bundle_code ?: 'BlipBlap eSIM',
-                    'location' => $plan?->country_name ?: $plan?->region_name ?: 'Global',
-                    'data' => $plan?->unlimited ? 'Unlimited' : trim((string) ($plan?->data_amount . ' ' . $plan?->data_unit)),
-                    'duration_days' => $plan?->duration_days,
-                    'iccid' => $esim->iccid,
-                    'status' => $esim->status,
-                    'qr_code_url' => $esim->qr_code_url,
-                    'smdp_address' => $esim->smdp_address,
-                    'matching_id' => $esim->matching_id,
-                    'activation_code' => $esim->activation_code,
-                    'order_reference' => $order?->order_reference,
-                    'created_at' => $esim->created_at?->toFormattedDateString(),
-                    'expires_at' => $esim->expires_at?->toFormattedDateString(),
-                    'days_remaining' => $usage['days_remaining'],
-                    'used_data' => $usage['used_data'],
-                    'remaining_data' => $usage['remaining_data'],
-                    'total_data' => $usage['total_data'],
-                    'usage_percent' => $usage['usage_percent'],
-                    'remaining_percent' => $usage['remaining_percent'],
-                    'usage_status' => $usage['usage_status'],
-                    'ios_install_url' => $install['ios_install_url'],
-                    'android_install_url' => $install['android_install_url'],
-                    'can_topup' => filled($esim->iccid) && $this->hasTopupPackages($esim, $plan),
-                    'topup_url' => route('topup.show', $esim),
-                ];
+                return $this->esimPayload($esim, $plans, $client, $usageService);
             })->values(),
         ]);
+    }
+
+    public function usage(Request $request, CustomerEsim $esim, EsimGoClient $client, EsimUsageService $usageService): JsonResponse
+    {
+        $this->authorizeOwnedEsim($request, $esim);
+
+        $plan = $this->planForEsim($esim->loadMissing('order'), collect());
+        $providerData = $usageService->providerEsimData($client, $esim);
+        $usage = $usageService->summary($providerData, $plan);
+
+        return response()->json([
+            'status' => $usage['usage_status'],
+            'days_remaining' => $usage['days_remaining'],
+            'used_data' => $usage['used_data'],
+            'remaining_data' => $usage['remaining_data'],
+            'total_data' => $usage['total_data'],
+            'usage_percent' => $usage['usage_percent'],
+            'remaining_percent' => $usage['remaining_percent'],
+            'usage_status' => $usage['usage_status'],
+            'expires_at' => $esim->refresh()->expires_at?->toFormattedDateString(),
+            'last_synced_at' => $esim->last_synced_at?->toDateTimeString(),
+        ]);
+    }
+
+    private function esimPayload(CustomerEsim $esim, Collection $plans, EsimGoClient $client, EsimUsageService $usageService): array
+    {
+        $order = $esim->order;
+        $plan = $this->planForEsim($esim, $plans);
+        $providerData = $usageService->providerEsimData($client, $esim);
+        $usage = $usageService->summary($providerData, $plan);
+        $install = $this->installLinks($providerData, $esim);
+        $syncedEsim = $esim->refresh();
+
+        return [
+            'id' => $syncedEsim->id,
+            'plan_title' => $plan?->title ?: $syncedEsim->nickname ?: $order?->bundle_code ?: 'BlipBlap eSIM',
+            'location' => $plan?->country_name ?: $plan?->region_name ?: 'Global',
+            'data' => $plan?->unlimited ? 'Unlimited' : trim((string) ($plan?->data_amount . ' ' . $plan?->data_unit)),
+            'duration_days' => $plan?->duration_days,
+            'iccid' => $syncedEsim->iccid,
+            'status' => $syncedEsim->status,
+            'qr_code_url' => $syncedEsim->qr_code_url,
+            'smdp_address' => $syncedEsim->smdp_address,
+            'matching_id' => $syncedEsim->matching_id,
+            'activation_code' => $syncedEsim->activation_code,
+            'order_reference' => $order?->order_reference,
+            'created_at' => $syncedEsim->created_at?->toFormattedDateString(),
+            'expires_at' => $syncedEsim->expires_at?->toFormattedDateString(),
+            'last_synced_at' => $syncedEsim->last_synced_at?->toDateTimeString(),
+            'days_remaining' => $usage['days_remaining'],
+            'used_data' => $usage['used_data'],
+            'remaining_data' => $usage['remaining_data'],
+            'total_data' => $usage['total_data'],
+            'usage_percent' => $usage['usage_percent'],
+            'remaining_percent' => $usage['remaining_percent'],
+            'usage_status' => $usage['usage_status'],
+            'ios_install_url' => $install['ios_install_url'],
+            'android_install_url' => $install['android_install_url'],
+            'can_topup' => filled($syncedEsim->iccid) && $this->hasTopupPackages($syncedEsim, $plan),
+            'topup_url' => route('topup.show', $syncedEsim),
+        ];
+    }
+
+    private function planForEsim(CustomerEsim $esim, Collection $plans): ?EsimPlan
+    {
+        $planId = $esim->order?->request_payload['plan_id'] ?? null;
+        $plan = $planId ? $plans->get($planId) : null;
+
+        if (! $plan && $planId) {
+            $plan = EsimPlan::query()->find($planId);
+        }
+
+        if (! $plan && $esim->current_bundle_code) {
+            $plan = EsimPlan::query()->where('supplier_code', $esim->current_bundle_code)->first();
+        }
+
+        return $plan;
+    }
+
+    private function authorizeOwnedEsim(Request $request, CustomerEsim $esim): void
+    {
+        abort_unless(
+            $request->user()
+            && ($esim->user_id === $request->user()->id || $esim->customer_email === $request->user()->email),
+            403
+        );
     }
 
     private function installLinks(array $providerData, CustomerEsim $esim): array
