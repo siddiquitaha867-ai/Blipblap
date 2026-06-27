@@ -70,6 +70,16 @@ const closeSearchWhenLeaving = (event) => {
   searchOpen.value = false;
 };
 
+const clearDestinationSearch = () => {
+  searchQuery.value = '';
+  searchOpen.value = false;
+};
+
+const selectDestination = () => {
+  clearDestinationSearch();
+  setMobileMenuOpen(false);
+};
+
 const syncDesktopState = () => {
   if (window.innerWidth > 900) {
     mobileMenuOpen.value = false;
@@ -129,6 +139,10 @@ watch(searchQuery, (value) => {
   }
 
   searchOpen.value = false;
+});
+
+watch(() => page.url, () => {
+  clearDestinationSearch();
 });
 </script>
 
@@ -229,7 +243,7 @@ watch(searchQuery, (value) => {
                       :href="destination.url"
                       class="destination-search-item"
                       @mousedown.prevent
-                      @click="setMobileMenuOpen(false)"
+                      @click="selectDestination"
                     >
                       <span class="destination-search-flag">
                         <img v-if="destination.flag_url" :src="destination.flag_url" :alt="`${destination.name} flag`">
