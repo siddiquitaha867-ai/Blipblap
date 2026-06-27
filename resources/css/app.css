@@ -527,33 +527,30 @@ button:disabled {
   cursor: pointer;
   display: inline-flex;
   font-size: 15px;
-  gap: 9px;
   font-weight: 800;
-  min-height: 54px;
-  min-width: 132px;
-  padding: 0 18px 0 14px;
+  height: 58px;
+  justify-content: center;
+  padding: 0;
+  width: 58px;
 }
 
 .support-chat-toggle__icon {
   align-items: center;
-  background: rgba(255, 255, 255, 0.18);
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  border-radius: 999px;
   display: inline-flex;
   flex: 0 0 auto;
-  height: 34px;
+  height: 100%;
   justify-content: center;
-  width: 34px;
+  width: 100%;
 }
 
 .support-chat-toggle__icon svg {
   fill: none;
-  height: 19px;
+  height: 27px;
   stroke: currentColor;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 2;
-  width: 19px;
+  stroke-width: 1.9;
+  width: 27px;
 }
 
 .support-chat-panel {
@@ -7233,20 +7230,21 @@ button:disabled {
   .support-chat-toggle {
     box-shadow: 0 14px 34px rgba(14, 80, 237, 0.28);
     font-size: 13px;
-    min-height: 48px;
-    min-width: 116px;
-    padding: 0 14px 0 9px;
-    width: auto;
+    height: 54px;
+    min-height: 0;
+    min-width: 0;
+    padding: 0;
+    width: 54px;
   }
 
   .support-chat-toggle__icon {
-    height: 32px;
-    width: 32px;
+    height: 100%;
+    width: 100%;
   }
 
   .support-chat-toggle__icon svg {
-    height: 18px;
-    width: 18px;
+    height: 25px;
+    width: 25px;
   }
 
   .support-chat-form {
