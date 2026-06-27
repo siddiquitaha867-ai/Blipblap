@@ -52,17 +52,29 @@ class CheckoutController extends Controller
                 ->with('status', 'Please agree to the Terms and Conditions and Privacy Policy before payment.');
         }
 
+        $billing = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'max:255'],
+            'phone' => ['required', 'string', 'max:50'],
+            'address_line1' => ['required', 'string', 'max:255'],
+            'address_line2' => ['nullable', 'string', 'max:255'],
+            'city' => ['required', 'string', 'max:120'],
+            'state' => ['required', 'string', 'max:120'],
+            'postal_code' => ['required', 'string', 'max:40'],
+            'country' => ['required', 'string', 'max:120'],
+        ]);
+
         return Inertia::render('Storefront/Payment', [
             'plan' => $plan,
-            'customerName' => (string) $request->query('name', ''),
-            'customerEmail' => (string) $request->query('email', $request->user()?->email ?? ''),
-            'customerPhone' => (string) $request->query('phone', ''),
-            'addressLine1' => (string) $request->query('address_line1', ''),
-            'addressLine2' => (string) $request->query('address_line2', ''),
-            'city' => (string) $request->query('city', ''),
-            'state' => (string) $request->query('state', ''),
-            'postalCode' => (string) $request->query('postal_code', ''),
-            'country' => (string) $request->query('country', ''),
+            'customerName' => (string) $billing['name'],
+            'customerEmail' => (string) $billing['email'],
+            'customerPhone' => (string) $billing['phone'],
+            'addressLine1' => (string) $billing['address_line1'],
+            'addressLine2' => (string) ($billing['address_line2'] ?? ''),
+            'city' => (string) $billing['city'],
+            'state' => (string) $billing['state'],
+            'postalCode' => (string) $billing['postal_code'],
+            'country' => (string) $billing['country'],
             'csrfToken' => csrf_token(),
             'stripePublishableKey' => config('services.stripe.key'),
         ]);
@@ -81,15 +93,15 @@ class CheckoutController extends Controller
         }
 
         $data = $request->validate([
-            'customer_name' => ['nullable', 'string', 'max:255'],
+            'customer_name' => ['required', 'string', 'max:255'],
             'customer_email' => ['required', 'email', 'max:255'],
-            'customer_phone' => ['nullable', 'string', 'max:50'],
-            'address_line1' => ['nullable', 'string', 'max:255'],
+            'customer_phone' => ['required', 'string', 'max:50'],
+            'address_line1' => ['required', 'string', 'max:255'],
             'address_line2' => ['nullable', 'string', 'max:255'],
-            'city' => ['nullable', 'string', 'max:120'],
-            'state' => ['nullable', 'string', 'max:120'],
-            'postal_code' => ['nullable', 'string', 'max:40'],
-            'country' => ['nullable', 'string', 'max:120'],
+            'city' => ['required', 'string', 'max:120'],
+            'state' => ['required', 'string', 'max:120'],
+            'postal_code' => ['required', 'string', 'max:40'],
+            'country' => ['required', 'string', 'max:120'],
             'terms_accepted' => ['accepted'],
         ]);
 

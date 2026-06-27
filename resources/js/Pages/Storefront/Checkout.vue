@@ -58,7 +58,7 @@ const goToPayment = () => {
       <form class="checkout-form" @submit.prevent="goToPayment">
         <label>
           <span>Full name</span>
-          <input v-model="customerName" type="text" placeholder="Your name" autocomplete="name">
+          <input v-model="customerName" type="text" placeholder="Your name" autocomplete="name" required>
         </label>
         <label>
           <span>Email for eSIM delivery</span>
@@ -66,32 +66,39 @@ const goToPayment = () => {
         </label>
         <label>
           <span>Phone</span>
-          <input v-model="customerPhone" type="text" placeholder="+1 555 123 4567" autocomplete="tel">
+          <input v-model="customerPhone" type="text" placeholder="+1 555 123 4567" autocomplete="tel" required>
         </label>
-        <label>
-          <span>Address line 1</span>
-          <input v-model="addressLine1" type="text" placeholder="Street address" autocomplete="address-line1">
-        </label>
-        <label>
-          <span>Address line 2</span>
-          <input v-model="addressLine2" type="text" placeholder="Apartment, suite, etc." autocomplete="address-line2">
-        </label>
-        <label>
-          <span>City</span>
-          <input v-model="city" type="text" placeholder="City" autocomplete="address-level2">
-        </label>
-        <label>
-          <span>State / province</span>
-          <input v-model="state" type="text" placeholder="State or province" autocomplete="address-level1">
-        </label>
-        <label>
-          <span>Postal code</span>
-          <input v-model="postalCode" type="text" placeholder="Postal code" autocomplete="postal-code">
-        </label>
-        <label>
-          <span>Country</span>
-          <input v-model="country" type="text" placeholder="Country" autocomplete="country-name">
-        </label>
+
+        <fieldset class="checkout-address-group checkout-wide">
+          <legend>Billing Address</legend>
+          <p>This address is required for billing before secure payment.</p>
+          <div>
+            <label>
+              <span>Address line 1</span>
+              <input v-model="addressLine1" type="text" placeholder="Street address" autocomplete="address-line1" required>
+            </label>
+            <label>
+              <span>Address line 2</span>
+              <input v-model="addressLine2" type="text" placeholder="Apartment, suite, etc." autocomplete="address-line2">
+            </label>
+            <label>
+              <span>City</span>
+              <input v-model="city" type="text" placeholder="City" autocomplete="address-level2" required>
+            </label>
+            <label>
+              <span>State / province</span>
+              <input v-model="state" type="text" placeholder="State or province" autocomplete="address-level1" required>
+            </label>
+            <label>
+              <span>Postal code</span>
+              <input v-model="postalCode" type="text" placeholder="Postal code" autocomplete="postal-code" required>
+            </label>
+            <label>
+              <span>Country</span>
+              <input v-model="country" type="text" placeholder="Country" autocomplete="country-name" required>
+            </label>
+          </div>
+        </fieldset>
         <fieldset class="checkout-method-group checkout-wide">
           <legend>Payment method</legend>
           <div class="checkout-method-tabs">

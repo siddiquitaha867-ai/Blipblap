@@ -1,7 +1,7 @@
 <script setup>
 import StorefrontLayout from '@/Layouts/StorefrontLayout.vue';
 import { usePage } from '@inertiajs/vue3';
-import { computed, ref } from 'vue';
+import { computed } from 'vue';
 
 defineOptions({ layout: StorefrontLayout });
 
@@ -53,17 +53,15 @@ const props = defineProps({
 });
 
 const page = usePage();
-const customerEmail = ref(props.customerEmail);
-const customerPhone = ref(props.customerPhone);
-const addressLine1 = ref(props.addressLine1);
-const addressLine2 = ref(props.addressLine2);
-const city = ref(props.city);
-const state = ref(props.state);
-const postalCode = ref(props.postalCode);
-const country = ref(props.country);
 const stripeAction = `/checkout/${props.plan.slug}/stripe`;
 const taxAmount = computed(() => Number(props.plan.tax_amount || 0));
 const totalAmount = computed(() => Number(props.plan.retail_price || 0) + taxAmount.value);
+const billingAddressLines = computed(() => [
+  props.addressLine1,
+  props.addressLine2,
+  [props.city, props.state, props.postalCode].filter(Boolean).join(', '),
+  props.country,
+].filter(Boolean));
 </script>
 
 <template>
@@ -90,13 +88,14 @@ const totalAmount = computed(() => Number(props.plan.retail_price || 0) + taxAmo
 
       <input type="hidden" name="_token" :value="props.csrfToken">
       <input type="hidden" name="customer_name" :value="props.customerName">
-      <input type="hidden" name="customer_phone" :value="customerPhone">
-      <input type="hidden" name="address_line1" :value="addressLine1">
-      <input type="hidden" name="address_line2" :value="addressLine2">
-      <input type="hidden" name="city" :value="city">
-      <input type="hidden" name="state" :value="state">
-      <input type="hidden" name="postal_code" :value="postalCode">
-      <input type="hidden" name="country" :value="country">
+      <input type="hidden" name="customer_email" :value="props.customerEmail">
+      <input type="hidden" name="customer_phone" :value="props.customerPhone">
+      <input type="hidden" name="address_line1" :value="props.addressLine1">
+      <input type="hidden" name="address_line2" :value="props.addressLine2">
+      <input type="hidden" name="city" :value="props.city">
+      <input type="hidden" name="state" :value="props.state">
+      <input type="hidden" name="postal_code" :value="props.postalCode">
+      <input type="hidden" name="country" :value="props.country">
       <input type="hidden" name="terms_accepted" value="1">
 
       <div class="payment-card-top">
@@ -128,42 +127,16 @@ const totalAmount = computed(() => Number(props.plan.retail_price || 0) + taxAmo
       </dl>
 
       <div class="payment-method-preview">
-        <label>
-          <span>Full name</span>
-          <input :value="props.customerName" type="text" readonly>
-        </label>
-        <label>
-          <span>Delivery email</span>
-          <input v-model="customerEmail" name="customer_email" type="email" placeholder="you@example.com" required>
-        </label>
-        <label>
-          <span>Phone</span>
-          <input v-model="customerPhone" type="text" readonly>
-        </label>
-        <label>
-          <span>Country</span>
-          <input v-model="country" type="text" readonly>
-        </label>
-        <label>
-          <span>Address line 1</span>
-          <input v-model="addressLine1" type="text" readonly>
-        </label>
-        <label>
-          <span>Address line 2</span>
-          <input v-model="addressLine2" type="text" readonly>
-        </label>
-        <label>
-          <span>City</span>
-          <input v-model="city" type="text" readonly>
-        </label>
-        <label>
-          <span>State / province</span>
-          <input v-model="state" type="text" readonly>
-        </label>
-        <label>
-          <span>Postal code</span>
-          <input v-model="postalCode" type="text" readonly>
-        </label>
+        <div>
+          <span>Customer</span>
+          <strong>{{ props.customerName }}</strong>
+          <small>{{ props.customerEmail }}</small>
+          <small>{{ props.customerPhone }}</small>
+        </div>
+        <div>
+          <span>Billing Address</span>
+          <strong v-for="line in billingAddressLines" :key="line">{{ line }}</strong>
+        </div>
       </div>
 
       <button type="submit" class="payment-submit">

@@ -5887,6 +5887,35 @@ button:disabled {
   grid-column: 1 / -1;
 }
 
+.checkout-address-group {
+  border: 1px solid #e2ebf3;
+  border-radius: 18px;
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 18px;
+}
+
+.checkout-address-group legend {
+  color: #06152b;
+  font-size: 15px;
+  font-weight: 900;
+  padding: 0 8px;
+}
+
+.checkout-address-group p {
+  color: var(--bb-muted);
+  font-size: 13px;
+  line-height: 1.45;
+  margin: 0;
+}
+
+.checkout-address-group > div {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: 1fr 1fr;
+}
+
 .checkout-method-group {
   border: 0;
   display: grid;
@@ -6179,41 +6208,37 @@ button:disabled {
   border-radius: 16px;
   display: grid;
   gap: 12px;
+  grid-template-columns: 1fr 1fr;
   margin-bottom: 20px;
   padding: 16px;
 }
 
 .payment-method-preview div {
+  align-content: start;
+  background: white;
+  border: 1px solid #edf2f7;
+  border-radius: 14px;
   display: grid;
-  gap: 12px;
-  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  padding: 14px;
 }
 
-.payment-method-preview label {
-  display: grid;
-  gap: 7px;
-}
-
-.payment-method-preview label span {
+.payment-method-preview span {
   color: var(--bb-muted);
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 900;
+  text-transform: uppercase;
 }
 
-.payment-method-preview input {
-  background: white;
-  border: 1px solid #dce7ef;
-  border-radius: 14px;
+.payment-method-preview strong,
+.payment-method-preview small {
   color: #111827;
-  height: 52px;
-  outline: 0;
-  padding: 0 16px;
-  width: 100%;
+  font-size: 14px;
+  line-height: 1.45;
 }
 
-.payment-method-preview input:focus {
-  border-color: var(--bb-blue);
-  box-shadow: 0 0 0 4px rgba(14, 80, 237, 0.12);
+.payment-method-preview small {
+  color: var(--bb-muted);
 }
 
 .payment-submit {
@@ -7896,10 +7921,11 @@ button:disabled {
   .comment-section,
   .comment-form,
   .checkout-form,
+  .checkout-address-group > div,
   .checkout-page,
   .payment-page,
   .topup-page,
-  .payment-method-preview div,
+  .payment-method-preview,
   .install-preview,
   .payment-card dl,
   .my-esim-install,
