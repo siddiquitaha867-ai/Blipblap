@@ -22,6 +22,10 @@ const props = defineProps({
     type: String,
     required: true,
   },
+  compatibilityChecked: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const page = usePage();
@@ -67,7 +71,10 @@ const dataLabel = (plan) => {
 
       <div class="payment-card-top">
         <span>Compatible top-ups</span>
-        <small>{{ packages.length }} packages</small>
+        <small>
+          {{ packages.length }} packages
+          <template v-if="compatibilityChecked"> · API verified</template>
+        </small>
       </div>
 
       <div v-if="packages.length" class="topup-options" role="radiogroup" aria-label="Top-up packages">
@@ -89,7 +96,13 @@ const dataLabel = (plan) => {
 
       <div v-else class="topup-empty">
         <strong>No compatible top-ups found</strong>
-        <p>We could not find an active top-up package for this eSIM destination.</p>
+        <p>
+          {{
+            compatibilityChecked
+              ? 'The provider API did not return a compatible top-up for this ICCID.'
+              : 'We could not find an active top-up package for this eSIM destination.'
+          }}
+        </p>
       </div>
 
       <dl v-if="selectedPlan" class="topup-summary">

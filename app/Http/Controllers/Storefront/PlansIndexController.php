@@ -16,13 +16,37 @@ class PlansIndexController extends Controller
         'asia',
         'balkans',
         'caribbean',
+        'cenam',
         'central america',
+        'cis',
         'europe',
+        'europeplus',
+        'europeplusregional',
         'latin america',
+        'latam',
         'middle east',
         'north america',
         'oceania',
         'south america',
+    ];
+
+    private const REGIONAL_LABELS = [
+        'africa' => 'Africa',
+        'asia' => 'Asia',
+        'balkans' => 'Balkans',
+        'caribbean' => 'Caribbean',
+        'cenam' => 'CENAM',
+        'centralamerica' => 'Central America',
+        'cis' => 'CIS',
+        'europe' => 'Europe',
+        'europeplus' => 'Europe+',
+        'europeplusregional' => 'Europe+',
+        'latinamerica' => 'Latin America',
+        'latam' => 'LATAM',
+        'middleeast' => 'Middle East',
+        'northamerica' => 'North America',
+        'oceania' => 'Oceania',
+        'southamerica' => 'South America',
     ];
 
     public function __invoke(): Response
@@ -96,7 +120,10 @@ class PlansIndexController extends Controller
     private function isRegionalPlan(EsimPlan $plan): bool
     {
         return ! $this->isGlobalPlan($plan)
-            && $this->hasRegionalDestinationName($plan);
+            && (
+                $plan->coverage_type === 'regional'
+                || $this->hasRegionalDestinationName($plan)
+            );
     }
 
     private function isGlobalPlan(EsimPlan $plan): bool
@@ -123,7 +150,7 @@ class PlansIndexController extends Controller
             $normalizedName = $this->normalizedName($name);
 
             if ($this->isRegionalDestinationName($normalizedName)) {
-                return Str::title($normalizedName);
+                return self::REGIONAL_LABELS[$normalizedName] ?? Str::title($normalizedName);
             }
         }
 
@@ -148,7 +175,9 @@ class PlansIndexController extends Controller
 
     private function normalizedName(?string $name): string
     {
-        return trim(strtolower((string) $name));
+        $normalized = strtolower(trim((string) $name));
+
+        return preg_replace('/[^a-z]+/', '', $normalized) ?? '';
     }
 
     private function flagUrl(string $iso): string

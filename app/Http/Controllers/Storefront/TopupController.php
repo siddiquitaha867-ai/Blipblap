@@ -8,7 +8,9 @@ use App\Models\EsimOrder;
 use App\Models\EsimPlan;
 use App\Services\EsimGo\EsimGoClient;
 use App\Services\EsimGo\OrderProvisioningService;
+use App\Services\LoyaltyService;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
@@ -18,7 +20,7 @@ use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
 class TopupController extends Controller
 {
-    public function show(Request $request, CustomerEsim $esim): Response|RedirectResponse
+    public function show(Request $request, CustomerEsim $esim, EsimGoClient $client): Response|RedirectResponse
     {
         $this->authorizeOwnedEsim($request, $esim);
 
@@ -28,10 +30,13 @@ class TopupController extends Controller
                 ->with('status', 'This eSIM is not available for top-up.');
         }
 
+        $packages = $this->topupPackages($esim, $client);
+
         return Inertia::render('Storefront/Topup', [
             'esim' => $this->esimPayload($esim),
             'sourcePlan' => $this->planPayload($this->sourcePlan($esim)),
-            'packages' => $this->topupPackages($esim)->map(fn (EsimPlan $plan): array => $this->planPayload($plan))->values(),
+            'packages' => $packages->map(fn (EsimPlan $plan): array => $this->planPayload($plan))->values(),
+            'compatibilityChecked' => $this->canUseCompatibilityApi($client),
             'csrfToken' => csrf_token(),
         ]);
     }
@@ -159,7 +164,7 @@ class TopupController extends Controller
         return redirect()->away($checkoutUrl);
     }
 
-    public function success(Request $request, CustomerEsim $esim, OrderProvisioningService $provisioning): Response|RedirectResponse
+    public function success(Request $request, CustomerEsim $esim, OrderProvisioningService $provisioning, LoyaltyService $loyalty): Response|RedirectResponse
     {
         $this->authorizeOwnedEsim($request, $esim);
 
@@ -179,6 +184,7 @@ class TopupController extends Controller
             $topupError = 'We could not confirm this top-up payment session. Please check My eSIMs or contact support if payment was taken.';
         } else {
             $this->markStripeSessionPaid($order, $sessionId);
+            $loyalty->awardPurchasePoints($order->refresh());
             $plan = EsimPlan::query()->where('supplier_code', $order->bundle_code)->first();
 
             try {
@@ -201,6 +207,7 @@ class TopupController extends Controller
             'plan' => $this->planPayload($plan),
             'order' => $order?->refresh(),
             'topupError' => $topupError,
+            'loyalty' => $loyalty->summaryForUser($request->user()),
         ]);
     }
 
@@ -233,7 +240,7 @@ class TopupController extends Controller
         return null;
     }
 
-    private function topupPackages(CustomerEsim $esim)
+    private function topupPackages(CustomerEsim $esim, ?EsimGoClient $client = null)
     {
         $sourcePlan = $this->sourcePlan($esim);
 
@@ -251,7 +258,7 @@ class TopupController extends Controller
             $query->where('supplier_code', $esim->current_bundle_code ?: '');
         }
 
-        return $query
+        $packages = $query
             ->when(
                 (clone $query)->where('topup_supported', true)->exists(),
                 fn ($builder) => $builder->where('topup_supported', true),
@@ -259,6 +266,46 @@ class TopupController extends Controller
             ->orderBy('duration_days')
             ->orderBy('data_amount')
             ->get();
+
+        if (! $client || ! $this->canUseCompatibilityApi($client) || ! $esim->iccid || $packages->isEmpty()) {
+            return $packages;
+        }
+
+        $checkedCount = 0;
+        $fallbackRequired = false;
+
+        $compatible = $packages->filter(function (EsimPlan $plan) use ($client, $esim, &$checkedCount, &$fallbackRequired): bool {
+            try {
+                $client->compatibility((string) $esim->iccid, (string) $plan->supplier_code);
+                $checkedCount++;
+
+                return true;
+            } catch (RequestException $exception) {
+                $checkedCount++;
+                $status = $exception->response?->status();
+
+                if (! $status || $status >= 500) {
+                    $fallbackRequired = true;
+                }
+
+                return false;
+            } catch (\Throwable) {
+                $fallbackRequired = true;
+
+                return false;
+            }
+        })->values();
+
+        if ($checkedCount > 0 && ! $fallbackRequired) {
+            return $compatible;
+        }
+
+        return $packages;
+    }
+
+    private function canUseCompatibilityApi(EsimGoClient $client): bool
+    {
+        return filled(config('esim-go.api_key'));
     }
 
     private function esimPayload(CustomerEsim $esim): array

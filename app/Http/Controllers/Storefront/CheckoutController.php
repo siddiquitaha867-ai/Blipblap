@@ -8,6 +8,7 @@ use App\Models\EsimOrder;
 use App\Models\EsimPlan;
 use App\Models\PromotionRule;
 use App\Services\EsimGo\OrderProvisioningService;
+use App\Services\LoyaltyService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
@@ -224,7 +225,7 @@ class CheckoutController extends Controller
         return redirect()->away($checkoutUrl);
     }
 
-    public function success(Request $request, EsimPlan $plan, OrderProvisioningService $provisioning): Response|RedirectResponse
+    public function success(Request $request, EsimPlan $plan, OrderProvisioningService $provisioning, LoyaltyService $loyalty): Response|RedirectResponse
     {
         if ($request->user()?->is_admin) {
             return redirect()
@@ -241,6 +242,7 @@ class CheckoutController extends Controller
 
         if ($order) {
             $this->markStripeSessionPaid($order, $sessionId);
+            $loyalty->awardPurchasePoints($order->refresh());
 
             try {
                 $provisioning->provision($order->refresh(), $plan);
@@ -266,10 +268,11 @@ class CheckoutController extends Controller
             'order' => $order?->refresh(),
             'esim' => $customerEsim,
             'provisioningError' => $provisioningError,
+            'loyalty' => $request->user() ? $loyalty->summaryForUser($request->user()) : null,
         ]);
     }
 
-    public function webhook(Request $request, OrderProvisioningService $provisioning): HttpResponse
+    public function webhook(Request $request, OrderProvisioningService $provisioning, LoyaltyService $loyalty): HttpResponse
     {
         $payload = $request->getContent();
         $signature = (string) $request->header('Stripe-Signature', '');
@@ -301,6 +304,8 @@ class CheckoutController extends Controller
                         'paid_at' => now(),
                         'response_payload' => $session,
                     ]);
+
+                    $loyalty->awardPurchasePoints($order->refresh());
 
                     try {
                         $plan = EsimPlan::query()->where('supplier_code', $order->bundle_code)->first();

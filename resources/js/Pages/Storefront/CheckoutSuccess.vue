@@ -22,6 +22,10 @@ const props = defineProps({
     type: String,
     default: null,
   },
+  loyalty: {
+    type: Object,
+    default: null,
+  },
 });
 
 const copied = ref(false);
@@ -57,6 +61,7 @@ const hasDirectInstallLink = computed(() => Boolean(appleInstallUrl.value || and
 const canShowAppleInstall = computed(() => isAppleDevice && Boolean(appleInstallUrl.value));
 const canShowAndroidInstall = computed(() => isAndroidDevice && Boolean(androidInstallUrl.value));
 const canShowDirectInstall = computed(() => canShowAppleInstall.value || canShowAndroidInstall.value);
+const loyaltyBalance = computed(() => props.loyalty?.balance || null);
 
 const copyActivationCode = async () => {
   if (!activationCode.value || typeof navigator === 'undefined' || !navigator.clipboard) {
@@ -108,6 +113,20 @@ watchEffect(async () => {
 
     <div v-if="provisioningError" class="install-alert">
       {{ provisioningError }}
+    </div>
+
+    <div v-if="loyaltyBalance" class="stripe-test-box">
+      <span>Loyalty points</span>
+      <strong>+{{ props.loyalty.points_per_purchase }} points added for this purchase</strong>
+      <p>
+        Current balance: {{ loyaltyBalance.points_balance }} points.
+        <template v-if="loyaltyBalance.redeemable_rewards > 0">
+          {{ loyaltyBalance.redeemable_rewards }} reward{{ loyaltyBalance.redeemable_rewards > 1 ? 's are' : ' is' }} ready to redeem.
+        </template>
+        <template v-else>
+          {{ loyaltyBalance.points_to_next_redeem }} points left until redemption.
+        </template>
+      </p>
     </div>
 
     <div class="install-preview" :class="{ 'install-preview--ready': hasInstallDetails }">

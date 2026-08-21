@@ -7120,6 +7120,109 @@ button:disabled {
   padding: 14px 16px;
 }
 
+.my-account-loyalty {
+  display: grid;
+  gap: 18px;
+}
+
+.my-account-loyalty-band {
+  background: linear-gradient(135deg, #0e50ed, #3d8ef2);
+  border-radius: 18px;
+  color: white;
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding: 20px;
+}
+
+.my-account-loyalty-band div,
+.my-account-loyalty-stats article {
+  min-width: 0;
+}
+
+.my-account-loyalty-band strong,
+.my-account-loyalty-stats strong {
+  display: block;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.my-account-loyalty-band span,
+.my-account-loyalty-stats span {
+  color: inherit;
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.my-account-loyalty-stats {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.my-account-loyalty-stats article {
+  background: #f7fafc;
+  border: 1px solid #dde8f1;
+  border-radius: 16px;
+  padding: 18px;
+}
+
+.my-account-loyalty-stats article span {
+  color: var(--bb-muted);
+}
+
+.my-account-loyalty-stats article strong {
+  color: var(--bb-ink);
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.my-account-loyalty-note {
+  background: #eef6ff;
+  border: 1px solid #d8e7ff;
+  border-radius: 14px;
+  color: var(--bb-ink);
+  line-height: 1.6;
+  margin: 0;
+  padding: 14px 16px;
+}
+
+.my-account-loyalty-table-wrap {
+  overflow-x: auto;
+}
+
+.my-account-loyalty-table {
+  border-collapse: collapse;
+  min-width: 100%;
+  width: 100%;
+}
+
+.my-account-loyalty-table th,
+.my-account-loyalty-table td {
+  border-bottom: 1px solid #e4edf4;
+  font-size: 14px;
+  padding: 14px 12px;
+  text-align: left;
+  vertical-align: top;
+}
+
+.my-account-loyalty-table th {
+  color: var(--bb-muted);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.my-account-loyalty-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
 .my-account-actions {
   align-items: center;
   display: flex;
@@ -8277,6 +8380,11 @@ button:disabled {
     justify-content: stretch;
   }
 
+  .my-account-loyalty-band,
+  .my-account-loyalty-stats {
+    grid-template-columns: 1fr;
+  }
+
   .my-account-actions button {
     width: 100%;
   }
@@ -8712,6 +8820,12 @@ button:disabled {
 
   .my-account-grid {
     gap: 14px;
+  }
+
+  .my-account-loyalty-table th,
+  .my-account-loyalty-table td {
+    font-size: 13px;
+    padding: 12px 10px;
   }
 
   .my-account-grid input {

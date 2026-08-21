@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Storefront;
 
 use App\Http\Controllers\Controller;
+use App\Services\LoyaltyService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -10,7 +11,7 @@ use Inertia\Response;
 
 class AccountController extends Controller
 {
-    public function show(Request $request): Response
+    public function show(Request $request, LoyaltyService $loyalty): Response
     {
         $user = $request->user();
 
@@ -26,6 +27,7 @@ class AccountController extends Controller
                 'city' => $user->city,
                 'country' => $user->country,
             ],
+            'loyalty' => $loyalty->summaryForUser($user),
         ]);
     }
 

@@ -10,6 +10,10 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  loyalty: {
+    type: Object,
+    default: null,
+  },
 });
 
 const page = usePage();
@@ -29,6 +33,12 @@ const initials = computed(() => {
 
   return `${first}${last || ''}`.toUpperCase() || 'BB';
 });
+
+const loyaltyBalance = computed(() => props.loyalty?.balance || {});
+const loyaltyHistory = computed(() => props.loyalty?.history || []);
+const redeemReady = computed(() => Number(loyaltyBalance.value.redeemable_rewards || 0) > 0);
+const pointsLabel = (value) => `${Number(value || 0)} pts`;
+const orderTypeLabel = (type) => type === 'topup' ? 'Top-up' : 'New eSIM';
 
 const saveProfile = () => {
   form.patch('/my-account', {
@@ -108,6 +118,79 @@ const saveProfile = () => {
             <input v-model="form.city" type="text" autocomplete="address-level2" placeholder="Dubai">
             <small v-if="form.errors.city">{{ form.errors.city }}</small>
           </label>
+        </div>
+      </section>
+
+      <section class="my-account-section">
+        <div>
+          <span>Loyalty</span>
+          <h2>Points and rewards</h2>
+        </div>
+        <div class="my-account-loyalty">
+          <div class="my-account-loyalty-band">
+            <div>
+              <strong>{{ pointsLabel(loyaltyBalance.points_balance) }}</strong>
+              <span>Current balance</span>
+            </div>
+            <div>
+              <strong>{{ pointsLabel(loyalty?.points_per_purchase) }}</strong>
+              <span>Per purchase</span>
+            </div>
+            <div>
+              <strong>{{ pointsLabel(loyalty?.redeem_threshold) }}</strong>
+              <span>Redeem threshold</span>
+            </div>
+          </div>
+
+          <div class="my-account-loyalty-stats">
+            <article>
+              <span>Lifetime earned</span>
+              <strong>{{ pointsLabel(loyaltyBalance.lifetime_points_earned) }}</strong>
+            </article>
+            <article>
+              <span>Redeemed</span>
+              <strong>{{ pointsLabel(loyaltyBalance.lifetime_points_redeemed) }}</strong>
+            </article>
+            <article>
+              <span>Available rewards</span>
+              <strong>{{ loyaltyBalance.redeemable_rewards || 0 }}</strong>
+            </article>
+          </div>
+
+          <p class="my-account-loyalty-note">
+            <template v-if="redeemReady">
+              {{ pointsLabel(loyaltyBalance.redeemable_points) }} are ready to redeem.
+            </template>
+            <template v-else>
+              {{ pointsLabel(loyaltyBalance.points_to_next_redeem) }} left until your next redemption.
+            </template>
+          </p>
+
+          <div class="my-account-loyalty-table-wrap">
+            <table class="my-account-loyalty-table">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Activity</th>
+                  <th>Order</th>
+                  <th>Total</th>
+                  <th>Points</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-if="!loyaltyHistory.length">
+                  <td colspan="5">Points will appear here after the first paid purchase.</td>
+                </tr>
+                <tr v-for="event in loyaltyHistory" :key="event.id">
+                  <td>{{ event.created_at ? new Date(event.created_at).toLocaleDateString() : 'Pending' }}</td>
+                  <td>{{ event.event_type === 'purchase_award' ? orderTypeLabel(event.order_type) : event.event_type }}</td>
+                  <td>{{ event.order_reference || 'Not linked' }}</td>
+                  <td>{{ event.currency && event.total !== null ? `${event.currency} ${Number(event.total).toFixed(2)}` : '—' }}</td>
+                  <td>+{{ pointsLabel(event.points) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </section>
 
