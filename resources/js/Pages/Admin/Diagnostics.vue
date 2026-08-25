@@ -4,7 +4,11 @@ import { ref } from 'vue';
 
 defineOptions({ layout: AdminLayout });
 
-defineProps({
+const props = defineProps({
+  csrfToken: {
+    type: String,
+    required: true,
+  },
   app: {
     type: Object,
     required: true,
@@ -52,7 +56,7 @@ const csrfTokenFromCookie = () => document.cookie
   .join('=');
 
 const csrfToken = () => {
-  const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || csrfTokenFromCookie() || '';
+  const token = props.csrfToken || document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || csrfTokenFromCookie() || '';
 
   try {
     return decodeURIComponent(token);
@@ -70,7 +74,6 @@ const postDiagnosticAction = async (url) => {
       Accept: 'application/json',
       'Content-Type': 'application/json',
       'X-CSRF-TOKEN': token,
-      'X-XSRF-TOKEN': token,
       'X-Requested-With': 'XMLHttpRequest',
     },
     body: JSON.stringify({ _token: token }),

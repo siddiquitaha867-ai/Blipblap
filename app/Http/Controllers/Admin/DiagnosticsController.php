@@ -24,6 +24,7 @@ class DiagnosticsController extends Controller
         $apiKey = (string) config('esim-go.api_key', '');
 
         return Inertia::render('Admin/Diagnostics', [
+            'csrfToken' => csrf_token(),
             'app' => [
                 'name' => config('app.name'),
                 'environment' => config('app.env'),
