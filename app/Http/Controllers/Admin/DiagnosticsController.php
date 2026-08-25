@@ -245,7 +245,7 @@ class DiagnosticsController extends Controller
         ];
 
         $requiredColumns = [
-            'users' => ['id', 'name', 'email', 'password', 'is_admin', 'is_banned', 'email_verified_at', 'last_login_at', 'phone', 'country'],
+            'users' => ['id', 'name', 'email', 'password', 'is_admin', 'is_banned', 'email_verified_at', 'last_login_at', 'phone_number', 'country'],
             'esim_plans' => ['id', 'supplier_code', 'country_name', 'retail_price', 'currency', 'tax_amount', 'is_active'],
             'contact_requests' => ['id', 'name', 'email', 'topic', 'order_reference', 'status', 'message', 'metadata', 'resolved_at'],
         ];

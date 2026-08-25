@@ -44,16 +44,36 @@ const syncResult = ref(null);
 const testingApi = ref(false);
 const syncingCatalogue = ref(false);
 
-const csrfToken = () => document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+const csrfTokenFromCookie = () => document.cookie
+  .split('; ')
+  .find((row) => row.startsWith('XSRF-TOKEN='))
+  ?.split('=')
+  .slice(1)
+  .join('=');
+
+const csrfToken = () => {
+  const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || csrfTokenFromCookie() || '';
+
+  try {
+    return decodeURIComponent(token);
+  } catch {
+    return token;
+  }
+};
 
 const postDiagnosticAction = async (url) => {
+  const token = csrfToken();
   const response = await fetch(url, {
     method: 'POST',
+    credentials: 'same-origin',
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
-      'X-CSRF-TOKEN': csrfToken(),
+      'X-CSRF-TOKEN': token,
+      'X-XSRF-TOKEN': token,
+      'X-Requested-With': 'XMLHttpRequest',
     },
+    body: JSON.stringify({ _token: token }),
   });
   const data = await response.json().catch(() => ({}));
 
