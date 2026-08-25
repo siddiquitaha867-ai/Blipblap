@@ -1,7 +1,8 @@
 import '../css/app.css';
 
-import { createInertiaApp } from '@inertiajs/vue3';
+import { createInertiaApp, router } from '@inertiajs/vue3';
 import { createApp, h } from 'vue';
+import { initGoogleAnalytics } from './analytics/googleAnalytics';
 
 createInertiaApp({
   resolve: (name) => {
@@ -12,5 +13,10 @@ createInertiaApp({
     createApp({ render: () => h(App, props) })
       .use(plugin)
       .mount(el);
+
+    initGoogleAnalytics({
+      measurementId: props.initialPage.props.analytics?.googleAnalytics?.measurementId,
+      router,
+    });
   },
 });

@@ -38,6 +38,11 @@ class HandleInertiaRequests extends Middleware
             'flash' => [
                 'status' => fn () => $request->session()->get('status'),
             ],
+            'analytics' => [
+                'googleAnalytics' => [
+                    'measurementId' => config('services.google_analytics.measurement_id'),
+                ],
+            ],
         ];
     }
 }

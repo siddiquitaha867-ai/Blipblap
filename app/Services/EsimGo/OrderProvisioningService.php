@@ -153,7 +153,7 @@ class OrderProvisioningService
             ->where('iccid', $order->iccid)
             ->first();
 
-        if (! $esim || ! $esim->topup_supported) {
+        if (! $esim) {
             $order->update([
                 'status' => 'topup_failed',
                 'fulfillment_status' => 'topup_not_available',

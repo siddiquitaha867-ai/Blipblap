@@ -245,8 +245,7 @@ class TopupController extends Controller
         $sourcePlan = $this->sourcePlan($esim);
 
         $query = EsimPlan::query()
-            ->where('is_active', true)
-            ->where('topup_supported', true);
+            ->where('is_active', true);
 
         if ($sourcePlan?->country_name) {
             $query->where('country_name', $sourcePlan->country_name);
@@ -258,11 +257,11 @@ class TopupController extends Controller
             $query->where('supplier_code', $esim->current_bundle_code ?: '');
         }
 
+        if ((clone $query)->where('topup_supported', true)->exists()) {
+            $query->where('topup_supported', true);
+        }
+
         $packages = $query
-            ->when(
-                (clone $query)->where('topup_supported', true)->exists(),
-                fn ($builder) => $builder->where('topup_supported', true),
-            )
             ->orderBy('duration_days')
             ->orderBy('data_amount')
             ->get();

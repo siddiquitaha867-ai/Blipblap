@@ -15,7 +15,7 @@ use Inertia\Response;
 
 class MyEsimController extends Controller
 {
-    public function __invoke(Request $request, EsimGoClient $client, EsimUsageService $usageService): Response
+    public function __invoke(Request $request, EsimUsageService $usageService): Response
     {
         $esims = CustomerEsim::query()
             ->with('order')
@@ -38,8 +38,8 @@ class MyEsimController extends Controller
             ->keyBy('id');
 
         return Inertia::render('Storefront/MyEsims', [
-            'esims' => $esims->map(function (CustomerEsim $esim) use ($plans, $client, $usageService): array {
-                return $this->esimPayload($esim, $plans, $client, $usageService);
+            'esims' => $esims->map(function (CustomerEsim $esim) use ($plans, $usageService): array {
+                return $this->esimPayload($esim, $plans, $usageService);
             })->values(),
         ]);
     }
@@ -66,14 +66,14 @@ class MyEsimController extends Controller
         ]);
     }
 
-    private function esimPayload(CustomerEsim $esim, Collection $plans, EsimGoClient $client, EsimUsageService $usageService): array
+    private function esimPayload(CustomerEsim $esim, Collection $plans, EsimUsageService $usageService): array
     {
         $order = $esim->order;
         $plan = $this->planForEsim($esim, $plans);
-        $providerData = $usageService->providerEsimData($client, $esim);
-        $usage = $usageService->summary($providerData, $plan);
-        $install = $this->installLinks($providerData, $esim);
         $syncedEsim = $esim->refresh();
+        $providerData = is_array($syncedEsim->last_status) ? $syncedEsim->last_status : [];
+        $usage = $usageService->summary($providerData, $plan);
+        $install = $this->installLinks($providerData, $syncedEsim);
 
         return [
             'id' => $syncedEsim->id,

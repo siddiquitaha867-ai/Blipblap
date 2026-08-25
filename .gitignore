@@ -8,5 +8,7 @@
 /database/*.sqlite
 composer.phar
 composer-setup.php
+*.zip
+/output/
 npm-debug.log
 yarn-error.log
